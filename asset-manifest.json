@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/expenses-form/static/css/main.6dea0f05.chunk.css",
+    "main.js": "/expenses-form/static/js/main.38005a89.chunk.js",
+    "main.js.map": "/expenses-form/static/js/main.38005a89.chunk.js.map",
+    "runtime-main.js": "/expenses-form/static/js/runtime-main.46a3628c.js",
+    "runtime-main.js.map": "/expenses-form/static/js/runtime-main.46a3628c.js.map",
+    "static/css/2.fdb2bc1c.chunk.css": "/expenses-form/static/css/2.fdb2bc1c.chunk.css",
+    "static/js/2.acaf5325.chunk.js": "/expenses-form/static/js/2.acaf5325.chunk.js",
+    "static/js/2.acaf5325.chunk.js.map": "/expenses-form/static/js/2.acaf5325.chunk.js.map",
+    "static/js/3.6ea77736.chunk.js": "/expenses-form/static/js/3.6ea77736.chunk.js",
+    "static/js/3.6ea77736.chunk.js.map": "/expenses-form/static/js/3.6ea77736.chunk.js.map",
+    "index.html": "/expenses-form/index.html",
+    "service-worker.js": "/expenses-form/service-worker.js",
+    "service-worker.js.map": "/expenses-form/service-worker.js.map",
+    "static/css/2.fdb2bc1c.chunk.css.map": "/expenses-form/static/css/2.fdb2bc1c.chunk.css.map",
+    "static/css/main.6dea0f05.chunk.css.map": "/expenses-form/static/css/main.6dea0f05.chunk.css.map",
+    "static/js/2.acaf5325.chunk.js.LICENSE.txt": "/expenses-form/static/js/2.acaf5325.chunk.js.LICENSE.txt",
+    "static/media/semantic.min.css": "/expenses-form/static/media/outline-icons.ddae9b1b.woff"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.46a3628c.js",
+    "static/css/2.fdb2bc1c.chunk.css",
+    "static/js/2.acaf5325.chunk.js",
+    "static/css/main.6dea0f05.chunk.css",
+    "static/js/main.38005a89.chunk.js"
+  ]
+}
