@@ -13,6 +13,8 @@ services:
     environment:
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
       - REACT_APP_API_ADMIN_SECRET=${REACT_APP_API_ADMIN_SECRET}
+      - PUBLIC_GITHUB_REPOSITORY=${PUBLIC_GITHUB_REPOSITORY}
+      - PUBLIC_GITHUB_ACCOUNT_TOKEN=${PUBLIC_GITHUB_ACCOUNT_TOKEN}
     volumes:
       - ./webapp:/app
 
@@ -20,3 +22,6 @@ services:
       # mounted `./webapp/node_modules` directory, so the host's `node_modules` ownership
       # doesn't pass to the container's user
       - /app/node_modules
+
+      # Required by git to deploy to GitHub
+      - ./.ssh:/root/.ssh
