@@ -1,0 +1,24 @@
+version: "3.4"
+
+services:
+  expenses-webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: expenses-webapp
+    container_name: expenses-webapp
+    command: "npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
+      - REACT_APP_API_ADMIN_SECRET=${REACT_APP_API_ADMIN_SECRET}
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./tsconfig.json:/app/tsconfig.json
+
+      # create an empty directory at `/app/node_modules` instead of using the previously
+      # mounted `./webapp/node_modules` directory, so the host's `node_modules` ownership
+      # doesn't pass to the container's user
+      - /app/node_modules
