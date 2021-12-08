@@ -9,5 +9,6 @@ shell-webapp:
 	docker-compose run --rm expenses-webapp bash
 
 deploy-webapp-from-local:
-	npm run deploy_from_local
+	cd ./webapp \
+		&& npm run deploy_from_local
 	@# TODO: docker-compose run --rm expenses-webapp npm run deploy_from_local
