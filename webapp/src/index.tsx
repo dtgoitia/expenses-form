@@ -3,6 +3,7 @@ import { API_BASE_URL } from "./constants";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import { GlobalStyle } from "./style/globalStyle";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -16,6 +17,7 @@ const client = new ApolloClient({
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
+      <GlobalStyle />
       <App />
     </ApolloProvider>
   </React.StrictMode>,
