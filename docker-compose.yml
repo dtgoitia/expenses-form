@@ -20,3 +20,12 @@ services:
       # mounted `./webapp/node_modules` directory, so the host's `node_modules` ownership
       # doesn't pass to the container's user
       - /app/node_modules
+
+  qr:
+    build:
+      context: ./qr
+      dockerfile: Dockerfile
+    image: qr
+    container_name: qr
+    volumes:
+      - ./qr:/app
