@@ -31,6 +31,58 @@ const DEFAULT_CONTEXT = {
 //   }
 // `;
 
+const DEFAULT_DATA = {
+  accounts: [
+    {
+      id: 1,
+      name: "monzo",
+    },
+    {
+      id: 2,
+      name: "revolut business",
+    },
+    {
+      id: 3,
+      name: "amex",
+    },
+    {
+      id: 4,
+      name: "evo",
+    },
+    {
+      id: 5,
+      name: "evo bizum",
+    },
+    {
+      id: 6,
+      name: "revolut personal GBP",
+    },
+    {
+      id: 7,
+      name: "revolut personal EUR",
+    },
+    {
+      id: 8,
+      name: "cash EUR",
+    },
+    {
+      id: 9,
+      name: "cash GBP",
+    },
+  ],
+  currencies: [
+    {
+      code: "GBP",
+    },
+    {
+      code: "EUR",
+    },
+    {
+      code: "USD",
+    },
+  ],
+};
+
 const QUERY_GET_PREDEFINED_DATA = gql`
   query GetAllAccounts {
     accounts {
@@ -92,7 +144,7 @@ enum FieldName {
 }
 
 function App() {
-  const [paidWith, setPaidWith] = useState<AccountName>("monzo");
+  const [paidWith, setPaidWith] = useState<AccountName>("revolut business");
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>("GBP");
@@ -103,7 +155,7 @@ function App() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [rawResponse, setRawResponse] = useState<any>();
 
-  const [loadPrefedinedData, { loading, error, data }] =
+  const [loadPrefedinedData, { loading, error, data: fetchedData }] =
     useLazyQuery<PredefinedData>(QUERY_GET_PREDEFINED_DATA, {
       context: DEFAULT_CONTEXT,
     });
@@ -113,6 +165,7 @@ function App() {
   });
 
   useEffect(() => {
+    console.debug(`Loading accounts and currencies from server`);
     loadPrefedinedData();
   }, [loadPrefedinedData]);
 
@@ -125,7 +178,9 @@ function App() {
     );
   }
 
-  const formAccounts = data?.accounts
+  let data = fetchedData ? fetchedData : DEFAULT_DATA;
+
+  const formAccounts = data.accounts
     .map((account) => account.name)
     .map((name) => ({
       key: name,
@@ -133,7 +188,7 @@ function App() {
       text: name,
     })) as unknown as DropdownItemProps[];
 
-  const formCurrencies = data?.currencies
+  const formCurrencies = data.currencies
     .map((currency) => currency.code)
     .map((name) => ({
       key: name,
@@ -185,7 +240,7 @@ function App() {
   }
 
   function handleSubmit() {
-    const accountIndex = (data as PredefinedData).accounts.filter(
+    const accountIndex = (fetchedData as PredefinedData).accounts.filter(
       (account) => account.name === paidWith
     )[0].id;
 
@@ -209,7 +264,12 @@ function App() {
 
   return (
     <div>
-      <Form loading={loading} onSubmit={handleSubmit}>
+      <div>
+        {loading
+          ? "Loading accounts and currencies from server..."
+          : "Accounts and currencies loaded from server"}
+      </div>
+      <Form onSubmit={handleSubmit}>
         <SemanticDatepicker onChange={handleDateChange} value={date} />
 
         <Form.Dropdown
