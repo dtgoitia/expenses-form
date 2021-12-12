@@ -1,3 +1,4 @@
+import Description from "./Description";
 import { API_ADMIN_SECRET } from "./constants";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
@@ -11,6 +12,7 @@ import {
   Form,
   InputOnChangeData,
 } from "semantic-ui-react";
+import styled from "styled-components";
 
 const DEFAULT_CONTEXT = {
   headers: { "x-hasura-admin-secret": API_ADMIN_SECRET },
@@ -138,10 +140,13 @@ enum FieldName {
   paidWith = "paidWith",
   amount = "amount",
   currency = "currency",
-  description = "description",
   pending = "pending",
   shared = "shared",
 }
+
+const CenteredPage = styled.div`
+  margin: 0 0.5rem;
+`;
 
 function App() {
   const [paidWith, setPaidWith] = useState<AccountName>("revolut business");
@@ -225,9 +230,6 @@ function App() {
       case FieldName.amount:
         setAmount(Number(value));
         break;
-      case FieldName.description:
-        setDescription(value);
-        break;
       case FieldName.pending:
         setPending(value === "true");
         break;
@@ -240,7 +242,7 @@ function App() {
   }
 
   function handleSubmit() {
-    const accountIndex = (fetchedData as PredefinedData).accounts.filter(
+    const accountIndex = (data as PredefinedData).accounts.filter(
       (account) => account.name === paidWith
     )[0].id;
 
@@ -263,7 +265,7 @@ function App() {
   }
 
   return (
-    <div>
+    <CenteredPage>
       <div>
         {loading
           ? "Loading accounts and currencies from server..."
@@ -297,12 +299,7 @@ function App() {
           />
         </Form.Group>
 
-        <Form.Input
-          name={FieldName.description}
-          placeholder="Foo with @JohnDoe,@JaneDoe at @BigCorp"
-          value={description}
-          onChange={handleChange}
-        />
+        <Description onChange={setDescription} />
 
         <Form.Group inline>
           <Form.Input
@@ -329,13 +326,21 @@ function App() {
       </Form>
       <pre>
         {JSON.stringify(
-          { paidWith, amount, currency, shared, pending, date },
+          {
+            paidWith,
+            amount,
+            currency,
+            shared,
+            pending,
+            date,
+            description,
+          },
           null,
           2
         )}
       </pre>
       {rawResponse ? <pre>{JSON.stringify(rawResponse, null, 2)}</pre> : null}
-    </div>
+    </CenteredPage>
   );
 }
 

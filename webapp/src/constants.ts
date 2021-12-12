@@ -1,5 +1,28 @@
 import LoadEnvVar from "./environment";
 
+export const TAGS = [
+  "2112bio",
+  "2112granada",
+  "groceries",
+  "eatout",
+  "social",
+  "ocio",
+  "drinks",
+  "invite",
+  "transport",
+];
+
+export const DEFAULT_PEOPLE = ["AngelaPerez"];
+export const SELLERS = [
+  "Amazon",
+  "AWS",
+  "GiffGaff",
+  "Lidl",
+  "Morrisons",
+  "Sainsbury",
+  "Tesco",
+  "TfL",
+];
 export const API_BASE_URL = LoadEnvVar.asUrl("REACT_APP_API_BASE_URL");
 export const API_ADMIN_SECRET = LoadEnvVar.asUrl("REACT_APP_API_ADMIN_SECRET");
 

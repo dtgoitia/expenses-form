@@ -19,6 +19,6 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   html {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 `;
