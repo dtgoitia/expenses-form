@@ -10,6 +10,7 @@ import {
   DropdownItemProps,
   DropdownProps,
   Form,
+  Icon,
   InputOnChangeData,
 } from "semantic-ui-react";
 import styled from "styled-components";
@@ -148,9 +149,19 @@ const CenteredPage = styled.div`
   margin: 0 0.5rem;
 `;
 
+const DateSlot = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+`;
+
+const ReloadDate = styled.div`
+  margin-bottom: 1rem;
+`;
+
 function App() {
   const [paidWith, setPaidWith] = useState<AccountName>("revolut business");
-  const [date, setDate] = useState<Date>(new Date());
+  const now = new Date(new Date().setMilliseconds(0));
+  const [date, setDate] = useState<Date>(now);
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>("GBP");
   const [description, setDescription] = useState<string | undefined>();
@@ -264,6 +275,11 @@ function App() {
     });
   }
 
+  function refreshDate(e: SyntheticEvent) {
+    e.preventDefault();
+    setDate(now);
+  }
+
   return (
     <CenteredPage>
       <div>
@@ -272,7 +288,19 @@ function App() {
           : "Accounts and currencies loaded from server"}
       </div>
       <Form onSubmit={handleSubmit}>
-        <SemanticDatepicker onChange={handleDateChange} value={date} />
+        <DateSlot>
+          <SemanticDatepicker
+            onChange={handleDateChange}
+            value={date}
+            datePickerOnly={true}
+          />
+          <ReloadDate onClick={refreshDate}>
+            <Button onClick={refreshDate}>
+              <Icon name="refresh"></Icon>
+              now
+            </Button>
+          </ReloadDate>
+        </DateSlot>
 
         <Form.Dropdown
           label="Paid with"
