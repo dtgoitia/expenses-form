@@ -25,6 +25,9 @@ rebuild-webapp:
 test-dev-webapp:
 	docker-compose run --rm $(WEBAPP_NAME) npm test
 
+run-full-stack:
+	 bash scripts/run_webapp_with_local_backend.sh
+
 shell-webapp:
 	docker-compose run --rm $(WEBAPP_NAME) bash
 

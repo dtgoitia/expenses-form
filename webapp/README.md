@@ -36,6 +36,16 @@ Uncaught ReferenceError: process is not defined
 
 Issue details [here][3]
 
+## Using Hasura locally
+
+To spin up the backend and the DB locally, run:
+
+```shell
+make run_hasura_locally
+```
+
+TODO: auto-apply migration on server start
+
 <!-- External references -->
 
 [1]: https://mswjs.io/docs/getting-started/integrate/browser#setup "Mock Service Worker - Setup"
