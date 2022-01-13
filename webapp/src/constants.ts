@@ -1,8 +1,6 @@
 import LoadEnvVar from "./environment";
 
 export const TAGS = [
-  "2112bio",
-  "2112granada",
   "groceries",
   "eatout",
   "social",
@@ -10,6 +8,8 @@ export const TAGS = [
   "drinks",
   "invite",
   "transport",
+  "health",
+  "present",
 ];
 
 export const DEFAULT_PEOPLE = ["AngelaPerez"];
