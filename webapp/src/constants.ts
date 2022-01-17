@@ -3,34 +3,18 @@ import LoadEnvVar from "./environment";
 export const PREDEFINED_OPTIONS_DATA = [
   {
     name: "Sainsbury's",
-    description: "Groceries at @Sainsburys #groceries",
-  },
-  {
-    name: "Morrisons's",
-    description: "Groceries at @Morrinsons #groceries",
-  },
-  {
-    name: "Lidl",
-    description: "Groceries at @Lidl #groceries",
-  },
-  {
-    name: "Tesco",
-    description: "Groceries at @Tesco #groceries",
-  },
-  {
-    name: "Sainsbury's @AngelaPerez",
     description: "Groceries with @AngelaPerez at @Sainsburys #groceries",
   },
   {
-    name: "Morrisons's @AngelaPerez",
+    name: "Morrisons's",
     description: "Groceries with @AngelaPerez at @Morrinsons #groceries",
   },
   {
-    name: "Lidl @AngelaPerez",
+    name: "Lidl",
     description: "Groceries with @AngelaPerez at @Lidl #groceries",
   },
   {
-    name: "Tesco @AngelaPerez",
+    name: "Tesco",
     description: "Groceries with @AngelaPerez at @Tesco #groceries",
   },
 ];
