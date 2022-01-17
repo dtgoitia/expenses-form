@@ -282,6 +282,13 @@ function App() {
     setDate(now);
   }
 
+  function refreshPage() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Location/reload
+    // `.reload(true)` is supported in Firefox and Chrome, but it's not standard
+    // @ts-ignore
+    window.location.reload(true);
+  }
+
   return (
     <CenteredPage>
       <div>
@@ -289,6 +296,10 @@ function App() {
           ? "Loading accounts and currencies from server..."
           : "Accounts and currencies loaded from server"}
       </div>
+      <Button onClick={refreshPage}>
+        <Icon name="refresh"></Icon>
+        reload PWA
+      </Button>
       <Form onSubmit={handleSubmit}>
         <DateSlot>
           <SemanticDatepicker
@@ -349,6 +360,7 @@ function App() {
             checked={pending}
             onChange={handleChange}
           />
+
           <Button type="submit" loading={submitting}>
             Add expense
           </Button>
