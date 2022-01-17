@@ -15,6 +15,8 @@ import {
 } from "semantic-ui-react";
 import styled from "styled-components";
 
+const DEFAULT_PAYMENT_METHOD = "amex";
+
 const DEFAULT_CONTEXT = {
   headers: { "x-hasura-admin-secret": API_ADMIN_SECRET },
 };
@@ -159,7 +161,7 @@ const ReloadDate = styled.div`
 `;
 
 function App() {
-  const [paidWith, setPaidWith] = useState<AccountName>("revolut business");
+  const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
   const now = new Date(new Date().setMilliseconds(0));
   const [date, setDate] = useState<Date>(now);
   const [amount, setAmount] = useState<number>();
