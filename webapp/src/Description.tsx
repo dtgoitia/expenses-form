@@ -132,6 +132,10 @@ function Description({ onChange }: DescriptionProps) {
   }
 
   useEffect(() => {
+    if (main === undefined && seller === undefined) {
+      return;
+    }
+
     const fullDescription = buildDescription({
       main,
       people,

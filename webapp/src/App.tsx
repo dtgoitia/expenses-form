@@ -1,5 +1,6 @@
 import Description from "./Description";
-import { API_ADMIN_SECRET } from "./constants";
+import PredefinedOptions from "./PredefinedButtons";
+import { API_ADMIN_SECRET, PREDEFINED_OPTIONS_DATA } from "./constants";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -300,6 +301,10 @@ function App() {
         <Icon name="refresh"></Icon>
         reload PWA
       </Button>
+      <PredefinedOptions
+        data={PREDEFINED_OPTIONS_DATA}
+        select={(description: string) => setDescription(description)}
+      />
       <Form onSubmit={handleSubmit}>
         <DateSlot>
           <SemanticDatepicker
