@@ -1,4 +1,5 @@
 import Description from "./Description";
+import ExpensesQueue from "./ExpenseQueue";
 import PredefinedOptions from "./PredefinedButtons";
 import { API_ADMIN_SECRET, PREDEFINED_OPTIONS_DATA } from "./constants";
 import { useLazyQuery, useMutation } from "@apollo/client";
@@ -101,6 +102,18 @@ const QUERY_GET_PREDEFINED_DATA = gql`
   }
 `;
 
+const QUERY_GET_SUBMITTED_EXPENSES = gql`
+  query GetExpenses {
+    expenses {
+      id
+      amount
+      currency
+      description
+      datetime
+    }
+  }
+`;
+
 const MUTATION_ADD_EXPENSE = gql`
   mutation AddExpense(
     $paid_with: Int
@@ -139,6 +152,18 @@ interface PredefinedData {
   }[];
 }
 
+interface SubmittedExpense {
+  __typename: string;
+  id: string;
+  amount: number;
+  currency: string;
+  description: string;
+  datetime: string;
+}
+interface SubmittedExpenses {
+  expenses: SubmittedExpense[];
+}
+
 enum FieldName {
   date = "date",
   paidWith = "paidWith",
@@ -170,29 +195,51 @@ function App() {
   const [description, setDescription] = useState<string | undefined>();
   const [pending, setPending] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
+  const [queue, setQueue] = useState<any[]>([]);
+  const [submittedQueue, setSubmittedQueue] = useState<SubmittedExpense[]>([]);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [rawResponse, setRawResponse] = useState<any>();
 
-  const [loadPrefedinedData, { loading, error, data: fetchedData }] =
-    useLazyQuery<PredefinedData>(QUERY_GET_PREDEFINED_DATA, {
+  const [
+    loadPrefedinedData,
+    {
+      loading: loadingPredefinedData,
+      error: errorLoadingPredefinedData,
+      data: fetchedData,
+    },
+  ] = useLazyQuery<PredefinedData>(QUERY_GET_PREDEFINED_DATA, {
+    context: DEFAULT_CONTEXT,
+  });
+
+  const [loadSubmittedExpenses, _] = useLazyQuery<SubmittedExpenses>(
+    QUERY_GET_SUBMITTED_EXPENSES,
+    {
       context: DEFAULT_CONTEXT,
-    });
+    }
+  );
 
   const [runMutation] = useMutation(MUTATION_ADD_EXPENSE, {
     context: DEFAULT_CONTEXT,
   });
 
   useEffect(() => {
+    console.debug(`Loading submitted expenses from server`);
+    loadSubmittedExpenses().then((result) => {
+      const rawExpenses = result.data?.expenses;
+      if (!rawExpenses) return;
+
+      setSubmittedQueue(rawExpenses);
+    });
     console.debug(`Loading accounts and currencies from server`);
     loadPrefedinedData();
-  }, [loadPrefedinedData]);
+  }, [loadPrefedinedData, loadSubmittedExpenses]);
 
-  if (error) {
+  if (errorLoadingPredefinedData) {
     return (
       <div>
         <h3>ERROR</h3>
-        <pre>{JSON.stringify(error, null, 2)}</pre>
+        <pre>{JSON.stringify(errorLoadingPredefinedData, null, 2)}</pre>
       </div>
     );
   }
@@ -293,7 +340,7 @@ function App() {
   return (
     <CenteredPage>
       <div>
-        {loading
+        {loadingPredefinedData
           ? "Loading accounts and currencies from server..."
           : "Accounts and currencies loaded from server"}
       </div>
@@ -371,6 +418,9 @@ function App() {
           </Button>
         </Form.Group>
       </Form>
+
+      <ExpensesQueue queue={queue} submitted={submittedQueue} />
+
       <pre>
         {JSON.stringify(
           {
