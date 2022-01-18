@@ -304,27 +304,42 @@ function App() {
     }
   }
 
+  function addToQueue(item: any) {
+    const updatedQueue = [...queue, item];
+    setQueue(updatedQueue);
+  }
+
   function handleSubmit() {
     const accountIndex = (data as PredefinedData).accounts.filter(
       (account) => account.name === paidWith
     )[0].id;
 
+    const formattedDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    const formattedTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    const formattedDatetime = `${formattedDate}  ${formattedTime}`;
+
     setSubmitting(true);
-    runMutation({
-      variables: {
-        paid_with: accountIndex,
-        datetime: date,
-        amount,
-        currency,
-        description: description ? description : "",
-        shared,
-        pending,
-      },
-    }).then((response) => {
-      setSubmitting(false);
-      console.dir(response);
-      setRawResponse(response);
+    addToQueue({
+      submitted: false,
+      description: `${formattedDatetime}   ${description}`,
+      data: { todo: 1234 },
     });
+
+    // runMutation({
+    //   variables: {
+    //     paid_with: accountIndex,
+    //     datetime: date,
+    //     amount,
+    //     currency,
+    //     description: description ? description : "",
+    //     shared,
+    //     pending,
+    //   },
+    // }).then((response) => {
+    //   setSubmitting(false);
+    //   console.dir(response);
+    //   setRawResponse(response);
+    // });
   }
 
   function refreshDate(e: SyntheticEvent) {

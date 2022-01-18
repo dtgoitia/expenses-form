@@ -1,0 +1,14 @@
+- [ ] Show queued transactions
+  - most urgent for trip
+
+- [ ] Remove API token from code, and move it to localstore
+  - First copy paste, you will support QR later
+- [ ] Remove hardcoded `DEFAULT_PEOPLE` and move to config
+- [ ] Add button to clear form
+
+- [ ] Support automatically generating entry in Splitwise
+- [ ] Autogenerate GraphQL types
+- [ ] Support autocompletion for seller as well
+  - most of the time you buy in Lidl, Morrisons, etc.
+  - not required for trip
+- [ ] Support loading config via QR (phone scans QR)
