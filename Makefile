@@ -1,3 +1,11 @@
+install-dev-tools:
+	pre-commit install  # pre-commit is (default)
+	pre-commit install --hook-type pre-push
+
+uninstall-dev-tools:
+	pre-commit uninstall  # pre-commit is (default)
+	pre-commit uninstall --hook-type pre-push
+
 run-webapp:
 	scripts/print_local_ip_via_qr.sh
 	docker-compose up expenses-webapp

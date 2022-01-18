@@ -1,9 +1,12 @@
+default_stages: [commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:
       - id: trailing-whitespace
+        stages: [commit]
       - id: end-of-file-fixer
+        stages: [commit]
 
   # HTML, CSS, TypeScript, Markdown
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -21,3 +24,13 @@ repos:
         name: prettier (TypeScript)
         types: [file]
         files: \.(ts|tsx)$
+
+  - repo: local
+    hooks:
+      - id: build-webapp
+        name: Build webapp before pushing to master
+        entry: scripts/build_webapp_only_in_master.sh
+        verbose: true
+        language: system
+        stages: [push]
+        pass_filenames: false
