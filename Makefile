@@ -1,6 +1,5 @@
 run-webapp:
-	scripts/get_local_ip.py | xargs -i \
-		docker-compose run --rm qr python generate.py '{}'
+	scripts/print_local_ip_via_qr.sh
 	docker-compose up expenses-webapp
 
 # Recreate web app docker image
