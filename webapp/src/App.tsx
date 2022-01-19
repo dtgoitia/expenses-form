@@ -195,7 +195,7 @@ function App() {
   const [description, setDescription] = useState<string | undefined>();
   const [pending, setPending] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const [queue, setQueue] = useState<any[]>([]);
   const [submittedQueue, setSubmittedQueue] = useState<SubmittedExpense[]>([]);
 
@@ -213,6 +213,7 @@ function App() {
     context: DEFAULT_CONTEXT,
   });
 
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
   const [loadSubmittedExpenses, _] = useLazyQuery<SubmittedExpenses>(
     QUERY_GET_SUBMITTED_EXPENSES,
     {
