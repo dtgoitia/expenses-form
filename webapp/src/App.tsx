@@ -195,6 +195,7 @@ function App() {
   const [description, setDescription] = useState<string | undefined>();
   const [pending, setPending] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const [queue, setQueue] = useState<any[]>([]);
   const [submittedQueue, setSubmittedQueue] = useState<SubmittedExpense[]>([]);
 
