@@ -58,7 +58,7 @@ interface SubmittedExpensesProps {
   amount: number;
   currency: string;
   description: string;
-  datetime: string;
+  datetime: string; // "2022-01-17T08:19:26+00:00"
 }
 function SubmittedExpense({
   datetime,
@@ -82,11 +82,27 @@ function SubmittedExpense({
   );
 }
 
+function sortExpensesByDate(
+  a: SubmittedExpensesProps,
+  b: SubmittedExpensesProps
+): number {
+  const date_a = new Date(a.datetime);
+  const date_b = new Date(b.datetime);
+
+  if (date_a < date_b) {
+    return -1;
+  }
+
+  return 1;
+}
+
 interface ExpenseQueueProps {
   queue: QueuedExpenseProps[];
   submitted: SubmittedExpensesProps[];
 }
 function ExpensesQueue({ queue, submitted }: ExpenseQueueProps) {
+  const sortedSubmitted = submitted.concat().sort(sortExpensesByDate);
+
   return (
     <div>
       {queue.map((item) => (
@@ -99,7 +115,7 @@ function ExpensesQueue({ queue, submitted }: ExpenseQueueProps) {
           }}
         />
       ))}
-      {submitted.map((item) => (
+      {sortedSubmitted.map((item) => (
         <SubmittedExpense
           datetime={item.datetime}
           amount={item.amount}
