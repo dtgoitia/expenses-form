@@ -1,3 +1,5 @@
+WEBAPP_NAME:=expenses-webapp
+
 install-dev-tools:
 	pre-commit install  # pre-commit is (default)
 	pre-commit install --hook-type pre-push
@@ -8,19 +10,19 @@ uninstall-dev-tools:
 
 run-webapp:
 	scripts/print_local_ip_via_qr.sh
-	docker-compose up expenses-webapp
+	docker-compose up $(WEBAPP_NAME)
 
 # Recreate web app docker image
 rebuild-webapp:
-	docker-compose build expenses-webapp
+	docker-compose build $(WEBAPP_NAME)
 
 shell-webapp:
-	docker-compose run --rm expenses-webapp bash
+	docker-compose run --rm $(WEBAPP_NAME) bash
 
 deploy-webapp-from-local:
 	cd ./webapp \
 		&& npm run deploy_from_local
-	@# TODO: docker-compose run --rm expenses-webapp npm run deploy_from_local
+	@# TODO: docker-compose run --rm $(WEBAPP_NAME) npm run deploy_from_local
 
 build-webapp:
 	scripts/build_webapp.sh
