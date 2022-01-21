@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-echo "Changing directory to 'webapp' directory..."
-cd webapp
+webapp_dir="webapp"
+echo "Changing directory to '${webapp_dir}' directory..."
+cd $webapp_dir || exit 1
 
 echo "Kicking off CI-like webapp build..."
 CI="true" npm run build
