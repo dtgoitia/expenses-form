@@ -16,6 +16,9 @@ run-webapp:
 rebuild-webapp:
 	docker-compose build $(WEBAPP_NAME)
 
+test-dev-webapp:
+	docker-compose run --rm $(WEBAPP_NAME) npm test
+
 shell-webapp:
 	docker-compose run --rm $(WEBAPP_NAME) bash
 
@@ -26,3 +29,6 @@ deploy-webapp-from-local:
 
 build-webapp:
 	scripts/build_webapp.sh
+
+set-up-development-environment: install-dev-tools rebuild-webapp
+	cd webapp; npm ci
