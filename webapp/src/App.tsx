@@ -7,9 +7,7 @@ import {
   PAYMENT_ACCOUNTS,
 } from "./constants";
 import { AccountName, CurrencyCode } from "./domain";
-import hasura from "./queries/hasuraContext";
-import { useMutation } from "@apollo/client";
-import gql from "graphql-tag";
+import useAddExpense from "./queries/useAddExpense.hook";
 import React, { SyntheticEvent, useState } from "react";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
 import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
@@ -22,30 +20,6 @@ import {
   InputOnChangeData,
 } from "semantic-ui-react";
 import styled from "styled-components";
-
-const MUTATION_ADD_EXPENSE = gql`
-  mutation AddExpense(
-    $paid_with: Int
-    $description: String
-    $currency: currencies_enum
-    $datetime: timestamptz
-    $amount: numeric
-  ) {
-    insert_expenses(
-      objects: {
-        amount: $amount
-        currency: $currency
-        description: $description
-        datetime: $datetime
-        paid_with: $paid_with
-      }
-    ) {
-      returning {
-        id
-      }
-    }
-  }
-`;
 
 enum FieldName {
   date = "date",
@@ -71,6 +45,10 @@ const ReloadDate = styled.div`
 
 function App() {
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
+  const accountIndex = PAYMENT_ACCOUNTS.filter(
+    (account) => account.name === paidWith
+  )[0].id;
+
   const now = new Date(new Date().setMilliseconds(0));
   const [date, setDate] = useState<Date>(now);
   const [amount, setAmount] = useState<number>();
@@ -82,8 +60,14 @@ function App() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [rawResponse, setRawResponse] = useState<any>();
 
-  const [runMutation] = useMutation(MUTATION_ADD_EXPENSE, {
-    context: hasura,
+  let runMutation = useAddExpense({
+    paidWith: accountIndex,
+    datetime: date,
+    amount: amount as number,
+    currency,
+    description: description as string,
+    shared,
+    pending,
   });
 
   const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.name).map(
@@ -149,25 +133,24 @@ function App() {
   }
 
   function handleSubmit() {
-    const accountIndex = PAYMENT_ACCOUNTS.filter(
-      (account) => account.name === paidWith
-    )[0].id;
+    if (!amount) {
+      // TODO: pipe errors to an error pannel
+      console.error("Amount is required");
+      return;
+    }
 
     setSubmitting(true);
-    runMutation({
-      variables: {
-        paid_with: accountIndex,
-        datetime: date,
-        amount,
-        currency,
-        description: description ? description : "",
-        shared,
-        pending,
-      },
-    }).then((response) => {
+    runMutation().then((response) => {
       setSubmitting(false);
+      if (response.errors) {
+        // TODO: pipe errors to an error pannel
+        console.error(response.errors);
+        setRawResponse(response);
+        return;
+      }
+
       console.dir(response);
-      setRawResponse(response);
+      setRawResponse(response.data);
     });
   }
 
