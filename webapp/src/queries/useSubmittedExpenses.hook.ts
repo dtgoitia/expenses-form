@@ -41,8 +41,6 @@ export default function useSubmittedExpenses(): Return {
     }
   );
 
-  console.dir({ loading, error, data });
-
   if (loading || error || data === undefined) {
     return { loading, error, data: [] };
   }
