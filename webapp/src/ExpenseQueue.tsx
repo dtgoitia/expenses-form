@@ -89,8 +89,7 @@ const Container = styled.div`
   gap: 0.8rem;
 `;
 const LoaderText = styled.span`
-    font-size: 0.8rem;
-  }
+  font-size: 0.8rem;
 `;
 
 function List() {
