@@ -280,6 +280,15 @@ function App() {
     setDate(data.value as unknown as Date);
   }
 
+  function handleAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+    if (value === undefined || value === null || value === "") {
+      setAmount(undefined);
+      return;
+    }
+
+    setAmount(Number(value));
+  }
+
   function handleChange(_: any, { name, value }: InputOnChangeData): void {
     console.debug(`handleChange(name=${name}, value=${value})`);
     if (value === undefined) {
@@ -289,9 +298,6 @@ function App() {
     switch (name) {
       case FieldName.paidWith:
         setPaidWith(value);
-        break;
-      case FieldName.amount:
-        setAmount(Number(value));
         break;
       case FieldName.pending:
         setPending(value === "true");
@@ -384,7 +390,7 @@ function App() {
             placeholder="Amount"
             name={FieldName.amount}
             value={amount}
-            onChange={handleChange}
+            onChange={handleAmountChange}
           />
           <Form.Dropdown
             name={FieldName.currency}
