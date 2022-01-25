@@ -1,11 +1,18 @@
 import Description from "./Description";
 import ExpenseQueue from "./ExpenseQueue";
 import PredefinedOptions from "./PredefinedButtons";
-import { PREDEFINED_OPTIONS_DATA } from "./constants";
+import {
+  CURRENCIES,
+  DEFAULT_CURRENCY,
+  DEFAULT_PAYMENT_METHOD,
+  PAYMENT_ACCOUNTS,
+  PREDEFINED_OPTIONS_DATA,
+} from "./constants";
+import { AccountName, CurrencyCode } from "./domain";
 import hasura from "./queries/hasuraContext";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useState } from "react";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
 import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
 import {
@@ -17,72 +24,6 @@ import {
   InputOnChangeData,
 } from "semantic-ui-react";
 import styled from "styled-components";
-
-const DEFAULT_PAYMENT_METHOD = "amex";
-
-const DEFAULT_DATA = {
-  accounts: [
-    {
-      id: 1,
-      name: "monzo",
-    },
-    {
-      id: 2,
-      name: "revolut business",
-    },
-    {
-      id: 3,
-      name: "amex",
-    },
-    {
-      id: 4,
-      name: "evo",
-    },
-    {
-      id: 5,
-      name: "evo bizum",
-    },
-    {
-      id: 6,
-      name: "revolut personal GBP",
-    },
-    {
-      id: 7,
-      name: "revolut personal EUR",
-    },
-    {
-      id: 8,
-      name: "cash EUR",
-    },
-    {
-      id: 9,
-      name: "cash GBP",
-    },
-  ],
-  currencies: [
-    {
-      code: "GBP",
-    },
-    {
-      code: "EUR",
-    },
-    {
-      code: "USD",
-    },
-  ],
-};
-
-const QUERY_GET_PREDEFINED_DATA = gql`
-  query GetAllAccounts {
-    accounts {
-      id
-      name
-    }
-    currencies {
-      code
-    }
-  }
-`;
 
 const MUTATION_ADD_EXPENSE = gql`
   mutation AddExpense(
@@ -107,20 +48,6 @@ const MUTATION_ADD_EXPENSE = gql`
     }
   }
 `;
-
-type AccountName = string;
-type CurrencyCode = string;
-
-interface PredefinedData {
-  accounts: {
-    __typename: string;
-    id: string;
-    name: AccountName;
-  }[];
-  currencies: {
-    code: CurrencyCode;
-  }[];
-}
 
 enum FieldName {
   date = "date",
@@ -149,7 +76,7 @@ function App() {
   const now = new Date(new Date().setMilliseconds(0));
   const [date, setDate] = useState<Date>(now);
   const [amount, setAmount] = useState<number>();
-  const [currency, setCurrency] = useState<CurrencyCode>("GBP");
+  const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [description, setDescription] = useState<string | undefined>();
   const [pending, setPending] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
@@ -157,52 +84,25 @@ function App() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [rawResponse, setRawResponse] = useState<any>();
 
-  const [
-    loadPrefedinedData,
-    {
-      loading: loadingPredefinedData,
-      error: errorLoadingPredefinedData,
-      data: fetchedData,
-    },
-  ] = useLazyQuery<PredefinedData>(QUERY_GET_PREDEFINED_DATA, {
-    context: hasura,
-  });
-
   const [runMutation] = useMutation(MUTATION_ADD_EXPENSE, {
     context: hasura,
   });
 
-  useEffect(() => {
-    console.debug(`Loading accounts and currencies from server`);
-    loadPrefedinedData();
-  }, [loadPrefedinedData]);
-
-  if (errorLoadingPredefinedData) {
-    return (
-      <div>
-        <h3>ERROR</h3>
-        <pre>{JSON.stringify(errorLoadingPredefinedData, null, 2)}</pre>
-      </div>
-    );
-  }
-
-  let data = fetchedData ? fetchedData : DEFAULT_DATA;
-
-  const formAccounts = data.accounts
-    .map((account) => account.name)
-    .map((name) => ({
+  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.name).map(
+    (name) => ({
       key: name,
       value: name,
       text: name,
-    })) as unknown as DropdownItemProps[];
+    })
+  ) as unknown as DropdownItemProps[];
 
-  const formCurrencies = data.currencies
-    .map((currency) => currency.code)
-    .map((name) => ({
+  const formCurrencies = CURRENCIES.map((currency) => currency.code).map(
+    (name) => ({
       key: name,
       value: name,
       text: name,
-    })) as unknown as DropdownItemProps[];
+    })
+  ) as unknown as DropdownItemProps[];
 
   function handleAccountChange(_: SyntheticEvent, data: DropdownProps): void {
     setPaidWith(data.value as string);
@@ -251,7 +151,7 @@ function App() {
   }
 
   function handleSubmit() {
-    const accountIndex = (data as PredefinedData).accounts.filter(
+    const accountIndex = PAYMENT_ACCOUNTS.filter(
       (account) => account.name === paidWith
     )[0].id;
 
@@ -287,11 +187,6 @@ function App() {
 
   return (
     <CenteredPage>
-      <div>
-        {loadingPredefinedData
-          ? "Loading accounts and currencies from server..."
-          : "Accounts and currencies loaded from server"}
-      </div>
       <Button onClick={refreshPage}>
         <Icon name="refresh"></Icon>
         reload PWA

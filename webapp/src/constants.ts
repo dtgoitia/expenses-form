@@ -1,3 +1,4 @@
+import { Account, AccountName, Currency, CurrencyCode } from "./domain";
 import LoadEnvVar from "./environment";
 
 export const PREDEFINED_OPTIONS_DATA = [
@@ -20,6 +21,61 @@ export const PREDEFINED_OPTIONS_DATA = [
   {
     name: "TfL",
     description: "Transport at @TfL #transport",
+  },
+];
+
+export const DEFAULT_PAYMENT_METHOD: AccountName = "amex";
+
+export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
+
+export const PAYMENT_ACCOUNTS: Account[] = [
+  {
+    id: 1,
+    name: "monzo",
+  },
+  {
+    id: 2,
+    name: "revolut business",
+  },
+  {
+    id: 3,
+    name: "amex",
+  },
+  {
+    id: 4,
+    name: "evo",
+  },
+  {
+    id: 5,
+    name: "evo bizum",
+  },
+  {
+    id: 6,
+    name: "revolut personal GBP",
+  },
+  {
+    id: 7,
+    name: "revolut personal EUR",
+  },
+  {
+    id: 8,
+    name: "cash EUR",
+  },
+  {
+    id: 9,
+    name: "cash GBP",
+  },
+];
+
+export const CURRENCIES: Currency[] = [
+  {
+    code: "GBP",
+  },
+  {
+    code: "EUR",
+  },
+  {
+    code: "USD",
   },
 ];
 
