@@ -1,6 +1,6 @@
 import { Expense } from "./domain";
 import useSubmittedExpenses from "./queries/useSubmittedExpenses.hook";
-import { Icon } from "semantic-ui-react";
+import { Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
 
 const DeleteActionSlot = styled.div`
@@ -82,6 +82,17 @@ function sortExpensesByDate(a: Expense, b: Expense): number {
   return 1;
 }
 
+const Container = styled.div`
+  display: flex;
+  flex: row nowrap;
+  justify-content: center;
+  gap: 0.8rem;
+`;
+const LoaderText = styled.span`
+    font-size: 0.8rem;
+  }
+`;
+
 function List() {
   /**
    * KNOWN PERFORMANCE ISSUE
@@ -99,7 +110,12 @@ function List() {
   const { loading, error, data: expenses } = useSubmittedExpenses();
 
   if (loading) {
-    return <div>Loading submitted expenses from server...</div>;
+    return (
+      <Container>
+        <Loader active inline size="mini" />
+        <LoaderText>Loading submitted expenses from server... </LoaderText>
+      </Container>
+    );
   }
 
   if (error) {
@@ -115,8 +131,8 @@ function List() {
 
   return (
     <div>
-      {sortedByDate.map((expense) => (
-        <ListItem expense={expense} />
+      {sortedByDate.map((expense, i) => (
+        <ListItem key={`queued-expense-${i}`} expense={expense} />
       ))}
     </div>
   );
