@@ -1,20 +1,14 @@
+import { Expense } from "./domain";
+import useSubmittedExpenses from "./queries/useSubmittedExpenses.hook";
 import { Icon } from "semantic-ui-react";
 import styled from "styled-components";
 
-// interface ExpenseData {
-//   amount: number;
-//   currency: Currency;
-//   description: string;
-//   datetime: ISOString;
-//   paid_with: Account;
-// }
-
-const DeleteSlot = styled.div`
+const DeleteActionSlot = styled.div`
   order: 1;
   flex-grow: 0;
   flex-shrink: 1;
 `;
-const SubmittedSlot = styled.div`
+const SubmittedStatusSlot = styled.div`
   order: 2;
   flex-grow: 0;
   flex-shrink: 1;
@@ -24,34 +18,10 @@ const DescriptionSlot = styled.div`
   flex-grow: 1;
   flex-shrink: 1;
 `;
-const StyledQueuedExpense = styled.div`
+const StyledListItem = styled.div`
   display: flex;
   flex-flow: row nowrap;
 `;
-
-interface QueuedExpenseProps {
-  submitted: boolean;
-  description: string;
-  data: any;
-  onDelete: () => void;
-}
-function ExpenseInQueue({ submitted, description, data }: QueuedExpenseProps) {
-  const iconName = submitted ? "check" : "spinner";
-  return (
-    <StyledQueuedExpense>
-      <DeleteSlot></DeleteSlot>
-      <SubmittedSlot>
-        <Icon loading name={iconName} />
-      </SubmittedSlot>
-      <DescriptionSlot>
-        <b>
-          {data.amount} {data.currency}
-        </b>{" "}
-        {description}
-      </DescriptionSlot>
-    </StyledQueuedExpense>
-  );
-}
 
 const MONTH_INDEX_TO_NAME: { [x: number]: string } = {
   1: "Jan",
@@ -80,40 +50,28 @@ function formatDate(isoDatetime: string): string {
   return `${formattedMonth}-${formattedDay}`;
 }
 
-interface SubmittedExpensesProps {
-  id?: string;
-  amount: number;
-  currency: string;
-  description: string;
-  datetime: string; // "2022-01-17T08:19:26+00:00"
+interface ListItemProps {
+  expense: Expense;
 }
-function SubmittedExpense({
-  datetime,
-  amount,
-  currency,
-  description,
-}: SubmittedExpensesProps) {
+function ListItem({ expense }: ListItemProps) {
   return (
-    <StyledQueuedExpense>
-      <DeleteSlot></DeleteSlot>
-      <SubmittedSlot>
+    <StyledListItem>
+      <DeleteActionSlot></DeleteActionSlot>
+      <SubmittedStatusSlot>
         <Icon name="check" />
-      </SubmittedSlot>
+      </SubmittedStatusSlot>
       <DescriptionSlot>
-        {formatDate(datetime)}{" "}
+        {formatDate(expense.datetime)}{" "}
         <b>
-          {amount} {currency}
+          {expense.amount} {expense.currency}
         </b>{" "}
-        {description}
+        {expense.description}
       </DescriptionSlot>
-    </StyledQueuedExpense>
+    </StyledListItem>
   );
 }
 
-function sortExpensesByDate(
-  a: SubmittedExpensesProps,
-  b: SubmittedExpensesProps
-): number {
+function sortExpensesByDate(a: Expense, b: Expense): number {
   const date_a = new Date(a.datetime);
   const date_b = new Date(b.datetime);
 
@@ -124,35 +82,46 @@ function sortExpensesByDate(
   return 1;
 }
 
-interface ExpenseQueueProps {
-  queue: QueuedExpenseProps[];
-  submitted: SubmittedExpensesProps[];
-}
-function ExpensesQueue({ queue, submitted }: ExpenseQueueProps) {
-  const sortedSubmitted = submitted.concat().sort(sortExpensesByDate);
+function List() {
+  /**
+   * KNOWN PERFORMANCE ISSUE
+   * This component is re-rendered each time the parent component renders. In other
+   * words, if the user types a character, this component rerenders.
+   *
+   * Luckily, Apollo is clever enough and doesn't retrigger the HTTP request, but I'm
+   * unsure about the caching policy used by Apollo.
+   *
+   * This performance issue will be ignored for the time being, as it makes the code
+   * more readable. The alternative is to lift up the state to the parent component.
+   * This way, the data passed as props to this component would not change and this
+   * component would not be re-rendered each time the parent component does.
+   */
+  const { loading, error, data: expenses } = useSubmittedExpenses();
+
+  if (loading) {
+    return <div>Loading submitted expenses from server...</div>;
+  }
+
+  if (error) {
+    return (
+      <div>
+        <h3>ERROR</h3>
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+      </div>
+    );
+  }
+
+  const sortedByDate = expenses.concat().sort(sortExpensesByDate);
 
   return (
     <div>
-      {queue.map((item) => (
-        <ExpenseInQueue
-          submitted={item.submitted}
-          description={item.description}
-          data={item.data}
-          onDelete={() => {
-            alert("Deleting");
-          }}
-        />
-      ))}
-      {sortedSubmitted.map((item) => (
-        <SubmittedExpense
-          datetime={item.datetime}
-          amount={item.amount}
-          currency={item.currency}
-          description={item.description}
-        />
+      {sortedByDate.map((expense) => (
+        <ListItem expense={expense} />
       ))}
     </div>
   );
 }
 
-export default ExpensesQueue;
+const ExpenseQueue = List;
+
+export default ExpenseQueue;

@@ -1,7 +1,8 @@
 import Description from "./Description";
-import ExpensesQueue from "./ExpenseQueue";
+import ExpenseQueue from "./ExpenseQueue";
 import PredefinedOptions from "./PredefinedButtons";
-import { API_ADMIN_SECRET, PREDEFINED_OPTIONS_DATA } from "./constants";
+import { PREDEFINED_OPTIONS_DATA } from "./constants";
+import hasura from "./queries/hasuraContext";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -18,25 +19,6 @@ import {
 import styled from "styled-components";
 
 const DEFAULT_PAYMENT_METHOD = "amex";
-
-const DEFAULT_CONTEXT = {
-  headers: { "x-hasura-admin-secret": API_ADMIN_SECRET },
-};
-
-// const QUERY_GET_EXPENSES = gql`
-//   query GetExpenses {
-//     expenses {
-//       amount
-//       currency
-//       datetime
-//       description
-//       id
-//       account {
-//         ledger_name
-//       }
-//     }
-//   }
-// `;
 
 const DEFAULT_DATA = {
   accounts: [
@@ -102,18 +84,6 @@ const QUERY_GET_PREDEFINED_DATA = gql`
   }
 `;
 
-const QUERY_GET_SUBMITTED_EXPENSES = gql`
-  query GetExpenses {
-    expenses {
-      id
-      amount
-      currency
-      description
-      datetime
-    }
-  }
-`;
-
 const MUTATION_ADD_EXPENSE = gql`
   mutation AddExpense(
     $paid_with: Int
@@ -152,18 +122,6 @@ interface PredefinedData {
   }[];
 }
 
-interface SubmittedExpense {
-  __typename: string;
-  id: string;
-  amount: number;
-  currency: string;
-  description: string;
-  datetime: string;
-}
-interface SubmittedExpenses {
-  expenses: SubmittedExpense[];
-}
-
 enum FieldName {
   date = "date",
   paidWith = "paidWith",
@@ -195,9 +153,6 @@ function App() {
   const [description, setDescription] = useState<string | undefined>();
   const [pending, setPending] = useState<boolean>(false);
   const [shared, setShared] = useState<boolean>(false);
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [queue, setQueue] = useState<any[]>([]);
-  const [submittedQueue, setSubmittedQueue] = useState<SubmittedExpense[]>([]);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [rawResponse, setRawResponse] = useState<any>();
@@ -210,32 +165,17 @@ function App() {
       data: fetchedData,
     },
   ] = useLazyQuery<PredefinedData>(QUERY_GET_PREDEFINED_DATA, {
-    context: DEFAULT_CONTEXT,
+    context: hasura,
   });
 
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [loadSubmittedExpenses, _] = useLazyQuery<SubmittedExpenses>(
-    QUERY_GET_SUBMITTED_EXPENSES,
-    {
-      context: DEFAULT_CONTEXT,
-    }
-  );
-
   const [runMutation] = useMutation(MUTATION_ADD_EXPENSE, {
-    context: DEFAULT_CONTEXT,
+    context: hasura,
   });
 
   useEffect(() => {
-    console.debug(`Loading submitted expenses from server`);
-    loadSubmittedExpenses().then((result) => {
-      const rawExpenses = result.data?.expenses;
-      if (!rawExpenses) return;
-
-      setSubmittedQueue(rawExpenses);
-    });
     console.debug(`Loading accounts and currencies from server`);
     loadPrefedinedData();
-  }, [loadPrefedinedData, loadSubmittedExpenses]);
+  }, [loadPrefedinedData]);
 
   if (errorLoadingPredefinedData) {
     return (
@@ -427,7 +367,7 @@ function App() {
         </Form.Group>
       </Form>
 
-      <ExpensesQueue queue={queue} submitted={submittedQueue} />
+      <ExpenseQueue />
 
       <pre>
         {JSON.stringify(
