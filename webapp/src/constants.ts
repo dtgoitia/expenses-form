@@ -1,26 +1,52 @@
-import { Account, AccountName, Currency, CurrencyCode } from "./domain";
+import {
+  Account,
+  AccountName,
+  Currency,
+  CurrencyCode,
+  Shortcut,
+} from "./domain";
 import LoadEnvVar from "./environment";
 
-export const PREDEFINED_OPTIONS_DATA = [
+export const SHORTCUTS: Shortcut[] = [
   {
-    name: "Sainsbury's",
-    description: "Groceries with @AngelaPerez at @Sainsburys #groceries",
+    id: 1,
+    buttonName: "Sainsbury's",
+    main: "Groceries",
+    people: ["AngelaPerez"],
+    seller: "Sainsburys",
+    tags: ["groceries"],
   },
   {
-    name: "Morrisons's",
-    description: "Groceries with @AngelaPerez at @Morrinsons #groceries",
+    id: 2,
+    buttonName: "Morrisons's",
+    main: "Groceries",
+    people: ["AngelaPerez"],
+    seller: "Morrisons",
+    tags: ["groceries"],
   },
   {
-    name: "Lidl",
-    description: "Groceries with @AngelaPerez at @Lidl #groceries",
+    id: 3,
+    buttonName: "Lidl",
+    main: "Groceries",
+    people: ["AngelaPerez"],
+    seller: "Lidl",
+    tags: ["groceries"],
   },
   {
-    name: "Tesco",
-    description: "Groceries with @AngelaPerez at @Tesco #groceries",
+    id: 4,
+    buttonName: "Tesco",
+    main: "Groceries",
+    people: ["AngelaPerez"],
+    seller: "Tesco",
+    tags: ["groceries"],
   },
   {
-    name: "TfL",
-    description: "Transport at @TfL #transport",
+    id: 5,
+    buttonName: "TfL",
+    main: "Transport",
+    people: [],
+    seller: "TfL",
+    tags: ["transport"],
   },
 ];
 

@@ -1,5 +1,7 @@
-import StyledTagSelector, { Tag, TagName } from "./TagSelector";
-import { DEFAULT_PEOPLE, TAGS } from "./constants";
+import Shortcuts from "../../PredefinedButtons";
+import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
+import { Person, Seller, ShortcutId, TagName } from "../../domain";
+import TagSelector, { SelectableTag } from "./TagSelector";
 import { useEffect, useState } from "react";
 import { DropdownProps, Form, InputOnChangeData } from "semantic-ui-react";
 import styled from "styled-components";
@@ -13,9 +15,6 @@ enum DescriptionSubfield {
   people = "people",
   seller = "seller",
 }
-
-type Seller = string;
-type Person = string;
 
 interface buildDescriptionArgs {
   main: string | undefined;
@@ -53,7 +52,10 @@ function buildDescription({
   return chunks.join(" ");
 }
 
-const defaultTags: Tag[] = TAGS.map((name) => ({ name: name, picked: false }));
+const defaultTags: SelectableTag[] = TAGS.map((name) => ({
+  name,
+  selected: false,
+}));
 
 const Grid = styled.div`
   display: grid;
@@ -87,9 +89,11 @@ function Description({ onChange }: DescriptionProps) {
   const [main, setMain] = useState<string | undefined>();
   const [seller, setSeller] = useState<Seller | undefined>();
   const [people, setPeople] = useState<Person[]>([]);
-  const [tags, setTags] = useState<Tag[]>(defaultTags);
-  const selectedTags: TagName[] = tags
-    .filter((tag) => tag.picked === true)
+  const [selectableTags, setSelectableTags] =
+    useState<SelectableTag[]>(defaultTags);
+
+  const selectedTags: TagName[] = selectableTags
+    .filter((tag) => tag.selected === true)
     .map((tag) => tag.name);
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);
@@ -146,8 +150,28 @@ function Description({ onChange }: DescriptionProps) {
     onChange(fullDescription);
   }, [onChange, main, seller, people, selectedTags]);
 
+  function handleShortcutSelection(id: ShortcutId) {
+    const shortcut = SHORTCUTS.filter((shortcut) => shortcut.id === id)[0];
+
+    setMain(shortcut.main);
+    setSeller(shortcut.seller);
+    setPeople(shortcut.people);
+
+    // Change tag desired selection
+    const mustSelect = new Set(shortcut.tags);
+    const rightSelection = selectableTags.map(({ name }) => ({
+      name,
+      selected: mustSelect.has(name),
+    }));
+    setSelectableTags(rightSelection);
+  }
+
   return (
     <Container>
+      <Shortcuts
+        data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
+        select={handleShortcutSelection}
+      />
       <Grid>
         <MainInput
           name={DescriptionSubfield.main}
@@ -174,11 +198,12 @@ function Description({ onChange }: DescriptionProps) {
             text: person,
             value: person,
           }))}
+          value={people}
           onChange={handlePeopleChange}
           allowAdditions
         />
       </Grid>
-      <StyledTagSelector tags={tags} onChange={setTags} />
+      <TagSelector tags={selectableTags} onChange={setSelectableTags} />
     </Container>
   );
 }

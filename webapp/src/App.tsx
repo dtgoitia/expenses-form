@@ -1,12 +1,10 @@
-import Description from "./Description";
 import ExpenseQueue from "./ExpenseQueue";
-import PredefinedOptions from "./PredefinedButtons";
+import Description from "./components/Description";
 import {
   CURRENCIES,
   DEFAULT_CURRENCY,
   DEFAULT_PAYMENT_METHOD,
   PAYMENT_ACCOUNTS,
-  PREDEFINED_OPTIONS_DATA,
 } from "./constants";
 import { AccountName, CurrencyCode } from "./domain";
 import hasura from "./queries/hasuraContext";
@@ -191,10 +189,6 @@ function App() {
         <Icon name="refresh"></Icon>
         reload PWA
       </Button>
-      <PredefinedOptions
-        data={PREDEFINED_OPTIONS_DATA}
-        select={(description: string) => setDescription(description)}
-      />
       <Form onSubmit={handleSubmit}>
         <DateSlot>
           <SemanticDatepicker

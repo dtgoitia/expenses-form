@@ -1,21 +1,22 @@
+import { TagName } from "../../domain";
 import { SyntheticEvent } from "react";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface TagProps {
   name: string;
-  picked: boolean;
+  selected: boolean;
   onClick: () => void;
 }
 
-function TagComponent({ name, picked, onClick }: TagProps) {
+function TagComponent({ name, selected, onClick }: TagProps) {
   const customOnClick = (e: SyntheticEvent) => {
     e.preventDefault();
     onClick();
   };
 
   return (
-    <Button size="mini" primary={picked} onClick={customOnClick}>
+    <Button size="mini" primary={selected} onClick={customOnClick}>
       {name}
     </Button>
   );
@@ -31,44 +32,40 @@ const StyledTagContainer = styled.div`
   column-gap: 0.5rem;
 `;
 
-export type TagName = string;
-export interface Tag {
+export interface SelectableTag {
   name: TagName;
-  picked: boolean;
+  selected: boolean;
 }
+
 interface TagSelectorProps {
-  tags: Tag[];
-  onChange: (tags: Tag[]) => void;
+  tags: SelectableTag[];
+  onChange: (tags: SelectableTag[]) => void;
 }
 
 function TagSelector({ tags, onChange }: TagSelectorProps) {
-  const switchTagPickState = (name: TagName) => {
-    const updatedPickedTags = tags.map((tag: Tag) => {
-      if (tag.name === name) {
-        const updatedTag: Tag = { ...tag, picked: !tag.picked };
-        return updatedTag;
-      }
+  function toggleTag(name: TagName) {
+    const updatedTags = tags.map((tag) => {
+      if (tag.name !== name) return tag;
 
-      return tag;
+      const toggledTag: SelectableTag = { ...tag, selected: !tag.selected };
+      return toggledTag;
     });
 
-    onChange(updatedPickedTags);
-  };
+    onChange(updatedTags);
+  }
 
   return (
     <StyledTagContainer>
-      {tags.map((tag: Tag, i: number) => (
+      {tags.map((tag, i) => (
         <TagComponent
           key={`${tag.name}-${i}`}
           name={tag.name}
-          picked={tag.picked}
-          onClick={() => switchTagPickState(tag.name)}
-        ></TagComponent>
+          selected={tag.selected}
+          onClick={() => toggleTag(tag.name)}
+        />
       ))}
     </StyledTagContainer>
   );
 }
 
-const StyledTagSelector = styled(TagSelector)``;
-
-export default StyledTagSelector;
+export default TagSelector;

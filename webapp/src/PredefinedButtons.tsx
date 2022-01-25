@@ -1,14 +1,16 @@
+import { ShortcutId } from "./domain";
+import { SyntheticEvent } from "react";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface ButtonData {
-  name: string;
-  description: string;
+  id: ShortcutId;
+  buttonName: string;
 }
 
-interface PredefinedOptionsProps {
+interface ShortcutsProps {
   data: ButtonData[];
-  select: (buttonName: string) => void;
+  select: (id: ShortcutId) => void;
 }
 
 const Container = styled.div`
@@ -20,19 +22,24 @@ const Container = styled.div`
   row-gap: 0.5rem;
 `;
 
-function PredefinedOptions({ data, select }: PredefinedOptionsProps) {
+function Shortcuts({ data, select }: ShortcutsProps) {
+  function handleClick(e: SyntheticEvent, id: ShortcutId) {
+    e.preventDefault();
+    select(id);
+  }
+
   return (
     <Container>
-      {data.map((button, i) => (
+      {data.map((shortcut, i) => (
         <Button
-          key={`stacked-button-${i}`}
-          onClick={() => select(button.description)}
+          key={`shortcut-${i}`}
+          onClick={(e) => handleClick(e, shortcut.id)}
         >
-          {button.name}
+          {shortcut.buttonName}
         </Button>
       ))}
     </Container>
   );
 }
 
-export default PredefinedOptions;
+export default Shortcuts;
