@@ -219,6 +219,7 @@ function App() {
             placeholder="Amount"
             name={FieldName.amount}
             value={amount}
+            step="any"
             onChange={handleAmountChange}
           />
           <Form.Dropdown
