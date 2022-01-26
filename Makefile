@@ -12,6 +12,11 @@ run-webapp:
 	scripts/print_local_ip_via_qr.sh
 	docker-compose up $(WEBAPP_NAME)
 
+run-webapp-mock-apis:
+	scripts/print_local_ip_via_qr.sh
+	REACT_APP_MOCK_APIS=true \
+		docker-compose up $(WEBAPP_NAME)
+
 # Recreate web app docker image
 rebuild-webapp:
 	docker-compose build $(WEBAPP_NAME)

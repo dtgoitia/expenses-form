@@ -1,5 +1,5 @@
 import App from "./App";
-import { API_BASE_URL } from "./constants";
+import { API_BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
@@ -9,7 +9,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.min.css";
 
-if (process.env.NODE_ENV === "development") {
+if (DEVELOPMENT_MODE && MOCK_APIS) {
   const { worker } = require("./mocks/browser");
   worker.start();
 }

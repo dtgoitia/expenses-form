@@ -32,10 +32,10 @@ export const handlers = [
           },
           {
             id: 178,
-            amount: 6.16,
+            amount: 100,
             currency: "GBP",
-            description: "Groceries with @AngelaPerez at @Lidl #groceries",
-            datetime: "2022-01-25T14:33:33+00:00",
+            description: "Fooooo",
+            datetime: "2022-07-25T14:33:33+00:00",
             __typename: "expenses",
           },
         ],

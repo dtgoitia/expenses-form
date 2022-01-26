@@ -30,7 +30,7 @@ function readEnvironmentVariable(name: string): string {
       [
         `Environment variable ${name} must be set.`,
         `For more details, check ${REACT_CUSTOM_ENVVAR_DOCS}`,
-      ].join(" "),
+      ].join(" ")
     );
   }
 
@@ -42,6 +42,19 @@ class LoadEnvVar {
     const value = readEnvironmentVariable(name);
     const withoutTrailingSlash = value.replace(/\/$/, "");
     return withoutTrailingSlash;
+  }
+
+  public static asBoolean(name: string, fallback = false): boolean {
+    let raw;
+    try {
+      raw = readEnvironmentVariable(name);
+    } catch (error) {
+      console.error(error);
+      return fallback;
+    }
+
+    const value = raw.toLowerCase() === "true";
+    return value;
   }
 }
 

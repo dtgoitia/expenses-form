@@ -7,6 +7,7 @@
 const ENV_VAR_WHITELIST = new Set([
   "REACT_APP_API_BASE_URL",
   "REACT_APP_API_ADMIN_SECRET",
+  "REACT_APP_MOCK_APIS",
 ]);
 
 exports.default = ENV_VAR_WHITELIST;

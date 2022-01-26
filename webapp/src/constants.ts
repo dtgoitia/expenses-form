@@ -130,6 +130,8 @@ export const SELLERS = [
 ];
 export const API_BASE_URL = LoadEnvVar.asUrl("REACT_APP_API_BASE_URL");
 export const API_ADMIN_SECRET = LoadEnvVar.asUrl("REACT_APP_API_ADMIN_SECRET");
+export const MOCK_APIS = LoadEnvVar.asBoolean("REACT_APP_MOCK_APIS", false);
+export const DEVELOPMENT_MODE = process.env.NODE_ENV === "development";
 
 export enum ApiEndpoints {
   OAUTH_TOKEN = "/auth/token/",
