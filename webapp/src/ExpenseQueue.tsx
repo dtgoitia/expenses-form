@@ -55,7 +55,7 @@ interface ListItemProps {
 }
 function ListItem({ expense }: ListItemProps) {
   return (
-    <StyledListItem>
+    <StyledListItem data-testid={`expense-${expense.id}`}>
       <DeleteActionSlot></DeleteActionSlot>
       <SubmittedStatusSlot>
         <Icon name="check" />
@@ -110,7 +110,7 @@ function List() {
 
   if (loading) {
     return (
-      <Container>
+      <Container data-testid="loading-expenses">
         <Loader active inline size="mini" />
         <LoaderText>Loading submitted expenses from server... </LoaderText>
       </Container>
@@ -129,9 +129,9 @@ function List() {
   const sortedByDate = expenses.concat().sort(sortExpensesByDate);
 
   return (
-    <div>
+    <div data-testid="expenses">
       {sortedByDate.map((expense, i) => (
-        <ListItem key={`queued-expense-${i}`} expense={expense} />
+        <ListItem key={`expense-${i}`} expense={expense} />
       ))}
     </div>
   );
