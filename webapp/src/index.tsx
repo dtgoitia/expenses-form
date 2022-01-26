@@ -9,6 +9,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.min.css";
 
+if (process.env.NODE_ENV === "development") {
+  const { worker } = require("./mocks/browser");
+  worker.start();
+}
+
 const client = new ApolloClient({
   uri: `${API_BASE_URL}/graphql`,
   cache: new InMemoryCache(),

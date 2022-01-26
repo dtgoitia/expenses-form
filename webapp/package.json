@@ -38,7 +38,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run build:main && npm run build:post",
+    "build:main": "react-scripts build",
+    "build:post": "rm ./build/mockServiceWorker.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "clear_build": "rm -rf ./build/",
