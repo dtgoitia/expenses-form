@@ -42,6 +42,7 @@ jobs:
         env:
           REACT_APP_API_BASE_URL: ${{ secrets.API_BASE_URL }}
           REACT_APP_API_ADMIN_SECRET: ${{ secrets.API_ADMIN_SECRET }}
+          REACT_APP_MOCK_APIS: ${{ secrets.MOCK_APIS }}
 
       - name: Remove source files
         run: rm -rf build/static/js/*.map

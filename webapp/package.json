@@ -38,7 +38,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run build:main && npm run build:post",
+    "build": "npm run build:pre && npm run build:main && npm run build:post",
+    "build:pre": "node ./scripts/failIfEnvVarsMissing.js",
     "build:main": "react-scripts build",
     "build:post": "rm ./build/mockServiceWorker.js",
     "test": "react-scripts test",

@@ -44,15 +44,8 @@ class LoadEnvVar {
     return withoutTrailingSlash;
   }
 
-  public static asBoolean(name: string, fallback = false): boolean {
-    let raw;
-    try {
-      raw = readEnvironmentVariable(name);
-    } catch (error) {
-      console.error(error);
-      return fallback;
-    }
-
+  public static asBoolean(name: string): boolean {
+    const raw = readEnvironmentVariable(name);
     const value = raw.toLowerCase() === "true";
     return value;
   }
