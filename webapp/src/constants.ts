@@ -107,6 +107,7 @@ export const CURRENCIES: Currency[] = [
 
 export const TAGS = [
   "2201lanzarote",
+  "expenses",
   "groceries",
   "eatout",
   "social",
