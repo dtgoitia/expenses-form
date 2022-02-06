@@ -50,7 +50,7 @@ export const SHORTCUTS: Shortcut[] = [
   },
 ];
 
-export const DEFAULT_PAYMENT_METHOD: AccountName = "revolut business";
+export const DEFAULT_PAYMENT_METHOD: AccountName = "amex";
 
 export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
 
@@ -106,7 +106,6 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export const TAGS = [
-  "2201lanzarote",
   "expenses",
   "groceries",
   "eatout",
