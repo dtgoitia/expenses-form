@@ -32,6 +32,7 @@ deploy-webapp-from-local:
 		&& npm run deploy_from_local
 	@# TODO: docker-compose run --rm $(WEBAPP_NAME) npm run deploy_from_local
 
+# Bundle webapp into the distribution folder
 build-webapp:
 	scripts/build_webapp.sh
 
