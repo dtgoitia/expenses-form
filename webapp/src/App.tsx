@@ -1,13 +1,8 @@
 import ExpensesForm from "./pages/ExpensesForm";
 import PageNotFound from "./pages/PageNotFound";
 import SettingsPage from "./pages/Settings";
+import Paths from "./routes";
 import { Route, Routes } from "react-router-dom";
-
-enum Paths {
-  root = "/",
-  settings = "/settings",
-  notFound = "/*",
-}
 
 function App() {
   return (

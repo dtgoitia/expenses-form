@@ -9,7 +9,9 @@ import {
 } from "../constants";
 import { AccountName, CurrencyCode } from "../domain";
 import useAddExpense from "../queries/useAddExpense.hook";
+import Paths from "../routes";
 import React, { SyntheticEvent, useState } from "react";
+import { Link } from "react-router-dom";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
 import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
 import {
@@ -169,6 +171,12 @@ function ExpensesForm() {
         <Icon name="refresh"></Icon>
         reload PWA
       </Button>
+      <Link to={Paths.settings}>
+        <Button>
+          <Icon name="setting"></Icon>
+          Settings
+        </Button>
+      </Link>
       <Form onSubmit={handleSubmit}>
         <DateSlot>
           <SemanticDatepicker
