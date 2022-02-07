@@ -1,7 +1,9 @@
 import CenteredPage from "../components/CenteredPage";
 import storage from "../localStorage";
+import Paths from "../routes";
 import { SyntheticEvent, useEffect, useState } from "react";
-import { Form, InputOnChangeData } from "semantic-ui-react";
+import { Link } from "react-router-dom";
+import { Button, Form, Icon, InputOnChangeData } from "semantic-ui-react";
 
 enum FieldName {
   hasuraApiToken = "hasura-api-token",
@@ -41,6 +43,12 @@ function SettingsPage() {
         fluid
         onChange={handleHasuraApiTokenChange}
       />
+      <Link to={Paths.root}>
+        <Button>
+          <Icon name="close"></Icon>
+          Close
+        </Button>
+      </Link>
     </CenteredPage>
   );
 }
