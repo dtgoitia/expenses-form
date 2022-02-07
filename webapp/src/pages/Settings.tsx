@@ -1,6 +1,11 @@
 import CenteredPage from "../components/CenteredPage";
 import storage from "../localStorage";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { Form, InputOnChangeData } from "semantic-ui-react";
+
+enum FieldName {
+  hasuraApiToken = "hasura-api-token",
+}
 
 function SettingsPage() {
   const [hasuraApiToken, setHasuraApiToken] = useState<string | null>(null);
@@ -11,10 +16,31 @@ function SettingsPage() {
     }
   }, []);
 
+  function handleHasuraApiTokenChange(
+    _: SyntheticEvent,
+    { value }: InputOnChangeData
+  ) {
+    if (value === undefined || value === null || value === "") {
+      setHasuraApiToken(null);
+      storage.hasuraApiToken.delete();
+      return;
+    }
+
+    setHasuraApiToken(value);
+    storage.hasuraApiToken.set(value);
+  }
+
   return (
     <CenteredPage>
-      <div>Settings</div>
-      <p>Hasura API token: {JSON.stringify(hasuraApiToken)}</p>
+      <h1>Settings</h1>
+      <Form.Input
+        label="Hasura API token"
+        placeholder="Hasura API token"
+        name={FieldName.hasuraApiToken}
+        value={hasuraApiToken}
+        fluid
+        onChange={handleHasuraApiTokenChange}
+      />
     </CenteredPage>
   );
 }
