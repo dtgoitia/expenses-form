@@ -1,5 +1,10 @@
 import App from "./App";
-import { API_BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
+import {
+  API_BASE_URL,
+  BASE_URL,
+  DEVELOPMENT_MODE,
+  MOCK_APIS,
+} from "./constants";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
@@ -7,6 +12,7 @@ import { GlobalStyle } from "./style/globalStyle";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
 
 if (DEVELOPMENT_MODE && MOCK_APIS) {
@@ -22,8 +28,10 @@ const client = new ApolloClient({
 ReactDOM.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <GlobalStyle />
-      <App />
+      <BrowserRouter basename={BASE_URL}>
+        <GlobalStyle />
+        <App />
+      </BrowserRouter>
     </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")
