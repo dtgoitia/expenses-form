@@ -1,5 +1,5 @@
 import { AccountId, CurrencyCode } from "../domain";
-import hasura from "./hasuraContext";
+import getHasuraContext from "./hasuraContext";
 import { useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 
@@ -39,7 +39,7 @@ interface AddExpenseProps {
 
 export default function useAddExpense(expense: AddExpenseProps) {
   const [runMutation] = useMutation(MUTATION_ADD_EXPENSE, {
-    context: hasura,
+    context: getHasuraContext(),
   });
 
   const { paidWith, ...remainingVariables } = expense;

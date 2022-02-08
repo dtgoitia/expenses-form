@@ -6,7 +6,6 @@
 // the app on runtime is present on build time.
 const ENV_VAR_WHITELIST = new Set([
   "REACT_APP_API_BASE_URL",
-  "REACT_APP_API_ADMIN_SECRET",
   "REACT_APP_MOCK_APIS",
 ]);
 

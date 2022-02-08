@@ -1,5 +1,5 @@
 import { Expense } from "../domain";
-import hasura from "./hasuraContext";
+import getHasuraContext from "./hasuraContext";
 import { ApolloError, useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 
@@ -37,7 +37,7 @@ export default function useSubmittedExpenses(): Return {
   const { loading, error, data } = useQuery<HasuraExpenses>(
     QUERY_GET_SUBMITTED_EXPENSES,
     {
-      context: hasura,
+      context: getHasuraContext(),
     }
   );
 

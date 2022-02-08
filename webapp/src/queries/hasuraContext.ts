@@ -1,7 +1,18 @@
-import { API_ADMIN_SECRET } from "../constants";
+import storage from "../localStorage";
 
-const hasura = {
-  headers: { "x-hasura-admin-secret": API_ADMIN_SECRET },
-};
+function getHasuraContext() {
+  const token = storage.hasuraApiToken.read();
+  if (token === null) {
+    // TODO: find a way of centralizing errors/warnings and nicely
+    // showing them in the UI
+    console.warn(`Hasura API token must be added to Settings`);
+  }
 
-export default hasura;
+  const context = {
+    headers: { "x-hasura-admin-secret": token },
+  };
+
+  return context;
+}
+
+export default getHasuraContext;

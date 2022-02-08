@@ -12,7 +12,6 @@ services:
       - "3000:3000"
     environment:
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
-      - REACT_APP_API_ADMIN_SECRET=${REACT_APP_API_ADMIN_SECRET}
       - REACT_APP_MOCK_APIS=${REACT_APP_MOCK_APIS:-false}
     volumes:
       - ./webapp:/app
