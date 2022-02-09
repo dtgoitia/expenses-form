@@ -1,11 +1,11 @@
 WEBAPP_NAME:=expenses-webapp
 
 install-dev-tools:
-	pre-commit install  # pre-commit is (default)
+	pre-commit install  # defaults to "pre-commit" stage
 	pre-commit install --hook-type pre-push
 
 uninstall-dev-tools:
-	pre-commit uninstall  # pre-commit is (default)
+	pre-commit uninstall  # defaults to "pre-commit" stage
 	pre-commit uninstall --hook-type pre-push
 
 run-webapp:
