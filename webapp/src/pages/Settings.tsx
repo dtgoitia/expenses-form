@@ -7,14 +7,21 @@ import { Button, Form, Icon, InputOnChangeData } from "semantic-ui-react";
 
 enum FieldName {
   hasuraApiToken = "hasura-api-token",
+  splitwiseApiToken = "splitwise-api-token",
 }
 
 function SettingsPage() {
   const [hasuraApiToken, setHasuraApiToken] = useState<string | null>(null);
+  const [splitwiseApiToken, setSplitwiseApiToken] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
       setHasuraApiToken(storage.hasuraApiToken.read());
+    }
+    if (storage.splitwiseApiToken.exists()) {
+      setSplitwiseApiToken(storage.splitwiseApiToken.read());
     }
   }, []);
 
@@ -32,6 +39,20 @@ function SettingsPage() {
     storage.hasuraApiToken.set(value);
   }
 
+  function handleSplitwiseApiTokenChange(
+    _: SyntheticEvent,
+    { value }: InputOnChangeData
+  ) {
+    if (value === undefined || value === null || value === "") {
+      setSplitwiseApiToken(null);
+      storage.splitwiseApiToken.delete();
+      return;
+    }
+
+    setSplitwiseApiToken(value);
+    storage.splitwiseApiToken.set(value);
+  }
+
   return (
     <CenteredPage>
       <h1>Settings</h1>
@@ -42,6 +63,14 @@ function SettingsPage() {
         value={hasuraApiToken}
         fluid
         onChange={handleHasuraApiTokenChange}
+      />
+      <Form.Input
+        label="Splitwise API token"
+        placeholder="Splitwise API token"
+        name={FieldName.splitwiseApiToken}
+        value={splitwiseApiToken}
+        fluid
+        onChange={handleSplitwiseApiTokenChange}
       />
       <Link to={Paths.root}>
         <Button>
