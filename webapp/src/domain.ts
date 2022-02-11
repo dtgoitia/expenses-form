@@ -1,4 +1,5 @@
 import { default as hasura } from "./clients/hasura";
+import { errorsService } from "./services/errors";
 import { BehaviorSubject } from "rxjs";
 
 export interface Expense {
@@ -70,8 +71,10 @@ export function getExpenses(): BehaviorSubject<GetExpensesRequest> {
       request$.next({ inflight: false, data: expenses });
     },
     error: (error) => {
-      // TODO: push to errors subject too
-      console.error(error);
+      errorsService.add({
+        header: "Fetching submitted expenses",
+        description: JSON.stringify(error, null, 2),
+      });
     },
     complete: () => {
       console.debug("Get expenses request observable completed");

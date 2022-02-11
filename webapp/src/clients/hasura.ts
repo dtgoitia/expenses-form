@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "../constants";
 import storage from "../localStorage";
+import { errorsService } from "../services/errors";
 import {
   ApolloClient,
   gql,
@@ -34,9 +35,10 @@ interface GetExpensesData {
 function getHasuraContext() {
   const token = storage.hasuraApiToken.read();
   if (token === null) {
-    // TODO: find a way of centralizing errors/warnings and nicely
-    // showing them in the UI
-    console.warn(`Hasura API token must be added to Settings`);
+    errorsService.add({
+      header: "Missing settings",
+      description: `Hasura API token must be added to the Settings page`,
+    });
   }
 
   const context = {
