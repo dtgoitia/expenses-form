@@ -1,4 +1,4 @@
-import hasura, { HasuraExpense } from "./clients/hasura";
+import hasura from "./clients/hasura";
 import { Expense } from "./domain";
 import { useEffect, useState } from "react";
 import { Icon, Loader } from "semantic-ui-react";
@@ -51,6 +51,10 @@ function formatDate(isoDatetime: string): string {
   return `${formattedMonth}-${formattedDay}`;
 }
 
+const LoadingIconContainer = styled.div`
+  margin-right: 0.4rem;
+`;
+
 interface ListItemProps {
   expense: Expense;
 }
@@ -59,7 +63,13 @@ function ListItem({ expense }: ListItemProps) {
     <StyledListItem>
       <DeleteActionSlot></DeleteActionSlot>
       <SubmittedStatusSlot>
-        <Icon name="check" />
+        {expense.submitted ? (
+          <Icon name="check" />
+        ) : (
+          <LoadingIconContainer>
+            <Loader active inline size="mini" />
+          </LoadingIconContainer>
+        )}
       </SubmittedStatusSlot>
       <DescriptionSlot>
         {formatDate(expense.datetime)}{" "}
@@ -94,14 +104,14 @@ const LoaderText = styled.span`
 `;
 
 function List() {
-  const [expenses, setExpenses] = useState<HasuraExpense[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const subscription = hasura.expenses$.subscribe((request) => {
       setLoading(request.loading);
       if (request.data === undefined) return;
-      setExpenses(request.data);
+      setExpenses(request.data as Expense[]);
     });
 
     hasura.getExpenses();

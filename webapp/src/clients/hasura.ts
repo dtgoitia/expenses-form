@@ -55,6 +55,7 @@ export interface HasuraExpense {
   currency: string;
   description: string;
   datetime: string;
+  submitted: boolean;
 }
 
 interface FetchedExpenses {
@@ -92,6 +93,7 @@ class HasuraClient {
           const expenses: HasuraExpense[] = result.data.expenses.map(
             ({ __typename, ...rest }) => ({
               ...rest,
+              submitted: true,
             })
           );
           this.expenses$.next({ loading: false, data: expenses });

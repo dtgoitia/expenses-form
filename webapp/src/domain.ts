@@ -4,6 +4,7 @@ export interface Expense {
   currency: string;
   description: string;
   datetime: string; // "2022-01-17T08:19:26+00:00"
+  submitted: boolean;
 }
 
 export type AccountId = number;
