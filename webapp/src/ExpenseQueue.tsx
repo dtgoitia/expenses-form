@@ -1,5 +1,5 @@
-import { Expense } from "./domain";
-import useSubmittedExpenses from "./queries/useSubmittedExpenses.hook";
+import { Expense, getExpenses, HasuraExpense } from "./domain";
+import { useEffect, useState } from "react";
 import { Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -93,20 +93,18 @@ const LoaderText = styled.span`
 `;
 
 function List() {
-  /**
-   * KNOWN PERFORMANCE ISSUE
-   * This component is re-rendered each time the parent component renders. In other
-   * words, if the user types a character, this component rerenders.
-   *
-   * Luckily, Apollo is clever enough and doesn't retrigger the HTTP request, but I'm
-   * unsure about the caching policy used by Apollo.
-   *
-   * This performance issue will be ignored for the time being, as it makes the code
-   * more readable. The alternative is to lift up the state to the parent component.
-   * This way, the data passed as props to this component would not change and this
-   * component would not be re-rendered each time the parent component does.
-   */
-  const { loading, error, data: expenses } = useSubmittedExpenses();
+  const [expenses, setExpenses] = useState<HasuraExpense[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const subscription = getExpenses().subscribe((request) => {
+      setLoading(request.inflight);
+      if (request.data === undefined) return;
+      setExpenses(request.data);
+    });
+
+    return subscription.unsubscribe;
+  }, []);
 
   if (loading) {
     return (
@@ -114,15 +112,6 @@ function List() {
         <Loader active inline size="mini" />
         <LoaderText>Loading submitted expenses from server... </LoaderText>
       </Container>
-    );
-  }
-
-  if (error) {
-    return (
-      <div>
-        <h3>ERROR</h3>
-        <pre>{JSON.stringify(error, null, 2)}</pre>
-      </div>
     );
   }
 
