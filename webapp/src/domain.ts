@@ -1,5 +1,7 @@
+export type ExpenseId = number;
+
 export interface Expense {
-  id?: string;
+  id?: ExpenseId;
   amount: number;
   currency: string;
   description: string;

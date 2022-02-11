@@ -1,4 +1,5 @@
 import ExpenseQueue from "../ExpenseQueue";
+import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
 import Description from "../components/Description";
 import {
@@ -8,7 +9,6 @@ import {
   PAYMENT_ACCOUNTS,
 } from "../constants";
 import { AccountName, CurrencyCode } from "../domain";
-import useAddExpense from "../queries/useAddExpense.hook";
 import Paths from "../routes";
 import React, { SyntheticEvent, useState } from "react";
 import { Link } from "react-router-dom";
@@ -57,17 +57,6 @@ function ExpensesForm() {
   const [shared, setShared] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [rawResponse, setRawResponse] = useState<any>();
-
-  let runMutation = useAddExpense({
-    paidWith: accountIndex,
-    datetime: date,
-    amount: amount as number,
-    currency,
-    description: description as string,
-    shared,
-    pending,
-  });
 
   const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.name).map(
     (name) => ({
@@ -90,7 +79,7 @@ function ExpensesForm() {
   }
 
   function handleCurrencyChange(_: SyntheticEvent, data: DropdownProps): void {
-    setCurrency(data.value as string);
+    setCurrency(data.value as CurrencyCode);
   }
 
   function handleDateChange(
@@ -139,18 +128,19 @@ function ExpensesForm() {
     }
 
     setSubmitting(true);
-    runMutation().then((response) => {
-      setSubmitting(false);
-      if (response.errors) {
-        // TODO: pipe errors to an error pannel
-        console.error(response.errors);
-        setRawResponse(response);
-        return;
-      }
-
-      console.dir(response);
-      setRawResponse(response.data);
-    });
+    hasura
+      .addExpense$({
+        paidWith: accountIndex,
+        datetime: date,
+        amount: amount as number,
+        currency,
+        description: description as string,
+        shared,
+        pending,
+      })
+      .subscribe(() => {
+        setSubmitting(false);
+      });
   }
 
   function refreshDate(e: SyntheticEvent) {
@@ -262,7 +252,6 @@ function ExpensesForm() {
           2
         )}
       </pre>
-      {rawResponse ? <pre>{JSON.stringify(rawResponse, null, 2)}</pre> : null}
     </CenteredPage>
   );
 }
