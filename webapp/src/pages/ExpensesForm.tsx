@@ -10,6 +10,7 @@ import {
 } from "../constants";
 import { AccountName, CurrencyCode } from "../domain";
 import Paths from "../routes";
+import { errorsService } from "../services/errors";
 import React, { SyntheticEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
@@ -122,8 +123,10 @@ function ExpensesForm() {
 
   function handleSubmit() {
     if (!amount) {
-      // TODO: pipe errors to an error pannel
-      console.error("Amount is required");
+      errorsService.add({
+        header: "Amount missing",
+        description: "Amount is required",
+      });
       return;
     }
 
