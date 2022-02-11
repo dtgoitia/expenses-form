@@ -71,8 +71,8 @@ class StoredItem<T> {
 }
 
 class Storage {
-  hasuraApiToken: StoredItem<string | null>;
-  splitwiseApiToken: StoredItem<string | null>;
+  hasuraApiToken: StoredItem<string | undefined>;
+  splitwiseApiToken: StoredItem<string | undefined>;
 
   constructor() {
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);

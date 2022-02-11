@@ -11,17 +11,17 @@ enum FieldName {
 }
 
 function SettingsPage() {
-  const [hasuraApiToken, setHasuraApiToken] = useState<string | null>(null);
-  const [splitwiseApiToken, setSplitwiseApiToken] = useState<string | null>(
-    null
+  const [hasuraToken, setHasuraToken] = useState<string | undefined>(undefined);
+  const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(
+    undefined
   );
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
-      setHasuraApiToken(storage.hasuraApiToken.read());
+      setHasuraToken(storage.hasuraApiToken.read());
     }
     if (storage.splitwiseApiToken.exists()) {
-      setSplitwiseApiToken(storage.splitwiseApiToken.read());
+      setSplitwiseToken(storage.splitwiseApiToken.read());
     }
   }, []);
 
@@ -30,12 +30,12 @@ function SettingsPage() {
     { value }: InputOnChangeData
   ) {
     if (value === undefined || value === null || value === "") {
-      setHasuraApiToken(null);
+      setHasuraToken(undefined);
       storage.hasuraApiToken.delete();
       return;
     }
 
-    setHasuraApiToken(value);
+    setHasuraToken(value);
     storage.hasuraApiToken.set(value);
   }
 
@@ -44,12 +44,12 @@ function SettingsPage() {
     { value }: InputOnChangeData
   ) {
     if (value === undefined || value === null || value === "") {
-      setSplitwiseApiToken(null);
+      setSplitwiseToken(undefined);
       storage.splitwiseApiToken.delete();
       return;
     }
 
-    setSplitwiseApiToken(value);
+    setSplitwiseToken(value);
     storage.splitwiseApiToken.set(value);
   }
 
@@ -60,7 +60,7 @@ function SettingsPage() {
         label="Hasura API token"
         placeholder="Hasura API token"
         name={FieldName.hasuraApiToken}
-        value={hasuraApiToken}
+        value={hasuraToken}
         fluid
         onChange={handleHasuraApiTokenChange}
       />
@@ -68,7 +68,7 @@ function SettingsPage() {
         label="Splitwise API token"
         placeholder="Splitwise API token"
         name={FieldName.splitwiseApiToken}
-        value={splitwiseApiToken}
+        value={splitwiseToken}
         fluid
         onChange={handleSplitwiseApiTokenChange}
       />
