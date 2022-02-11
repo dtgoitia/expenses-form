@@ -18,7 +18,7 @@ export interface Account {
   name: AccountName;
 }
 
-export type CurrencyCode = string;
+export type CurrencyCode = "GBP" | "EUR" | "USD";
 
 export interface Currency {
   code: CurrencyCode;
@@ -39,4 +39,9 @@ export interface Shortcut {
   people: Person[];
   seller: Seller;
   tags: TagName[];
+}
+
+export function addExpense(expense: Expense) {
+  // TODO: set expenses$ outside these functions, so that anyone can subscribe and get
+  //       updates as new expenses are added.
 }

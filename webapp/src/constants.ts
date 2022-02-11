@@ -143,3 +143,10 @@ export enum ApiEndpoints {
   OAUTH_VALIDATE_TOKEN = "/api/v1/test/",
   USERS_TO_SUSPEND = "/api/v1/users-to-suspend/",
 }
+
+export const SPLITWISE_USER_EMAIL_ME = LoadEnvVar.asString(
+  "REACT_APP_SPLITWISE_USER_EMAIL_ME"
+);
+export const SPLITWISE_USER_EMAIL_PARTNER = LoadEnvVar.asString(
+  "REACT_APP_SPLITWISE_USER_EMAIL_PARTNER"
+);

@@ -144,6 +144,48 @@ function ExpensesForm() {
       .subscribe(() => {
         setSubmitting(false);
       });
+    //   .then((success: boolean) => {
+    //     if (!success) {
+    //       return;
+    //     }
+
+    //     // if (!shared) {
+    //     //   console.debug(
+    //     //     `Payment is not shared, nothing will be added to Splitwise`
+    //     //   );
+    //     //   return;
+    //     // }
+
+    //     // console.debug(`Adding expense to Splitwise`);
+    //     // if (splitwise === null) {
+    //     //   console.error(
+    //     //     "Splitwise client could not initialize, nothing will be added to Splitwise"
+    //     //   );
+    //     //   return;
+    //     // }
+    //     // if (currency === "USD") {
+    //     //   console.error("Splitwise client does not support USD currency yet");
+    //     //   return;
+    //     // }
+
+    //     // const [myAmount, myPartnersAmount] = splitExpense(amount);
+    //     // alert(`'my email: ${SPLITWISE_USER_EMAIL_ME}`);
+    //     // alert(`'other email: ${SPLITWISE_USER_EMAIL_PARTNER}`);
+    //     // const expense: SplitwiseExpense = {
+    //     //   cost: amount,
+    //     //   description: description as string,
+    //     //   date: date,
+    //     //   currency: currency,
+    //     //   group_id: 0,
+    //     //   users__0__email: SPLITWISE_USER_EMAIL_ME,
+    //     //   users__0__paid_share: amount,
+    //     //   users__0__owed_share: myAmount,
+    //     //   users__1__email: SPLITWISE_USER_EMAIL_PARTNER,
+    //     //   users__1__paid_share: 0,
+    //     //   users__1__owed_share: myPartnersAmount,
+    //     // };
+    //     // return splitwise.createExpense(expense);
+    //   });
   }
 
   function refreshDate(e: SyntheticEvent) {
