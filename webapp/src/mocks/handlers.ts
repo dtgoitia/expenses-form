@@ -1,6 +1,22 @@
 import { graphql } from "msw";
 
 export const handlers = [
+  graphql.mutation("AddExpense", (req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.data({
+        insert_expenses: {
+          returning: [
+            {
+              id: 236,
+              __typename: "expenses",
+            },
+          ],
+          __typename: "expenses_mutation_response",
+        },
+      })
+    );
+  }),
   graphql.query("GetExpenses", (req, res, ctx) => {
     return res(
       ctx.status(200),
