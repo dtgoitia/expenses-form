@@ -1,7 +1,3 @@
-import { default as hasura } from "./clients/hasura";
-import { errorsService } from "./services/errors";
-import { BehaviorSubject } from "rxjs";
-
 export interface Expense {
   id?: string;
   amount: number;
@@ -40,45 +36,4 @@ export interface Shortcut {
   people: Person[];
   seller: Seller;
   tags: TagName[];
-}
-
-export interface HasuraExpense {
-  id: string;
-  amount: number;
-  currency: string;
-  description: string;
-  datetime: string;
-}
-
-interface GetExpensesRequest {
-  inflight: boolean;
-  data: HasuraExpense[] | undefined;
-}
-export function getExpenses(): BehaviorSubject<GetExpensesRequest> {
-  const request$ = new BehaviorSubject<GetExpensesRequest>({
-    inflight: true,
-    data: undefined,
-  });
-
-  const submittedExpenses$ = hasura.getExpenses$();
-  submittedExpenses$.subscribe({
-    next: (result) => {
-      const expenses: HasuraExpense[] = result.data.expenses.map(
-        ({ __typename, ...rest }) => ({
-          ...rest,
-        })
-      );
-      request$.next({ inflight: false, data: expenses });
-    },
-    error: (error) => {
-      errorsService.add({
-        header: "Fetching submitted expenses",
-        description: JSON.stringify(error, null, 2),
-      });
-    },
-    complete: () => {
-      console.debug("Get expenses request observable completed");
-    },
-  });
-  return request$;
 }

@@ -1,4 +1,5 @@
-import { Expense, getExpenses, HasuraExpense } from "./domain";
+import hasura, { HasuraExpense } from "./clients/hasura";
+import { Expense } from "./domain";
 import { useEffect, useState } from "react";
 import { Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
@@ -97,11 +98,13 @@ function List() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const subscription = getExpenses().subscribe((request) => {
-      setLoading(request.inflight);
+    const subscription = hasura.expenses$.subscribe((request) => {
+      setLoading(request.loading);
       if (request.data === undefined) return;
       setExpenses(request.data);
     });
+
+    hasura.getExpenses();
 
     return subscription.unsubscribe;
   }, []);

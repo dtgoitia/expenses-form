@@ -7,6 +7,7 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
 } from "@apollo/client";
+import { BehaviorSubject } from "rxjs";
 
 const QUERY_GET_SUBMITTED_EXPENSES = gql`
   query GetExpenses {
@@ -19,7 +20,7 @@ const QUERY_GET_SUBMITTED_EXPENSES = gql`
     }
   }
 `;
-interface Expense {
+interface RawExpense {
   __typename: string;
   id: string;
   amount: number;
@@ -29,7 +30,7 @@ interface Expense {
 }
 
 interface GetExpensesData {
-  expenses: Expense[];
+  expenses: RawExpense[];
 }
 
 function getHasuraContext() {
@@ -48,24 +49,67 @@ function getHasuraContext() {
   return context;
 }
 
+export interface HasuraExpense {
+  id: string;
+  amount: number;
+  currency: string;
+  description: string;
+  datetime: string;
+}
+
+interface FetchedExpenses {
+  loading: boolean;
+  data: HasuraExpense[] | undefined;
+}
+
 class HasuraClient {
   private client: ApolloClient<NormalizedCacheObject>;
+  public expenses$: BehaviorSubject<FetchedExpenses>;
+
   constructor(baseUrl: string) {
     this.client = new ApolloClient({
       uri: `${baseUrl}/graphql`,
       cache: new InMemoryCache(),
     });
+
+    this.expenses$ = new BehaviorSubject<FetchedExpenses>({
+      loading: false,
+      data: undefined,
+    });
   }
 
-  public getExpenses$() {
-    const query$ = this.client.watchQuery<GetExpensesData>({
-      query: QUERY_GET_SUBMITTED_EXPENSES,
-      context: getHasuraContext(),
-    });
-    return query$;
+  public getExpenses(): void {
+    console.debug("Fetching expenses from Hasura");
+    this.expenses$.next({ loading: true, data: undefined });
+
+    const subscription = this.client
+      .watchQuery<GetExpensesData>({
+        query: QUERY_GET_SUBMITTED_EXPENSES,
+        context: getHasuraContext(),
+      })
+      .subscribe({
+        next: (result) => {
+          const expenses: HasuraExpense[] = result.data.expenses.map(
+            ({ __typename, ...rest }) => ({
+              ...rest,
+            })
+          );
+          this.expenses$.next({ loading: false, data: expenses });
+        },
+        error: (error) => {
+          errorsService.add({
+            header: "Fetching submitted expenses",
+            description: JSON.stringify(error, null, 2), // TODO: improve error message
+          });
+        },
+        complete: () => {
+          console.debug("Get expenses request observable completed");
+          subscription.unsubscribe();
+        },
+      });
   }
 }
 
-const client = new HasuraClient(API_BASE_URL);
+const hasura = new HasuraClient(API_BASE_URL);
 
-export default client;
+export default hasura;
