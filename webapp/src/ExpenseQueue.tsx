@@ -43,7 +43,7 @@ function formatDate(isoDatetime: string): string {
   const date = new Date(isoDatetime);
 
   const month = date.getMonth() + 1;
-  const day = date.getDate() + 1;
+  const day = date.getDate();
 
   const formattedMonth = MONTH_INDEX_TO_NAME[month];
   const formattedDay = day > 9 ? `${day}` : `0${day}`;
