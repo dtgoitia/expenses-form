@@ -1,6 +1,7 @@
 import ExpenseQueue from "../ExpenseQueue";
 import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
+import DateTimePicker from "../components/DateTimePicker";
 import Description from "../components/Description";
 import {
   CURRENCIES,
@@ -13,8 +14,6 @@ import Paths from "../routes";
 import { errorsService } from "../services/errors";
 import React, { SyntheticEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import SemanticDatepicker from "react-semantic-ui-datepickers";
-import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
 import {
   Button,
   DropdownItemProps,
@@ -56,7 +55,7 @@ function ExpensesForm() {
   )[0].id;
 
   const now = new Date(new Date().setMilliseconds(0));
-  const [date, setDate] = useState<Date>(now);
+  const [date, setDate] = useState<Date | undefined>(now);
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [description, setDescription] = useState<string | undefined>();
@@ -91,10 +90,6 @@ function ExpensesForm() {
 
   function handleCurrencyChange(_: any, data: DropdownProps): void {
     setCurrency(data.value as CurrencyCode);
-  }
-
-  function handleDateChange(_: any, data: SemanticDatepickerProps): void {
-    setDate(data.value as unknown as Date);
   }
 
   function handleAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
@@ -133,12 +128,20 @@ function ExpensesForm() {
       return;
     }
 
+    if (!date) {
+      errorsService.add({
+        header: "Date is missing",
+        description: "Date is required",
+      });
+      return;
+    }
+
     setSubmitting(true);
     hasura
       .addExpense$({
         paidWith: accountIndex,
         datetime: date,
-        amount: amount as number,
+        amount: amount,
         currency,
         description: description as string,
         shared,
@@ -175,11 +178,7 @@ function ExpensesForm() {
       </Link>
       <Form onSubmit={handleSubmit}>
         <DateSlot>
-          <SemanticDatepicker
-            onChange={handleDateChange}
-            value={date}
-            datePickerOnly={true}
-          />
+          <DateTimePicker value={date} onChange={setDate} />
           <ReloadDate onClick={refreshDate}>
             <Button onClick={refreshDate}>
               <Icon name="refresh"></Icon>
