@@ -1,4 +1,5 @@
 import ErrorPanel from "./components/ErrorPanel";
+import DebugPage from "./pages/DebugPage";
 import ExpensesForm from "./pages/ExpensesForm";
 import PageNotFound from "./pages/PageNotFound";
 import SettingsPage from "./pages/Settings";
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path={Paths.root} element={<ExpensesForm />} />
         <Route path={Paths.settings} element={<SettingsPage />} />
+        <Route path={Paths.debug} element={<DebugPage />} />
         <Route path={Paths.notFound} element={<PageNotFound />} />
       </Routes>
     </div>

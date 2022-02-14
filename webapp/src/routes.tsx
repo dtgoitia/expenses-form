@@ -1,6 +1,7 @@
 enum Paths {
   root = "/",
   settings = "/settings",
+  debug = "/debug",
   notFound = "/*",
 }
 
