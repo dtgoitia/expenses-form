@@ -58,38 +58,47 @@ export const PAYMENT_ACCOUNTS: Account[] = [
   {
     id: 1,
     name: "monzo",
+    pending: false,
   },
   {
     id: 2,
     name: "revolut business",
+    pending: true,
   },
   {
     id: 3,
     name: "amex",
+    pending: true,
   },
   {
     id: 4,
     name: "evo",
+    pending: false,
   },
   {
     id: 5,
     name: "evo bizum",
+    pending: false,
   },
   {
     id: 6,
     name: "revolut personal GBP",
+    pending: false,
   },
   {
     id: 7,
     name: "revolut personal EUR",
+    pending: false,
   },
   {
     id: 8,
     name: "cash EUR",
+    pending: false,
   },
   {
     id: 9,
     name: "cash GBP",
+    pending: false,
   },
 ];
 

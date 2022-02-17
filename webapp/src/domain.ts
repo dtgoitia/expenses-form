@@ -16,6 +16,7 @@ export type AccountName = string;
 export interface Account {
   id: AccountId;
   name: AccountName;
+  pending: boolean; // true if usually payments are pending when paid with this account
 }
 
 export type CurrencyCode = string;

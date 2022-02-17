@@ -43,6 +43,12 @@ const ReloadDate = styled.div`
   margin-bottom: 1rem;
 `;
 
+const pendingPaymentMethods = new Set(
+  PAYMENT_ACCOUNTS.filter((account) => account.pending).map(
+    (account) => account.name
+  )
+);
+
 function ExpensesForm() {
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
@@ -54,7 +60,9 @@ function ExpensesForm() {
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [description, setDescription] = useState<string | undefined>();
-  const [pending, setPending] = useState<boolean>(false);
+  const [pending, setPending] = useState<boolean>(
+    pendingPaymentMethods.has(DEFAULT_PAYMENT_METHOD)
+  );
   const [shared, setShared] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -76,7 +84,9 @@ function ExpensesForm() {
   ) as unknown as DropdownItemProps[];
 
   function handleAccountChange(_: any, data: DropdownProps): void {
-    setPaidWith(data.value as string);
+    const value = data.value as string;
+    setPaidWith(value);
+    setPending(pendingPaymentMethods.has(value));
   }
 
   function handleCurrencyChange(_: any, data: DropdownProps): void {
@@ -103,9 +113,6 @@ function ExpensesForm() {
     }
 
     switch (name) {
-      case FieldName.paidWith:
-        setPaidWith(value);
-        break;
       case FieldName.pending:
         setPending(value === "true");
         break;
