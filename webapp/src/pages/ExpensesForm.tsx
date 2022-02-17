@@ -75,19 +75,15 @@ function ExpensesForm() {
     })
   ) as unknown as DropdownItemProps[];
 
-  function handleAccountChange(_: SyntheticEvent, data: DropdownProps): void {
+  function handleAccountChange(_: any, data: DropdownProps): void {
     setPaidWith(data.value as string);
   }
 
-  function handleCurrencyChange(_: SyntheticEvent, data: DropdownProps): void {
+  function handleCurrencyChange(_: any, data: DropdownProps): void {
     setCurrency(data.value as CurrencyCode);
   }
 
-  function handleDateChange(
-    _: SyntheticEvent | undefined,
-    data: SemanticDatepickerProps
-  ): void {
-    console.dir(data.value);
+  function handleDateChange(_: any, data: SemanticDatepickerProps): void {
     setDate(data.value as unknown as Date);
   }
 
