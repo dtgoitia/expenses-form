@@ -100,6 +100,16 @@ export const PAYMENT_ACCOUNTS: Account[] = [
     name: "cash GBP",
     pending: false,
   },
+  {
+    id: 10,
+    name: "paid by Angela GBP",
+    pending: false,
+  },
+  {
+    id: 11,
+    name: "paid by Angela EUR",
+    pending: false,
+  },
 ];
 
 export const CURRENCIES: Currency[] = [
