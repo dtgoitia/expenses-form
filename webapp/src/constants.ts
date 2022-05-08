@@ -110,6 +110,11 @@ export const PAYMENT_ACCOUNTS: Account[] = [
     name: "paid by Angela EUR",
     pending: false,
   },
+  {
+    id: 12,
+    name: "paid by somebody else",
+    pending: false,
+  },
 ];
 
 export const CURRENCIES: Currency[] = [
