@@ -14,6 +14,7 @@ services:
       - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
       - REACT_APP_SPLITWISE_API_BASE_URL=${REACT_APP_SPLITWISE_API_BASE_URL}
       - REACT_APP_MOCK_APIS=${REACT_APP_MOCK_APIS:-false}
+      - NODE_OPTIONS=--no-experimental-fetch
     volumes:
       - ./webapp:/app
 
