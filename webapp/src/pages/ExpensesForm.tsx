@@ -11,7 +11,7 @@ import {
 import { AccountName, CurrencyCode } from "../domain";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SemanticDatepicker from "react-semantic-ui-datepickers";
 import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
@@ -48,6 +48,41 @@ const pendingPaymentMethods = new Set(
     (account) => account.name
   )
 );
+const GrayedOutText = styled.span`
+  opacity: 0.6;
+  margin-left: 1rem;
+`;
+
+function FormattedDate({ date }: { date: Date }) {
+  const [secondsDiff, setDiff] = useState<number>(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setDiff((_) => {
+        const now = new Date().getTime();
+        const ms = now - date.getTime();
+        const seconds = Math.round(ms / 1000);
+        return seconds;
+      });
+    }, 100);
+    return () => clearInterval(intervalId);
+  }, [date]);
+
+  const formattedDate = date
+    .toISOString()
+    .replace("T", " ") // improve readability
+    .replace(".000", "") // drop milliseconds
+    .replace("Z", " +00:00"); // improve timezone readability
+
+  const [isoDate, isoTime, timezone] = formattedDate.split(" ");
+
+  return (
+    <span>
+      {isoDate} <b>{isoTime}</b> {timezone}
+      <GrayedOutText>{secondsDiff}s</GrayedOutText>
+    </span>
+  );
+}
 
 function ExpensesForm() {
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
@@ -174,6 +209,7 @@ function ExpensesForm() {
         </Button>
       </Link>
       <Form onSubmit={handleSubmit}>
+        <FormattedDate date={date} />
         <DateSlot>
           <SemanticDatepicker
             onChange={handleDateChange}
