@@ -59,8 +59,7 @@ function FormattedDate({ date }: { date: Date }) {
   useEffect(() => {
     const intervalId = setInterval(() => {
       setDiff((_) => {
-        const now = new Date().getTime();
-        const ms = now - date.getTime();
+        const ms = now().getTime() - date.getTime();
         const seconds = Math.round(ms / 1000);
         return seconds;
       });
@@ -84,14 +83,17 @@ function FormattedDate({ date }: { date: Date }) {
   );
 }
 
+function now(): Date {
+  return new Date(new Date().setMilliseconds(0));
+}
+
 function ExpensesForm() {
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
     (account) => account.name === paidWith
   )[0].id;
 
-  const now = new Date(new Date().setMilliseconds(0));
-  const [date, setDate] = useState<Date>(now);
+  const [date, setDate] = useState<Date>(now());
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [description, setDescription] = useState<string | undefined>();
@@ -185,8 +187,9 @@ function ExpensesForm() {
   }
 
   function refreshDate(e: SyntheticEvent) {
+    console.debug("Refreshing date");
     e.preventDefault();
-    setDate(now);
+    setDate(now());
   }
 
   function refreshPage() {
