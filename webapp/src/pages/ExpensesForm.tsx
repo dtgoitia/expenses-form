@@ -75,10 +75,19 @@ function FormattedDate({ date }: { date: Date }) {
 
   const [isoDate, isoTime, timezone] = formattedDate.split(" ");
 
+  const secs = secondsDiff % 60;
+  const mins = (secondsDiff - secs) / 60;
+  const formattedDiffChunks = [];
+  if (mins > 0) {
+    formattedDiffChunks.push(`${mins}m`);
+  }
+  formattedDiffChunks.push(`${secs}s`);
+  const formattedDiff = formattedDiffChunks.join(" ");
+
   return (
     <span>
       {isoDate} <b>{isoTime}</b> {timezone}
-      <GrayedOutText>{secondsDiff}s</GrayedOutText>
+      <GrayedOutText>{formattedDiff}</GrayedOutText>
     </span>
   );
 }
