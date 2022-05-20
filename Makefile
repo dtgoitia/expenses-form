@@ -19,6 +19,7 @@ run-webapp-mock-apis:
 
 # Recreate web app docker image
 rebuild-webapp:
+	docker-compose down
 	docker-compose build --no-cache $(WEBAPP_NAME)
 
 test-dev-webapp:
