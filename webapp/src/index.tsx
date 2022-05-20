@@ -1,4 +1,5 @@
 import App from "./App";
+import "./blueprint.css";
 import {
   API_BASE_URL,
   BASE_URL,
