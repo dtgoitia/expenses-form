@@ -2,6 +2,7 @@ import ExpenseQueue from "../ExpenseQueue";
 import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
 import DateTimePicker from "../components/DateTimePicker";
+import FormattedDate from "../components/DateTimePicker/FormattedDate";
 import Description from "../components/Description";
 import {
   CURRENCIES,
@@ -13,7 +14,7 @@ import { now } from "../datetimeUtils";
 import { AccountName, CurrencyCode } from "../domain";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -48,49 +49,6 @@ const pendingPaymentMethods = new Set(
     (account) => account.name
   )
 );
-const GrayedOutText = styled.span`
-  opacity: 0.6;
-  margin-left: 1rem;
-`;
-
-function FormattedDate({ date }: { date: Date }) {
-  const [secondsDiff, setDiff] = useState<number>(0);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setDiff((_) => {
-        const ms = now().getTime() - date.getTime();
-        const seconds = Math.round(ms / 1000);
-        return seconds;
-      });
-    }, 100);
-    return () => clearInterval(intervalId);
-  }, [date]);
-
-  const formattedDate = date
-    .toISOString()
-    .replace("T", " ") // improve readability
-    .replace(".000", "") // drop milliseconds
-    .replace("Z", " +00:00"); // improve timezone readability
-
-  const [isoDate, isoTime, timezone] = formattedDate.split(" ");
-
-  const secs = secondsDiff % 60;
-  const mins = (secondsDiff - secs) / 60;
-  const formattedDiffChunks = [];
-  if (mins > 0) {
-    formattedDiffChunks.push(`${mins}m`);
-  }
-  formattedDiffChunks.push(`${secs}s`);
-  const formattedDiff = formattedDiffChunks.join(" ");
-
-  return (
-    <span>
-      {isoDate} <b>{isoTime}</b> {timezone}
-      <GrayedOutText>{formattedDiff}</GrayedOutText>
-    </span>
-  );
-}
 
 function ExpensesForm() {
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
