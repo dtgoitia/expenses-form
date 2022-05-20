@@ -27,7 +27,7 @@ function DateTimePicker({ defaultDate, date, onChange }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <Container>
+    <Container className="bp4-text-large">
       <Row>
         <Collapse isOpen={isOpen}>
           <BlueprintTimePicker
