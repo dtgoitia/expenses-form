@@ -8,6 +8,7 @@ import {
   DEFAULT_PAYMENT_METHOD,
   PAYMENT_ACCOUNTS,
 } from "../constants";
+import { now } from "../datetimeUtils";
 import { AccountName, CurrencyCode } from "../domain";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
@@ -90,10 +91,6 @@ function FormattedDate({ date }: { date: Date }) {
       <GrayedOutText>{formattedDiff}</GrayedOutText>
     </span>
   );
-}
-
-function now(): Date {
-  return new Date(new Date().setMilliseconds(0));
 }
 
 function ExpensesForm() {
