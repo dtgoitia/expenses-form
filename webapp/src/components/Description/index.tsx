@@ -116,7 +116,7 @@ function Description({ onChange }: DescriptionProps) {
 
   function handlePeopleChange(_: any, { value }: DropdownProps): void {
     const selectedPeople: Person[] = value as string[];
-    if (!selectedPeople || selectedPeople.length === 0) {
+    if (!selectedPeople) {
       return;
     }
 
