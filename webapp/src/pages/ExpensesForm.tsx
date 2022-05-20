@@ -2,6 +2,7 @@ import ExpenseQueue from "../ExpenseQueue";
 import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
 import Description from "../components/Description";
+import TimePicker from "../components/TimePicker";
 import {
   CURRENCIES,
   DEFAULT_CURRENCY,
@@ -14,8 +15,6 @@ import Paths from "../routes";
 import { errorsService } from "../services/errors";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import SemanticDatepicker from "react-semantic-ui-datepickers";
-import { SemanticDatepickerProps } from "react-semantic-ui-datepickers/dist/types";
 import {
   Button,
   DropdownItemProps,
@@ -136,10 +135,6 @@ function ExpensesForm() {
     setCurrency(data.value as CurrencyCode);
   }
 
-  function handleDateChange(_: any, data: SemanticDatepickerProps): void {
-    setDate(data.value as unknown as Date);
-  }
-
   function handleAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
     if (value === undefined || value === null || value === "") {
       setAmount(undefined);
@@ -217,14 +212,10 @@ function ExpensesForm() {
           Settings
         </Button>
       </Link>
+      <TimePicker date={date} defaultDate={now()} onChange={setDate} />
       <Form onSubmit={handleSubmit}>
         <FormattedDate date={date} />
         <DateSlot>
-          <SemanticDatepicker
-            onChange={handleDateChange}
-            value={date}
-            datePickerOnly={true}
-          />
           <ReloadDate onClick={refreshDate}>
             <Button onClick={refreshDate}>
               <Icon name="refresh"></Icon>
