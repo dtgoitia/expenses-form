@@ -1,3 +1,4 @@
+import FormattedDate from "./FormattedDate";
 import { Button, Collapse } from "@blueprintjs/core";
 import {
   TimePicker as BlueprintTimePicker,
@@ -8,7 +9,11 @@ import styled from "styled-components";
 
 const Container = styled.div`
   margin: 1rem;
+`;
+const Row = styled.div`
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: space-between;
 `;
 
@@ -23,20 +28,24 @@ function DateTimePicker({ defaultDate, date, onChange }: Props) {
 
   return (
     <Container>
-      <Collapse isOpen={isOpen}>
-        <BlueprintTimePicker
-          value={date}
-          defaultValue={defaultDate}
-          showArrowButtons
-          precision={TimePrecision.SECOND}
-          onChange={onChange}
+      <Row>
+        <Collapse isOpen={isOpen}>
+          <BlueprintTimePicker
+            value={date}
+            defaultValue={defaultDate}
+            showArrowButtons
+            precision={TimePrecision.SECOND}
+            onChange={onChange}
+          />
+        </Collapse>
+      </Row>
+      <Row>
+        <FormattedDate date={date} />
+        <Button
+          text={isOpen ? "Close" : "Edit time"}
+          onClick={() => setIsOpen(!isOpen)}
         />
-      </Collapse>
-
-      <Button
-        text={isOpen ? "Close" : "Edit time"}
-        onClick={() => setIsOpen(!isOpen)}
-      />
+      </Row>
     </Container>
   );
 }
