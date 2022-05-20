@@ -1,8 +1,8 @@
 import ExpenseQueue from "../ExpenseQueue";
 import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
+import DateTimePicker from "../components/DateTimePicker";
 import Description from "../components/Description";
-import TimePicker from "../components/TimePicker";
 import {
   CURRENCIES,
   DEFAULT_CURRENCY,
@@ -212,7 +212,7 @@ function ExpensesForm() {
           Settings
         </Button>
       </Link>
-      <TimePicker date={date} defaultDate={now()} onChange={setDate} />
+      <DateTimePicker date={date} defaultDate={now()} onChange={setDate} />
       <Form onSubmit={handleSubmit}>
         <FormattedDate date={date} />
         <DateSlot>

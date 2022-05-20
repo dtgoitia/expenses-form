@@ -18,7 +18,7 @@ interface Props {
   onChange: (date: Date) => void;
 }
 
-function TimePicker({ defaultDate, date, onChange }: Props) {
+function DateTimePicker({ defaultDate, date, onChange }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -41,4 +41,4 @@ function TimePicker({ defaultDate, date, onChange }: Props) {
   );
 }
 
-export default TimePicker;
+export default DateTimePicker;
