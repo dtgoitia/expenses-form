@@ -141,7 +141,7 @@ export const TAGS = [
   "health",
   "present",
   "home",
-  "2205valencia",
+  "2205cologne",
 ];
 
 export const DEFAULT_PEOPLE = ["AngelaPerez", "JavierDomingo"];
