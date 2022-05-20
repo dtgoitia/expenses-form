@@ -144,7 +144,7 @@ export const TAGS = [
   "2205valencia",
 ];
 
-export const DEFAULT_PEOPLE = ["AngelaPerez"];
+export const DEFAULT_PEOPLE = ["AngelaPerez", "JavierDomingo"];
 export const SELLERS = [
   "Amazon",
   "AWS",
