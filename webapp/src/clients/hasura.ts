@@ -37,6 +37,8 @@ const MUTATION_ADD_EXPENSE = gql`
     $currency: currencies_enum
     $datetime: timestamptz
     $amount: numeric
+    $shared: Boolean
+    $pending: Boolean
   ) {
     insert_expenses(
       objects: {
@@ -45,6 +47,8 @@ const MUTATION_ADD_EXPENSE = gql`
         description: $description
         datetime: $datetime
         paid_with: $paid_with
+        shared: $shared
+        pending: $pending
       }
     ) {
       returning {
