@@ -211,7 +211,7 @@ function ExpensesForm() {
         <Form.Group inline>
           <Form.Input
             type="checkbox"
-            label="Shared"
+            label="Splitwise"
             name={FieldName.shared}
             value={!shared}
             checked={shared}
