@@ -17,6 +17,7 @@ import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
 
 if (DEVELOPMENT_MODE && MOCK_APIS) {
+  console.log("Mocking API call responses");
   const { worker } = require("./mocks/browser");
   worker.start();
 }
