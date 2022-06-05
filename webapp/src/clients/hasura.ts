@@ -10,11 +10,13 @@ import {
 } from "@apollo/client";
 import {
   BehaviorSubject,
+  combineLatest,
   filter,
   first,
   from,
   map,
   Observable,
+  take,
   zip,
 } from "rxjs";
 
@@ -58,6 +60,14 @@ const MUTATION_ADD_EXPENSE = gql`
   }
 `;
 
+const MUTATION_DELETE_EXPENSE = gql`
+  mutation DeleteExpense($id: Int!) {
+    delete_expenses_by_pk(id: $id) {
+      id
+    }
+  }
+`;
+
 interface RawExpense {
   __typename: string;
   id: ExpenseId;
@@ -79,6 +89,15 @@ interface AddExpenseProps {
 
 interface GetExpensesData {
   expenses: RawExpense[];
+}
+
+interface DeleteExpenseData {
+  delete_expenses_by_pk: {
+    id: ExpenseId;
+  };
+}
+interface DeleteExpenseInput {
+  id: ExpenseId;
 }
 
 function getHasuraContext() {
@@ -166,6 +185,65 @@ class HasuraClient {
         },
         complete: () => {
           console.debug("Get expenses request observable completed");
+          subscription.unsubscribe();
+        },
+      });
+  }
+
+  public deleteExpense(id: ExpenseId): void {
+    console.debug(`Deleting submitted expense (id=${id}) from Hasura...`);
+
+    const deletedIdPromise = this.client
+      .mutate<DeleteExpenseData, DeleteExpenseInput>({
+        mutation: MUTATION_DELETE_EXPENSE,
+        variables: { id: id },
+        context: getHasuraContext(),
+      })
+      .then((mutationResult) => {
+        if (mutationResult.errors) {
+          mutationResult.errors.forEach((error) => {
+            errorsService.add({
+              header: "Deleting submitted expense",
+              description: JSON.stringify(error, null, 2),
+            });
+          });
+          return;
+        }
+
+        const responseData = mutationResult.data as DeleteExpenseData;
+        const deletedId = responseData.delete_expenses_by_pk.id;
+        return deletedId;
+      })
+      .catch((error) => {
+        console.error(error);
+        errorsService.add({
+          header: "Deleting submitted expense",
+          description: JSON.stringify(error, null, 2),
+        });
+      });
+
+    const deletedId$ = from(deletedIdPromise);
+
+    const subscription = combineLatest([this.expenses$, deletedId$])
+      .pipe(take(1))
+      .subscribe({
+        next: ([expenses, deletedId]) => {
+          const lastExpenses = expenses.data as HasuraExpense[];
+          const updatedExpenses = lastExpenses.filter(
+            (expense) => expense.id !== deletedId
+          );
+          this.expenses$.next({ loading: false, data: updatedExpenses });
+          subscription.unsubscribe();
+        },
+        error: (error) => {
+          console.error(error);
+          errorsService.add({
+            header: "Deleting a submitted expense",
+            description: JSON.stringify(error, null, 2),
+          });
+        },
+        complete: () => {
+          console.debug("Delete expense request observable completed");
           subscription.unsubscribe();
         },
       });
