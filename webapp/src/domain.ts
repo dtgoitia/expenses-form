@@ -1,12 +1,12 @@
 export type ExpenseId = number;
-export type DatetimeISOString = string;
+export type DatetimeISOString = string; // "2022-01-17T08:19:26+00:00"
 
 export interface Expense {
   id?: ExpenseId;
   amount: number;
   currency: string;
   description: string;
-  datetime: DatetimeISOString; // "2022-01-17T08:19:26+00:00"
+  datetime: DatetimeISOString;
   submitted: boolean;
 }
 
