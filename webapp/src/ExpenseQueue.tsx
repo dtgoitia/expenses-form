@@ -1,7 +1,7 @@
 import hasura from "./clients/hasura";
-import { Expense } from "./domain";
+import { Expense, ExpenseId } from "./domain";
 import { useEffect, useState } from "react";
-import { Icon, Loader } from "semantic-ui-react";
+import { Button, Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
 
 const DeleteActionSlot = styled.div`
@@ -57,11 +57,25 @@ const LoadingIconContainer = styled.div`
 
 interface ListItemProps {
   expense: Expense;
+  deleting: boolean;
+  remove: () => void;
 }
-function ListItem({ expense }: ListItemProps) {
+function ListItem({ expense, deleting, remove }: ListItemProps) {
+  function handleOnClick() {
+    if (deleting) return; // Do nothing if already removing item
+    remove();
+  }
   return (
     <StyledListItem>
-      <DeleteActionSlot></DeleteActionSlot>
+      <DeleteActionSlot>
+        <Button onClick={handleOnClick}>
+          {deleting ? (
+            <Loader active inline size="mini" />
+          ) : (
+            <Icon name="delete" />
+          )}
+        </Button>
+      </DeleteActionSlot>
       <SubmittedStatusSlot>
         {expense.submitted ? (
           <Icon name="check" />
@@ -82,9 +96,9 @@ function ListItem({ expense }: ListItemProps) {
   );
 }
 
-function sortExpensesByDate(a: Expense, b: Expense): number {
-  const date_a = new Date(a.datetime);
-  const date_b = new Date(b.datetime);
+function sortExpensesByDate(a: ExpenseItem, b: ExpenseItem): number {
+  const date_a = new Date(a.expense.datetime);
+  const date_b = new Date(b.expense.datetime);
 
   if (date_a < date_b) {
     return -1;
@@ -103,15 +117,30 @@ const LoaderText = styled.span`
   font-size: 0.8rem;
 `;
 
+interface ExpenseItem {
+  expense: Expense;
+  deleting: boolean;
+}
+
 function List() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<ExpenseItem[]>([]);
+  const [listIsLoading, setListIsLoading] = useState(false);
+
+  function deleteExpense(id: ExpenseId) {
+    hasura.deleteExpense(id);
+  }
 
   useEffect(() => {
     const subscription = hasura.expenses$.subscribe((request) => {
-      setLoading(request.loading);
+      setListIsLoading(request.loading);
+
       if (request.data === undefined) return;
-      setExpenses(request.data as Expense[]);
+
+      const updatedItems = (request.data as Expense[]).map((expense) => ({
+        deleting: false,
+        expense,
+      }));
+      setItems(updatedItems);
     });
 
     hasura.getExpenses();
@@ -119,7 +148,7 @@ function List() {
     return subscription.unsubscribe;
   }, []);
 
-  if (loading) {
+  if (listIsLoading) {
     return (
       <Container>
         <Loader active inline size="mini" />
@@ -128,13 +157,28 @@ function List() {
     );
   }
 
-  const sortedByDate = expenses.concat().sort(sortExpensesByDate);
+  const itemsSortedByDate = items.concat().sort(sortExpensesByDate);
 
   return (
     <div>
-      {sortedByDate.map((expense, i) => (
-        <ListItem key={`queued-expense-${i}`} expense={expense} />
-      ))}
+      {itemsSortedByDate.map(({ expense, deleting }, i) => {
+        const onDelete = () => {
+          const updatedItems = items.map((item) => {
+            if (item.expense.id !== expense.id) return item;
+            return { deleting: true, expense };
+          });
+          setItems(updatedItems);
+          deleteExpense(expense.id);
+        };
+        return (
+          <ListItem
+            key={`queued-expense-${i}`}
+            deleting={deleting}
+            expense={expense}
+            remove={onDelete}
+          />
+        );
+      })}
     </div>
   );
 }
