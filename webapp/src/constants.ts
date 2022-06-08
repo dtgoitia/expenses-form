@@ -130,7 +130,6 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export const TAGS = [
-  "2206bio",
   "expenses",
   "groceries",
   "eatout",
