@@ -130,6 +130,7 @@ export const CURRENCIES: Currency[] = [
 ];
 
 export const TAGS = [
+  "2206bio",
   "expenses",
   "groceries",
   "eatout",
@@ -141,7 +142,6 @@ export const TAGS = [
   "health",
   "present",
   "home",
-  "2205cologne",
 ];
 
 export const DEFAULT_PEOPLE = ["AngelaPerez", "JavierDomingo"];
