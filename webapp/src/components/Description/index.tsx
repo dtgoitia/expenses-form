@@ -1,6 +1,7 @@
 import Shortcuts from "../../PredefinedButtons";
 import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
 import { Person, Seller, ShortcutId, TagName } from "../../domain";
+import storage from "../../localStorage";
 import TagSelector, { SelectableTag } from "./TagSelector";
 import { useEffect, useState } from "react";
 import { DropdownProps, Form, InputOnChangeData } from "semantic-ui-react";
@@ -52,10 +53,10 @@ function buildDescription({
   return chunks.join(" ");
 }
 
-const defaultTags: SelectableTag[] = TAGS.map((name) => ({
-  name,
-  selected: false,
-}));
+const tagsInConfig = storage.tripTags.read() || [];
+const defaultTags: SelectableTag[] = mergeTags([TAGS, tagsInConfig]).map(
+  (tag: string): SelectableTag => ({ name: tag, selected: false })
+);
 
 const Grid = styled.div`
   display: grid;
@@ -84,6 +85,26 @@ const PeopleInput = styled(Form.Dropdown)`
 const Container = styled.div`
   margin-bottom: 1rem;
 `;
+
+function mergeTags(listOfTagLists: string[][]): string[] {
+  /**
+   * Return a list of unique strings. The order is preserved - items of the first list
+   * are added first, then items in the second list, etc.
+   */
+  const tags = listOfTagLists.flatMap((tags) => tags);
+
+  const added = new Set<string>([]);
+
+  const uniqueTags: string[] = [];
+  for (const tag of tags) {
+    if (added.has(tag)) continue;
+
+    added.add(tag);
+    uniqueTags.push(tag);
+  }
+
+  return uniqueTags;
+}
 
 function Description({ onChange }: DescriptionProps) {
   const [main, setMain] = useState<string | undefined>();

@@ -1,6 +1,7 @@
 enum ValueType {
   string = "string",
   number = "number",
+  object = "object",
 }
 
 class StoredItem<T> {
@@ -30,6 +31,9 @@ class StoredItem<T> {
       case ValueType.number:
         return Number(rawValue) as unknown as T;
 
+      case ValueType.object:
+        return JSON.parse(rawValue);
+
       default:
         throw new Error(`Type ${this.type} is not supported yet`);
     }
@@ -47,6 +51,10 @@ class StoredItem<T> {
 
       case ValueType.number:
         serializedValue = (value as unknown as number).toString();
+        break;
+
+      case ValueType.object:
+        serializedValue = JSON.stringify(value);
         break;
 
       default:
@@ -73,6 +81,7 @@ class StoredItem<T> {
 class Storage {
   hasuraApiToken: StoredItem<string | undefined>;
   splitwiseApiToken: StoredItem<string | undefined>;
+  tripTags: StoredItem<string[] | undefined>;
 
   constructor() {
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
@@ -80,6 +89,7 @@ class Storage {
       "splitwise_api_token",
       ValueType.string
     );
+    this.tripTags = new StoredItem("trip_tags", ValueType.object);
     // this.b = new StoredItem("b", 123);
     // this.c = new StoredItem("c");
   }
