@@ -1,5 +1,6 @@
 import hasura from "./clients/hasura";
 import { Expense, ExpenseId } from "./domain";
+import { Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Button, Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
@@ -61,14 +62,17 @@ interface ListItemProps {
   remove: () => void;
 }
 function ListItem({ expense, deleting, remove }: ListItemProps) {
-  function handleOnClick() {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  function handleOnDeleteClick() {
     if (deleting) return; // Do nothing if already removing item
     remove();
   }
+
   return (
     <StyledListItem>
       <DeleteActionSlot>
-        <Button onClick={handleOnClick}>
+        <Button onClick={handleOnDeleteClick}>
           {deleting ? (
             <Loader active inline size="mini" />
           ) : (
@@ -76,7 +80,7 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
           )}
         </Button>
       </DeleteActionSlot>
-      <SubmittedStatusSlot>
+      <SubmittedStatusSlot onClick={() => setIsOpen(!isOpen)}>
         {expense.submitted ? (
           <Icon name="check" />
         ) : (
@@ -85,12 +89,16 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
           </LoadingIconContainer>
         )}
       </SubmittedStatusSlot>
-      <DescriptionSlot>
+      <DescriptionSlot onClick={() => setIsOpen(!isOpen)}>
         {formatDate(expense.datetime)}{" "}
         <b>
           {expense.amount} {expense.currency}
         </b>{" "}
         {expense.description}
+        <Collapse isOpen={isOpen}>
+          <div>id: {expense.id}</div>
+          <div>{expense.datetime}</div>
+        </Collapse>
       </DescriptionSlot>
     </StyledListItem>
   );
