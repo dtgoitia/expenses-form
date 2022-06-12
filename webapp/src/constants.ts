@@ -143,7 +143,7 @@ export const TAGS = [
   "home",
 ];
 
-export const DEFAULT_PEOPLE = ["AngelaPerez", "JavierDomingo"];
+export const DEFAULT_PEOPLE = ["AngelaPerez"];
 export const SELLERS = [
   "Amazon",
   "AWS",
