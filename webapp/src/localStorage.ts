@@ -82,6 +82,7 @@ class Storage {
   hasuraApiToken: StoredItem<string | undefined>;
   splitwiseApiToken: StoredItem<string | undefined>;
   tripTags: StoredItem<string[] | undefined>;
+  people: StoredItem<string[] | undefined>;
 
   constructor() {
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
@@ -90,8 +91,7 @@ class Storage {
       ValueType.string
     );
     this.tripTags = new StoredItem("trip_tags", ValueType.object);
-    // this.b = new StoredItem("b", 123);
-    // this.c = new StoredItem("c");
+    this.people = new StoredItem("people", ValueType.object);
   }
 }
 

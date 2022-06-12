@@ -54,9 +54,15 @@ function buildDescription({
 }
 
 const tagsInConfig = storage.tripTags.read() || [];
-const defaultTags: SelectableTag[] = mergeTags([TAGS, tagsInConfig]).map(
+const defaultTags: SelectableTag[] = mergeStringLists([TAGS, tagsInConfig]).map(
   (tag: string): SelectableTag => ({ name: tag, selected: false })
 );
+
+const peopleInConfig = storage.people.read() || [];
+const defaultPeople: Person[] = mergeStringLists([
+  DEFAULT_PEOPLE,
+  peopleInConfig,
+]);
 
 const Grid = styled.div`
   display: grid;
@@ -86,24 +92,24 @@ const Container = styled.div`
   margin-bottom: 1rem;
 `;
 
-function mergeTags(listOfTagLists: string[][]): string[] {
+function mergeStringLists(listOfStringLists: string[][]): string[] {
   /**
    * Return a list of unique strings. The order is preserved - items of the first list
    * are added first, then items in the second list, etc.
    */
-  const tags = listOfTagLists.flatMap((tags) => tags);
+  const flatList = listOfStringLists.flatMap((s) => s);
 
   const added = new Set<string>([]);
 
-  const uniqueTags: string[] = [];
-  for (const tag of tags) {
-    if (added.has(tag)) continue;
+  const unique: string[] = [];
+  for (const s of flatList) {
+    if (added.has(s)) continue;
 
-    added.add(tag);
-    uniqueTags.push(tag);
+    added.add(s);
+    unique.push(s);
   }
 
-  return uniqueTags;
+  return unique;
 }
 
 function Description({ onChange }: DescriptionProps) {
@@ -118,7 +124,7 @@ function Description({ onChange }: DescriptionProps) {
     .map((tag) => tag.name);
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);
-  const selectablePeople = [...DEFAULT_PEOPLE, ...peopleAddedByUser];
+  const selectablePeople = [...defaultPeople, ...peopleAddedByUser];
 
   function handleChange(_: any, { name, value }: InputOnChangeData): void {
     if (value === undefined) {

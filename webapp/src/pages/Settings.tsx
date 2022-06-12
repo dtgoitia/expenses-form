@@ -5,18 +5,18 @@ import { SyntheticEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Form, Icon, InputOnChangeData } from "semantic-ui-react";
 
-function tagsToInputField(tags: string[]): string {
-  return tags.join(",");
+function listToInputField(items: string[]): string {
+  return items.join(",");
 }
 
-function inputFieldToTags(inputValue: string): string[] {
-  const quotedTags = inputValue
+function inputFieldToList(inputValue: string): string[] {
+  const quotedItems = inputValue
     .split(",")
     .filter((tag) => tag !== "") // because  value="foo,," --> ["foo","",""]
     .map((tag) => `"${tag}"`)
     .join(",");
-  const tags = JSON.parse(`[${quotedTags}]`);
-  return tags;
+  const items = JSON.parse(`[${quotedItems}]`);
+  return items;
 }
 
 function SettingsPage() {
@@ -25,6 +25,7 @@ function SettingsPage() {
     undefined
   );
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
+  const [people, setPeople] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
@@ -34,7 +35,11 @@ function SettingsPage() {
       setSplitwiseToken(storage.splitwiseApiToken.read());
     }
     if (storage.tripTags.exists()) {
-      setTripTags(tagsToInputField(storage.tripTags.read() as string[]));
+      setTripTags(listToInputField(storage.tripTags.read() as string[]));
+    }
+
+    if (storage.people.exists()) {
+      setPeople(listToInputField(storage.people.read() as string[]));
     }
   }, []);
 
@@ -78,8 +83,21 @@ function SettingsPage() {
 
     setTripTags(value);
 
-    const tags = inputFieldToTags(value);
+    const tags = inputFieldToList(value);
     storage.tripTags.set(tags);
+  }
+
+  function handlePeopleChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+    if (value === undefined || value === null || value === "") {
+      setPeople(undefined);
+      storage.people.delete();
+      return;
+    }
+
+    setPeople(value);
+
+    const peopleNames = inputFieldToList(value);
+    storage.people.set(peopleNames);
   }
 
   return (
@@ -108,6 +126,14 @@ function SettingsPage() {
         value={tripTags}
         fluid
         onChange={handleTripTagsChange}
+      />
+      <Form.Input
+        label="People"
+        placeholder="JohnDoe,JaneDoe"
+        name="people"
+        value={people}
+        fluid
+        onChange={handlePeopleChange}
       />
       <Link to={Paths.root}>
         <Button>
