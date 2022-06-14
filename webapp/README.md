@@ -16,6 +16,33 @@ As per [official docs][1], navigate to the directory where your `package.json` i
 npx msw init public/ --save
 ```
 
+## Build
+
+### Compilation fails due lack of permissions to access `node_modules`
+
+```
+Starting the development server...
+
+Failed to compile.
+
+EACCES: permission denied, mkdir '/app/node_modules/.cache'
+ERROR in EACCES: permission denied, mkdir '/app/node_modules/.cache'
+
+webpack compiled with 1 error
+```
+
+The solution was to specify a user in the Dockerfile:
+
+```Dockerfile
+FROM ...
+
+USER node
+
+# ...
+```
+
+Issue details [here][4]
+
 ## Known bugs
 
 ### Uncaught ReferenceError: process is not defined
@@ -51,3 +78,4 @@ TODO: auto-apply migration on server start
 [1]: https://mswjs.io/docs/getting-started/integrate/browser#setup "Mock Service Worker - Setup"
 [2]: https://create-react-app.dev/docs/deployment/#building-for-relative-paths "Create React App - Building for relative paths"
 [3]: https://stackoverflow.com/questions/70368760/react-uncaught-referenceerror-process-is-not-defined "React Uncaught ReferenceError: process is not defined"
+[4]: https://stackoverflow.com/a/24555761/8038693
