@@ -1,5 +1,26 @@
 WEBAPP_NAME:=expenses-webapp
 
+set-up-development-environment:
+	@echo ""
+	@echo Installing git hooks...
+	make install-dev-tools
+
+	@echo ""
+	@echo ""
+	@echo Installing NPM dependencies outside of the container, to support pre-push builds...
+	@# this step is necessary because otherwise docker-compose creates a node_modules
+	@# folder with root permissions and outside-container build fails
+	cd webapp; npm ci
+
+	@echo ""
+	@echo ""
+	@echo Creating development docker images...
+	make rebuild-webapp
+
+	@echo ""
+	@echo ""
+	@echo To start app:  make run-full-stack
+
 install-dev-tools:
 	pre-commit install  # defaults to "pre-commit" stage
 	pre-commit install --hook-type pre-push
@@ -43,6 +64,3 @@ deploy-webapp-from-local:
 # Bundle webapp into the distribution folder
 build-webapp:
 	scripts/build_webapp.sh
-
-set-up-development-environment: install-dev-tools rebuild-webapp
-	cd webapp; npm ci
