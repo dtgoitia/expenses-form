@@ -49,7 +49,49 @@ const pendingPaymentMethods = new Set(
   )
 );
 
+interface ExpenseData {
+  paidWith: AccountName;
+  date: Date;
+  amount: number | undefined;
+  currency: CurrencyCode;
+  description: string | undefined;
+  pending: boolean;
+  shared: boolean;
+  submitting: boolean;
+}
+
+interface ExpensesFormState {
+  expenses: ExpenseData[];
+  focused: number; // index of the focused expense in `expenses`
+}
+
 function ExpensesForm() {
+  const [formState, setFormState] = useState<ExpensesFormState>({
+    expenses: [
+      {
+        paidWith: DEFAULT_PAYMENT_METHOD,
+        date: now(),
+        amount: undefined,
+        currency: DEFAULT_CURRENCY,
+        description: undefined,
+        pending: pendingPaymentMethods.has(DEFAULT_PAYMENT_METHOD),
+        shared: false,
+        submitting: false,
+      },
+    ],
+    focused: 0,
+  });
+
+  function _setDate(newDate: Date): void {
+    setFormState({
+      ...formState,
+      expenses: formState.expenses.map((expense, i) => {
+        if (i !== formState.focused) return expense;
+        return { ...expense, date: newDate };
+      }),
+    });
+  }
+
   const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
     (account) => account.name === paidWith
@@ -147,7 +189,9 @@ function ExpensesForm() {
   function refreshDate(e: SyntheticEvent) {
     console.debug("Refreshing date");
     e.preventDefault();
-    setDate(now());
+    const newDate = now();
+    setDate(newDate);
+    _setDate(newDate);
   }
 
   function refreshPage() {
@@ -156,6 +200,10 @@ function ExpensesForm() {
     // @ts-ignore
     window.location.reload(true);
   }
+
+  console.log(`-------------`);
+  console.log(` date=${date}`);
+  console.log(`_date=${formState.expenses[formState.focused].date}`);
 
   return (
     <CenteredPage>
