@@ -247,6 +247,80 @@ describe("Expenses form domain", () => {
   });
 
   describe("add new expense", () => {
-    test.skip("expenses are in chronological order", () => {});
+    test("expenses are in chronological order", () => {
+      const t1 = new Date("2000-02-01T01:00:00Z");
+      const t2 = new Date("2000-02-01T01:03:00Z");
+      const t3 = new Date("2000-02-01T01:07:00Z");
+      const defaultExpenseValues = {
+        paidWith: "foo-account",
+        amount: 1,
+        currency: "GBP",
+        description: undefined,
+        pending: false,
+        shared: false,
+        submitting: false,
+      };
+      const form = createForm({
+        previousState: {
+          expenses: [
+            { date: t1, ...defaultExpenseValues },
+            { date: t3, ...defaultExpenseValues },
+          ],
+          loaded: 1,
+        },
+      });
+      const newExpense = { date: t2, ...defaultExpenseValues };
+
+      form.addExpense(newExpense);
+
+      expect(form.state).toEqual({
+        expenses: [
+          { date: t1, ...defaultExpenseValues },
+          { date: t2, ...defaultExpenseValues },
+          { date: t3, ...defaultExpenseValues },
+        ],
+        loaded: 2, // <-- `loaded` index also adjusts because expenses get sorted
+      });
+    });
+  });
+
+  describe("remove expense by index", () => {
+    test("expenses are in chronological order", () => {
+      const t1 = new Date("2000-02-01T01:00:00Z");
+      const t2 = new Date("2000-02-01T01:03:00Z");
+      const t3 = new Date("2000-02-01T01:07:00Z");
+      const defaultExpenseValues = {
+        paidWith: "foo-account",
+        amount: 1,
+        currency: "GBP",
+        description: undefined,
+        pending: false,
+        shared: false,
+        submitting: false,
+      };
+      const form = createForm({
+        previousState: {
+          expenses: [
+            { date: t1, ...defaultExpenseValues },
+            { date: t2, ...defaultExpenseValues },
+            { date: t3, ...defaultExpenseValues },
+          ],
+          loaded: 1,
+        },
+      });
+
+      const oldest = 0;
+      form.removeExpenseByIndex(oldest);
+
+      expect(form.state).toEqual({
+        expenses: [
+          { date: t2, ...defaultExpenseValues },
+          { date: t3, ...defaultExpenseValues },
+        ],
+        loaded: 0, // <-- `loaded` index also adjusts because expenses are shifted
+      });
+    });
+
+    test.skip("what happens if you try to remove the loaded expense?", () => {});
   });
 });

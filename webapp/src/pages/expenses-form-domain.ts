@@ -177,6 +177,85 @@ class ExpensesForm {
     );
   }
 
+  public addExpense(expense: Expense): void {
+    /**
+     * Add expense maintaining chronological order and update `loader` pointer
+     * as required.
+     */
+
+    const previousLoaded = this.state.loaded;
+
+    // append new expense at the end - it's important to add it to the end, to preserve
+    // existing order and therefore `loaded` still points to the right expense
+    const expenses = [...this.state.expenses, expense];
+
+    // assign `index` to every expense
+    const indexed = expenses.map((expense, i) => ({ expense, index: i }));
+
+    // sort by date
+    const sorted = indexed.sort(function (a, b) {
+      const [date_a, date_b] = [a.expense.date, b.expense.date];
+      if (date_a < date_b) return -1;
+      if (date_a === date_b) return 0;
+      return 1;
+    });
+
+    // find loaded expense by `index`, and update `loaded` with its current position in array
+    let newLoaded: number | undefined = undefined;
+    for (let currentIndex = 0; currentIndex < sorted.length; currentIndex++) {
+      const numberedExpense = sorted[currentIndex];
+      if (numberedExpense.index == previousLoaded) {
+        newLoaded = currentIndex;
+        break;
+      }
+    }
+
+    if (!newLoaded) {
+      throw new Error(
+        `Could not find expense by "loaded" pointer after adding a new expense`
+      );
+    }
+
+    const sortedExpenses = sorted.map((numbered) => numbered.expense);
+
+    this.update({ expenses: sortedExpenses, loaded: newLoaded });
+  }
+
+  public removeExpenseByIndex(index: number): void {
+    /**
+     * Remove expense and update `loader` pointer as required.
+     *
+     * Assumption: expenses are in chronological order
+     */
+    let expenseRemoved = false;
+    const previousLoaded = this.state.loaded;
+    let newLoaded = previousLoaded;
+    const updatedExpenses: Expense[] = [];
+    this.state.expenses.forEach((expense, n) => {
+      if (n === index) {
+        expenseRemoved = true;
+        return;
+      }
+
+      // Update `newLoaded` value on the go using `expenseRemoved`
+      if (n === this.state.loaded) {
+        if (expenseRemoved) {
+          // The loaded expense was after the removed item, the pointer
+          // needs to be shifted one to the right (forward in time)
+          newLoaded = previousLoaded - 1;
+        } else {
+          // The loaded expense was before the removed item, so no need
+          // to update the pointer
+          newLoaded = previousLoaded;
+        }
+      }
+
+      updatedExpenses.push(expense);
+    });
+
+    this.update({ expenses: updatedExpenses, loaded: newLoaded });
+  }
+
   private updateNthExpense(n: number, func: ExpenseUpdater): void {
     const newState = {
       ...this.state,
