@@ -43,6 +43,9 @@ const ReloadDate = styled.div`
   margin-bottom: 1rem;
 `;
 
+// TODO: the `pending` flag should always be `true`, because until you add the
+// transaction IDs etc, you keep them as pending in the journal --> so the pending flag
+// is not useful anymore, you can remove it
 const pendingPaymentMethods = new Set(
   PAYMENT_ACCOUNTS.filter((account) => account.pending).map(
     (account) => account.name

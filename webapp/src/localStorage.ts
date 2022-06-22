@@ -86,6 +86,7 @@ class Storage {
   form: StoredItem<object>;
 
   constructor() {
+    // TODO: migrate stored items to keys prefixed with `expenses_`
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
     this.splitwiseApiToken = new StoredItem(
       "splitwise_api_token",
