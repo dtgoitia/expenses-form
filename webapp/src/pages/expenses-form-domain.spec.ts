@@ -1,7 +1,10 @@
 import { DEFAULT_CURRENCY, DEFAULT_PAYMENT_METHOD } from "../constants";
 import { default as realStorage } from "../localStorage";
 import ExpensesForm, {
+  deserializeExpenseStatus,
   ExpensesFormState,
+  ExpenseStatus,
+  InvalidExpenseStatus,
   IStorage,
 } from "./expenses-form-domain";
 
@@ -39,7 +42,7 @@ function generateFormState(): ExpensesFormState {
         description: "Groceries",
         pending: false,
         shared: false,
-        submitting: false,
+        status: ExpenseStatus.Submitted,
       },
     ],
     loaded: 0,
@@ -218,28 +221,28 @@ describe("Expenses form domain", () => {
     test.skip("fails if tries to set invalid value", () => {});
   });
 
-  describe("focused expense submitting", () => {
+  describe("focused expense status", () => {
     test("has default value if no previous state", () => {
       const form = createForm();
-      expect(form.loadedExpense.submitting).toEqual(false);
+      expect(form.loadedExpense.status).toEqual(ExpenseStatus.Draft);
     });
 
     test("has previous state value if previous state exists", () => {
       const previous = generateFormState();
-      previous.expenses[0].submitting = true;
+      previous.expenses[0].status = ExpenseStatus.Editing;
       const form = createForm({ previousState: previous });
-      expect(form.loadedExpense.submitting).toEqual(true);
+      expect(form.loadedExpense.status).toEqual(ExpenseStatus.Editing);
     });
 
     test("updates value", () => {
       const form = createForm();
-      expect(form.loadedExpense.submitting).toEqual(false);
+      expect(form.loadedExpense.status).toEqual(ExpenseStatus.Draft);
 
-      form.setSubmitting(true);
+      form.setStatus(ExpenseStatus.Submitted);
 
-      expect(form.loadedExpense.submitting).toEqual(true);
-      expect((realStorage.form.read() as any).expenses[0].submitting).toEqual(
-        true
+      expect(form.loadedExpense.status).toEqual(ExpenseStatus.Submitted);
+      expect((realStorage.form.read() as any).expenses[0].status).toEqual(
+        "SUBMITTED"
       );
     });
 
@@ -258,7 +261,7 @@ describe("Expenses form domain", () => {
         description: undefined,
         pending: false,
         shared: false,
-        submitting: false,
+        status: ExpenseStatus.Draft,
       };
       const form = createForm({
         previousState: {
@@ -282,6 +285,22 @@ describe("Expenses form domain", () => {
         loaded: 2, // <-- `loaded` index also adjusts because expenses get sorted
       });
     });
+    test("fail if new expense status is not draft", () => {
+      const form = createForm();
+
+      expect(() => {
+        form.addExpense({
+          paidWith: "foo-account",
+          date: mockNow(),
+          amount: 1,
+          currency: "GBP",
+          description: undefined,
+          pending: false,
+          shared: false,
+          status: ExpenseStatus.Submitted, // <-- wrong! should be Draft
+        });
+      }).toThrowError(InvalidExpenseStatus);
+    });
   });
 
   describe("remove expense by index", () => {
@@ -296,7 +315,7 @@ describe("Expenses form domain", () => {
         description: undefined,
         pending: false,
         shared: false,
-        submitting: false,
+        status: ExpenseStatus.Draft,
       };
       const form = createForm({
         previousState: {
@@ -322,5 +341,18 @@ describe("Expenses form domain", () => {
     });
 
     test.skip("what happens if you try to remove the loaded expense?", () => {});
+  });
+
+  describe("deserialize expense status", () => {
+    test("works with valid value", () => {
+      expect(() =>
+        deserializeExpenseStatus(ExpenseStatus.Draft)
+      ).not.toThrowError();
+    });
+    test("fails with invalid value", () => {
+      expect(() => deserializeExpenseStatus("foo")).toThrowError(
+        InvalidExpenseStatus
+      );
+    });
   });
 });

@@ -6,6 +6,38 @@ import {
 import { now } from "../datetimeUtils";
 import { AccountName, CurrencyCode } from "../domain";
 import { BehaviorSubject } from "rxjs";
+import { UnexpectedScenario } from "./devex";
+
+export enum ExpenseStatus {
+  /**
+   *                │
+   *                ▼
+   *         ┌───►DRAFT──────────────────────────┐
+   *         │      │                            │
+   *     (failed)   │                            │
+   *         │      ▼                            │
+   *         └──SUBMITTING                       │
+   *                │                            │
+   *                ▼                            ▼
+   *  ┌────────►SUBMITTED───────►DELETING────►(gone)
+   *  │           ▲ │ ▲             │
+   *  │      ┌────┘ │ └──(failed)───┘
+   *  │      │      │
+   *  │  (discard)  │
+   *  │      │      ▼
+   *  │      └───EDITING◄────┐
+   *  │             │        │
+   *  │             │    (failed)
+   *  │             ▼        │
+   *  └──────────UPDATING────┘
+   */
+  Draft = "DRAFT",
+  Submitting = "SUBMITTING",
+  Submitted = "SUBMITTED",
+  Editing = "EDITING",
+  Updating = "UPDATING",
+  Deleting = "DELETING",
+}
 
 interface Expense {
   paidWith: AccountName;
@@ -15,7 +47,7 @@ interface Expense {
   description: string | undefined;
   pending: boolean;
   shared: boolean;
-  submitting: boolean;
+  status: ExpenseStatus;
 }
 
 export interface ExpensesFormState {
@@ -44,7 +76,7 @@ interface RawStoredExpense {
   description: string | null;
   pending: boolean;
   shared: boolean;
-  submitting: boolean;
+  status: string;
 }
 
 interface RawStoredState {
@@ -60,7 +92,28 @@ function setUndefinedIfNull<T>(value: T | null): T | undefined {
   return value;
 }
 
-function deserialzieExpense(raw: RawStoredExpense): Expense {
+export class InvalidExpenseStatus extends Error {
+  constructor(message: string) {
+    super(message);
+
+    // because we are extending a built-in class
+    Object.setPrototypeOf(this, InvalidExpenseStatus.prototype);
+  }
+}
+
+export function deserializeExpenseStatus(raw: string): ExpenseStatus {
+  if (!Object.values(<any>ExpenseStatus).includes(raw)) {
+    throw new InvalidExpenseStatus(
+      `The value ${raw} is not a valid ExpenseStatus`
+    );
+  }
+
+  const status = raw as ExpenseStatus;
+
+  return status;
+}
+
+function deserializeExpense(raw: RawStoredExpense): Expense {
   return {
     paidWith: raw.paidWith as AccountName,
     date: new Date(raw.date),
@@ -69,17 +122,17 @@ function deserialzieExpense(raw: RawStoredExpense): Expense {
     description: setUndefinedIfNull(raw.description),
     pending: raw.pending,
     shared: raw.shared,
-    submitting: raw.submitting,
+    status: deserializeExpenseStatus(raw.status),
   };
 }
 
-function deserialzieState(raw: RawStoredState): ExpensesFormState | undefined {
+function deserializeState(raw: RawStoredState): ExpensesFormState | undefined {
   if (!raw) {
     return undefined;
   }
 
   return {
-    expenses: raw.expenses.map(deserialzieExpense),
+    expenses: raw.expenses.map(deserializeExpense),
     loaded: raw.loaded,
   };
 }
@@ -95,7 +148,7 @@ class ExpensesForm {
     this.now = now;
 
     this.storage = storageClient;
-    const previous = deserialzieState(
+    const previous = deserializeState(
       this.storage.form.read() as RawStoredState
     );
 
@@ -112,7 +165,7 @@ class ExpensesForm {
             description: undefined,
             pending: true,
             shared: false,
-            submitting: false,
+            status: ExpenseStatus.Draft,
           },
         ],
         loaded: 0,
@@ -170,10 +223,10 @@ class ExpensesForm {
     );
   }
 
-  public setSubmitting(submitting: boolean): void {
+  public setStatus(status: ExpenseStatus): void {
     this.updateNthExpense(
       this.state.loaded,
-      (expense: Expense): Expense => ({ ...expense, submitting })
+      (expense: Expense): Expense => ({ ...expense, status })
     );
   }
 
@@ -182,6 +235,12 @@ class ExpensesForm {
      * Add expense maintaining chronological order and update `loader` pointer
      * as required.
      */
+
+    if (expense.status !== ExpenseStatus.Draft) {
+      throw new InvalidExpenseStatus(
+        `Every new entry must start with a ${ExpenseStatus.Draft} status`
+      );
+    }
 
     const previousLoaded = this.state.loaded;
 
@@ -210,8 +269,8 @@ class ExpensesForm {
       }
     }
 
-    if (!newLoaded) {
-      throw new Error(
+    if (newLoaded === undefined) {
+      throw new UnexpectedScenario(
         `Could not find expense by "loaded" pointer after adding a new expense`
       );
     }
