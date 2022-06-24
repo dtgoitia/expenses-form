@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../constants";
-import { AccountId, CurrencyCode, ExpenseId } from "../domain";
+import { AccountId, CurrencyCode, HasuraExpenseId } from "../domain";
 import storage from "../localStorage";
 import { errorsService } from "../services/errors";
 import {
@@ -70,7 +70,7 @@ const MUTATION_DELETE_EXPENSE = gql`
 
 interface RawExpense {
   __typename: string;
-  id: ExpenseId;
+  id: HasuraExpenseId;
   amount: number;
   currency: string;
   description: string;
@@ -93,11 +93,11 @@ interface GetExpensesData {
 
 interface DeleteExpenseData {
   delete_expenses_by_pk: {
-    id: ExpenseId;
+    id: HasuraExpenseId;
   };
 }
 interface DeleteExpenseInput {
-  id: ExpenseId;
+  id: HasuraExpenseId;
 }
 
 function getHasuraContext() {
@@ -117,7 +117,7 @@ function getHasuraContext() {
 }
 
 export interface HasuraExpense {
-  id: ExpenseId;
+  id: HasuraExpenseId;
   amount: number;
   currency: string;
   description: string;
@@ -135,7 +135,7 @@ interface AddExpenseResponse {
     returning: [
       {
         __typename: "expenses";
-        id: ExpenseId;
+        id: HasuraExpenseId;
       }
     ];
     __typename: "expenses_mutation_response";
@@ -190,7 +190,7 @@ class HasuraClient {
       });
   }
 
-  public deleteExpense(id: ExpenseId): void {
+  public deleteExpense(id: HasuraExpenseId): void {
     console.debug(`Deleting submitted expense (id=${id}) from Hasura...`);
 
     const deletedIdPromise = this.client
@@ -250,7 +250,7 @@ class HasuraClient {
   }
 
   public addExpense$(expense: AddExpenseProps): Observable<void> {
-    const tempId: ExpenseId = -1;
+    const tempId: HasuraExpenseId = -1;
 
     this.addInflightExpense(expense, tempId);
     const newExpenseId = this.submitExpense(expense);
@@ -275,7 +275,10 @@ class HasuraClient {
     );
   }
 
-  private addInflightExpense(expense: AddExpenseProps, tempId: ExpenseId) {
+  private addInflightExpense(
+    expense: AddExpenseProps,
+    tempId: HasuraExpenseId
+  ) {
     const subscription = this.expenses$
       .pipe(first())
       .subscribe((previous: FetchedExpenses) => {
@@ -297,7 +300,9 @@ class HasuraClient {
     subscription.unsubscribe();
   }
 
-  private async submitExpense(expense: AddExpenseProps): Promise<ExpenseId> {
+  private async submitExpense(
+    expense: AddExpenseProps
+  ): Promise<HasuraExpenseId> {
     const { paidWith, ...remainingVariables } = expense;
 
     return this.client

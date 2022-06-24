@@ -1,5 +1,5 @@
 import hasura from "./clients/hasura";
-import { Expense, ExpenseId } from "./domain";
+import { Expense, HasuraExpenseId } from "./domain";
 import { Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Button, Icon, Loader } from "semantic-ui-react";
@@ -134,7 +134,7 @@ function List() {
   const [items, setItems] = useState<ExpenseItem[]>([]);
   const [listIsLoading, setListIsLoading] = useState(false);
 
-  function deleteExpense(id: ExpenseId) {
+  function deleteExpense(id: HasuraExpenseId) {
     hasura.deleteExpense(id);
   }
 
