@@ -303,6 +303,52 @@ describe("Expenses form domain", () => {
     });
   });
 
+  describe("draft expense is submitted", () => {
+    test(`expense status changes to ${ExpenseStatus.Submitting}`, () => {});
+    test(`hasura client requests to add a new expense`, () => {});
+  });
+
+  describe(`expense submission succeeds`, () => {
+    test(`expense status changes to ${ExpenseStatus.Submitted}`, () => {});
+  });
+
+  describe(`expense submission fails`, () => {
+    test(`expense status changes to ${ExpenseStatus.Draft}`, () => {});
+  });
+
+  describe(`submitted expense is edited`, () => {
+    test(`expense status changes to ${ExpenseStatus.Editing}`, () => {});
+  });
+
+  describe(`changes in edited expense are discarded`, () => {
+    test(`expense status changes to ${ExpenseStatus.Submitted}`, () => {});
+  });
+
+  describe(`edited expense is submitted`, () => {
+    test(`expense status changes to ${ExpenseStatus.Updating}`, () => {});
+    test(`hasura client requests to mutate the existing expense`, () => {});
+  });
+
+  describe(`expense update succeeds`, () => {
+    test(`expense status changes to ${ExpenseStatus.Submitted}`, () => {});
+  });
+
+  describe(`expense update fails`, () => {
+    test(`expense status changes to ${ExpenseStatus.Editing}`, () => {});
+  });
+
+  describe(`submitted expense is deleted`, () => {
+    test(`expense status changes to ${ExpenseStatus.Deleting}`, () => {});
+  });
+
+  describe(`submitted expense deletion succeeds`, () => {
+    test(`expense is not present anymore`, () => {});
+  });
+
+  describe(`submitted expense deletion fails`, () => {
+    test(`expense status changes to ${ExpenseStatus.Submitted}`, () => {});
+  });
+
   describe("remove expense by index", () => {
     test("expenses are in chronological order", () => {
       const t1 = new Date("2000-02-01T01:00:00Z");
