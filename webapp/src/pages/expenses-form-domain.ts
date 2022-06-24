@@ -1,13 +1,9 @@
-import {
-  DEFAULT_CURRENCY,
-  DEFAULT_PAYMENT_METHOD,
-  PAYMENT_ACCOUNTS,
-} from "../constants";
-import { now } from "../datetimeUtils";
+import { DEFAULT_CURRENCY, DEFAULT_PAYMENT_METHOD } from "../constants";
 import { AccountName, CurrencyCode } from "../domain";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, filter } from "rxjs";
 import { UnexpectedScenario } from "./devex";
 
+export type ExpenseId = string;
 export enum ExpenseStatus {
   /**
    *                │
@@ -40,6 +36,7 @@ export enum ExpenseStatus {
 }
 
 interface Expense {
+  id: ExpenseId;
   paidWith: AccountName;
   date: Date;
   amount: number | undefined;
@@ -48,11 +45,13 @@ interface Expense {
   pending: boolean;
   shared: boolean;
   status: ExpenseStatus;
+  focused: boolean;
 }
+
+type ExpenseWithoutId = Omit<Expense, "id" | "focused">;
 
 export interface ExpensesFormState {
   expenses: Expense[];
-  loaded: number; // index of expense loaded in form to be edited
 }
 
 type ExpenseUpdater = (expense: Expense) => Expense;
@@ -69,6 +68,7 @@ export interface IStorage {
 }
 
 interface RawStoredExpense {
+  id: string;
   paidWith: string;
   date: string;
   amount: number | null;
@@ -77,6 +77,7 @@ interface RawStoredExpense {
   pending: boolean;
   shared: boolean;
   status: string;
+  focused: boolean;
 }
 
 interface RawStoredState {
@@ -90,6 +91,15 @@ function setUndefinedIfNull<T>(value: T | null): T | undefined {
   }
 
   return value;
+}
+
+export class DataIntegrityError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    // because we are extending a built-in class
+    Object.setPrototypeOf(this, InvalidExpenseStatus.prototype);
+  }
 }
 
 export class InvalidExpenseStatus extends Error {
@@ -115,6 +125,7 @@ export function deserializeExpenseStatus(raw: string): ExpenseStatus {
 
 function deserializeExpense(raw: RawStoredExpense): Expense {
   return {
+    id: raw.id as ExpenseId,
     paidWith: raw.paidWith as AccountName,
     date: new Date(raw.date),
     amount: setUndefinedIfNull(raw.amount),
@@ -123,6 +134,7 @@ function deserializeExpense(raw: RawStoredExpense): Expense {
     pending: raw.pending,
     shared: raw.shared,
     status: deserializeExpenseStatus(raw.status),
+    focused: raw.focused,
   };
 }
 
@@ -133,16 +145,14 @@ function deserializeState(raw: RawStoredState): ExpensesFormState | undefined {
 
   return {
     expenses: raw.expenses.map(deserializeExpense),
-    loaded: raw.loaded,
   };
 }
 
-class ExpensesForm {
+export default class ExpensesForm {
   private storage: IStorage;
   public state: ExpensesFormState; // TODO: make this private and only expose state via Observable
-  public loadedExpense: Expense;
   private state$: BehaviorSubject<ExpensesFormState>;
-  private now: () => Date;
+  private now: () => Date; // TODO: what is this used for??
 
   constructor(now: () => Date, storageClient: IStorage) {
     this.now = now;
@@ -158,6 +168,7 @@ class ExpensesForm {
       this.state = {
         expenses: [
           {
+            id: generateExpenseId(),
             paidWith: DEFAULT_PAYMENT_METHOD,
             date: this.now(),
             amount: undefined,
@@ -166,71 +177,87 @@ class ExpensesForm {
             pending: true,
             shared: false,
             status: ExpenseStatus.Draft,
+            focused: true,
           },
         ],
-        loaded: 0,
       };
       this.storage.form.set(this.state);
     }
 
-    this.loadedExpense = this.state.expenses[this.state.loaded];
+    // this.loadedExpense = this.state.expenses[this.state.focused];
     this.state$ = new BehaviorSubject(this.state);
     // TODO: pass errorService on constructor, to emit errors as needed
   }
 
+  public getFocusedExpense(): Expense {
+    this.assertOnlyOneExpenseIsFocused();
+    return this.state.expenses.filter((expense) => expense.focused === true)[0];
+  }
+
+  public focusExpense(id: ExpenseId): void {
+    this.assertOnlyOneExpenseIsFocused();
+
+    let expenseFound = false;
+    const updatedExpenses = this.state.expenses.map((expense) => {
+      if (expense.id === id) {
+        expenseFound = true;
+        return { ...expense, focused: true };
+      }
+
+      return { ...expense, focused: false };
+    });
+
+    if (!expenseFound) {
+      throw new Error(`No expense found with id ${id}`);
+    }
+
+    this.update({ ...this.state, expenses: updatedExpenses });
+  }
+
   public setPaidWith(paidWith: AccountName): void {
     // TODO: validate if account is supported
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, paidWith })
     );
   }
 
   public setDate(date: Date): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, date })
     );
   }
 
   public setAmount(amount: number | undefined): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, amount })
     );
   }
 
   public setCurrency(currency: CurrencyCode): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, currency })
     );
   }
 
   public setDescription(description: string | undefined): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, description })
     );
   }
 
-  public setPending(pending: boolean): void {}
-
   public setShared(shared: boolean): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, shared })
     );
   }
 
   public setStatus(status: ExpenseStatus): void {
-    this.updateNthExpense(
-      this.state.loaded,
+    this.updateFocusedExpense(
       (expense: Expense): Expense => ({ ...expense, status })
     );
   }
 
-  public addExpense(expense: Expense): void {
+  public addExpense(expense: ExpenseWithoutId): void {
     /**
      * Add expense maintaining chronological order and update `loader` pointer
      * as required.
@@ -242,85 +269,78 @@ class ExpensesForm {
       );
     }
 
-    const previousLoaded = this.state.loaded;
+    const newExpense: Expense = {
+      ...expense,
+      id: generateExpenseId(),
+      focused: false, // the added expense must be automatically focused
+    };
 
-    // append new expense at the end - it's important to add it to the end, to preserve
-    // existing order and therefore `loaded` still points to the right expense
-    const expenses = [...this.state.expenses, expense];
-
-    // assign `index` to every expense
-    const indexed = expenses.map((expense, i) => ({ expense, index: i }));
-
-    // sort by date
-    const sorted = indexed.sort(function (a, b) {
-      const [date_a, date_b] = [a.expense.date, b.expense.date];
-      if (date_a < date_b) return -1;
-      if (date_a === date_b) return 0;
-      return 1;
+    // Unfocus every other expense
+    const existingExpenses = this.state.expenses.map((expense) => {
+      expense.focused = false;
+      return expense;
     });
 
-    // find loaded expense by `index`, and update `loaded` with its current position in array
-    let newLoaded: number | undefined = undefined;
-    for (let currentIndex = 0; currentIndex < sorted.length; currentIndex++) {
-      const numberedExpense = sorted[currentIndex];
-      if (numberedExpense.index == previousLoaded) {
-        newLoaded = currentIndex;
-        break;
-      }
-    }
+    this.update({
+      expenses: [...existingExpenses, newExpense].sort(SorterExpenseByDate),
+    });
+  }
 
-    if (newLoaded === undefined) {
-      throw new UnexpectedScenario(
-        `Could not find expense by "loaded" pointer after adding a new expense`
+  // public removeExpenseById(id: ExpenseId): void {
+  //   /**
+  //    * Remove expense and update `loader` pointer as required.
+  //    *
+  //    * Assumption: expenses are in chronological order
+  //    */
+  //   let expenseRemoved = false;
+  //   this.state.expenses.filter((expense, n) => {
+  //     if (n === index) {
+  //       expenseRemoved = true;
+  //       return;
+  //     }
+
+  //     // Update `newLoaded` value on the go using `expenseRemoved`
+  //     if (n === this.state.focused) {
+  //       if (expenseRemoved) {
+  //         // The loaded expense was after the removed item, the pointer
+  //         // needs to be shifted one to the right (forward in time)
+  //         newLoaded = previousLoaded - 1;
+  //       } else {
+  //         // The loaded expense was before the removed item, so no need
+  //         // to update the pointer
+  //         newLoaded = previousLoaded;
+  //       }
+  //     }
+
+  //     updatedExpenses.push(expense);
+  //   });
+
+  //   this.update({ expenses: updatedExpenses });
+  // }
+
+  private assertOnlyOneExpenseIsFocused(): void {
+    const focusedExpenses = this.state.expenses.filter(
+      (expense) => expense.focused
+    );
+    const amount = focusedExpenses.length;
+    if (amount === 0) {
+      throw new DataIntegrityError(
+        `Expected one focused expense, but none were found`
       );
     }
 
-    const sortedExpenses = sorted.map((numbered) => numbered.expense);
-
-    this.update({ expenses: sortedExpenses, loaded: newLoaded });
+    if (amount > 1) {
+      throw new DataIntegrityError(
+        `Expected one focused expense, but multiple were found`
+      );
+    }
   }
 
-  public removeExpenseByIndex(index: number): void {
-    /**
-     * Remove expense and update `loader` pointer as required.
-     *
-     * Assumption: expenses are in chronological order
-     */
-    let expenseRemoved = false;
-    const previousLoaded = this.state.loaded;
-    let newLoaded = previousLoaded;
-    const updatedExpenses: Expense[] = [];
-    this.state.expenses.forEach((expense, n) => {
-      if (n === index) {
-        expenseRemoved = true;
-        return;
-      }
-
-      // Update `newLoaded` value on the go using `expenseRemoved`
-      if (n === this.state.loaded) {
-        if (expenseRemoved) {
-          // The loaded expense was after the removed item, the pointer
-          // needs to be shifted one to the right (forward in time)
-          newLoaded = previousLoaded - 1;
-        } else {
-          // The loaded expense was before the removed item, so no need
-          // to update the pointer
-          newLoaded = previousLoaded;
-        }
-      }
-
-      updatedExpenses.push(expense);
-    });
-
-    this.update({ expenses: updatedExpenses, loaded: newLoaded });
-  }
-
-  private updateNthExpense(n: number, func: ExpenseUpdater): void {
+  private updateFocusedExpense(func: ExpenseUpdater): void {
     const newState = {
       ...this.state,
-      expenses: this.state.expenses.map((item, i) => {
-        if (i != n) return item;
-        return func(item);
+      expenses: this.state.expenses.map((expense) => {
+        return expense.focused ? func(expense) : expense;
       }),
     };
     this.update(newState);
@@ -328,7 +348,6 @@ class ExpensesForm {
 
   private update(state: ExpensesFormState): void {
     this.state = state;
-    this.loadedExpense = this.state.expenses[this.state.loaded];
     this.storage.form.set(state);
     this.state$.next(state);
   }
@@ -338,4 +357,32 @@ class ExpensesForm {
 
 // how to subscribe react component to Observable: https://stackoverflow.com/a/57309032/8038693
 
-export default ExpensesForm;
+/**
+ * Returns a hash code from a string
+ * @param  {String} str The string to hash.
+ * @return {Number}    A 32bit integer
+ * @see http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+ */
+function hashCode(str) {
+  // source: https://stackoverflow.com/questions/6122571/simple-non-secure-hash-function-for-javascript
+  let hash = 0;
+  for (let i = 0, len = str.length; i < len; i++) {
+    let chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return `${hash}`;
+}
+
+export function generateExpenseId(): ExpenseId {
+  const randomString = new Date().toISOString();
+  const hash = hashCode(randomString);
+  return hash;
+}
+
+function SorterExpenseByDate(a: Expense, b: Expense): number {
+  const [date_a, date_b] = [a.date, b.date];
+  if (date_a < date_b) return -1;
+  if (date_a === date_b) return 0;
+  return 1;
+}
