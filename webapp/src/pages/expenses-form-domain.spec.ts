@@ -283,6 +283,51 @@ describe("Expenses form domain", () => {
     test("multiple expenses cannot be focused", () => {});
   });
 
+  describe("get expense by ID", () => {
+    test("returns expense if expense exists", () => {
+      const expense = generateExpense({ focused: true });
+      const form = createForm({ previousState: { expenses: [expense] } });
+      const retrieved = form.getExpense(expense.id);
+      expect(retrieved).toEqual(expense);
+    });
+    test("throws error if expense does not exists", () => {
+      const form = createForm();
+      const retrieved = form.getExpense("non-existing expense ID");
+      expect(retrieved).toThrowError(Error);
+    });
+    test("throws error if multiple expenses are found with the same ID", () => {
+      const expense = generateExpense({ focused: true });
+      const form = createForm({
+        previousState: { expenses: [expense, expense] },
+      });
+      const retrieved = form.getExpense(expense.id);
+      expect(retrieved).toThrowError(Error);
+    });
+    // TODO: Update al the setDate, setAmount, etc. to update by ID underneath
+    /** TODO: decide where to store the "focused ID"... UI or form?
+     * step back:
+     *  * why are you moving all the logic away from the UI?
+     *    - testability: it's much easier to test the logic without the UI
+     *    - complexity: it's easier to handle domain complexity (e.g.: offline features)
+     * that said, where should you track which entry is focused?
+     *  * probably outside the UI
+     * random thought:
+     *   * the data exposed by `ExpenseForm` does not need to have the same shape as the
+     *     internal state, or the persistet data
+     *   * possible solution:
+     *     - keep an internal pointer, inside the `ExpenseForm`
+     *     - keep the list of expenses without any knowledge of whether they are focused
+     *       or not
+     *     - when you read one entry, you infer the `focused` attribute using the
+     *       pointer
+     *     - when you read multiple entries, you infer the `focused` attributes
+     *     - the UI only needs to:
+     *        1. render according to the `focused` state
+     *        2. notify the `ExpenseForm` when the user wants to focus a different expense
+     *     - the `ExpenseForm` is responsible for only one entry being focused at a time
+     */
+  });
+
   describe("add new expense", () => {
     test("expenses are in chronological order", () => {
       const t1 = new Date("2000-02-01T01:00:00Z");

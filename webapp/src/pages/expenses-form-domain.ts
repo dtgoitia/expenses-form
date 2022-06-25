@@ -257,6 +257,22 @@ export default class ExpensesForm {
     );
   }
 
+  public getExpense(id: ExpenseId): Expense {
+    const result = this.state.expenses.filter((e) => e.id === id);
+    console.dir(result);
+    if (result.length === 0) {
+      throw new Error(`Expense with ID=${id} is not among expenses in form`);
+    }
+
+    if (result.length > 1) {
+      throw new DataIntegrityError(
+        `Expense IDs must be unique, but multiple expenses found with ID=${id}`
+      );
+    }
+
+    return result[0];
+  }
+
   public addExpense(expense: ExpenseWithoutId): void {
     /**
      * Add expense maintaining chronological order and update `loader` pointer
