@@ -1,4 +1,5 @@
 import hasura from "./clients/hasura";
+import { PAYMENT_ACCOUNTS } from "./constants";
 import { Expense, ExpenseId } from "./domain";
 import { Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -69,6 +70,10 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
     remove();
   }
 
+  const paymentAccount = PAYMENT_ACCOUNTS.filter(
+    (account) => account.id === expense.paid_with
+  )[0].name;
+
   return (
     <StyledListItem>
       <DeleteActionSlot>
@@ -96,8 +101,9 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
         </b>{" "}
         {expense.description}
         <Collapse isOpen={isOpen}>
-          <div>id: {expense.id}</div>
-          <div>{expense.datetime}</div>
+          <pre>id: {expense.id}</pre>
+          <pre>datetime: {expense.datetime}</pre>
+          <pre>paid_with: {paymentAccount}</pre>
         </Collapse>
       </DescriptionSlot>
     </StyledListItem>
