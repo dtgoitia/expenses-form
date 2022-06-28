@@ -28,8 +28,6 @@ const QUERY_GET_SUBMITTED_EXPENSES = gql`
       currency
       description
       datetime
-      paid_with
-      shared
     }
   }
 `;
@@ -77,8 +75,6 @@ interface RawExpense {
   currency: string;
   description: string;
   datetime: string;
-  paid_with: number;
-  shared: boolean;
 }
 
 interface AddExpenseProps {
@@ -127,8 +123,6 @@ export interface HasuraExpense {
   description: string;
   datetime: string;
   submitted: boolean;
-  paid_with: number;
-  shared: boolean;
 }
 
 interface FetchedExpenses {
@@ -294,8 +288,6 @@ class HasuraClient {
           description: expense.description,
           datetime: expense.datetime.toISOString(),
           submitted: false,
-          paid_with: expense.paidWith,
-          shared: expense.shared,
         };
 
         const expenses: HasuraExpense[] = [...previousExpenses, newExpense];

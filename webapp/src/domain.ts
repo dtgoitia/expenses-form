@@ -8,8 +8,6 @@ export interface Expense {
   description: string;
   datetime: DatetimeISOString;
   submitted: boolean;
-  paid_with: number;
-  shared: boolean;
 }
 
 export type AccountId = number;
