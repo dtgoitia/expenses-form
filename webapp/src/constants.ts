@@ -50,7 +50,7 @@ export const SHORTCUTS: Shortcut[] = [
   },
 ];
 
-export const DEFAULT_PAYMENT_METHOD: AccountName = "amex";
+export const DEFAULT_PAYMENT_METHOD: AccountName = "monzo";
 
 export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
 
