@@ -1,6 +1,8 @@
 import hasura from "./clients/hasura";
 import { PAYMENT_ACCOUNTS } from "./constants";
 import { Expense, ExpenseId } from "./domain";
+import { errorsService } from "./services/errors";
+import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Collapse } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Button, Icon, Loader } from "semantic-ui-react";
@@ -57,6 +59,20 @@ const LoadingIconContainer = styled.div`
   margin-right: 0.4rem;
 `;
 
+function copyToClipboard(text: string): Promise<void> {
+  return navigator.clipboard
+    .writeText(text)
+    .then((_) => {
+      alert(`Copied to clipboard:\n${text}`);
+    })
+    .catch((reason) => {
+      errorsService.add({
+        header: "Error while trying to copy to clipboard",
+        description: reason,
+      });
+    });
+}
+
 interface ListItemProps {
   expense: Expense;
   deleting: boolean;
@@ -73,6 +89,8 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
   const paymentAccount = PAYMENT_ACCOUNTS.filter(
     (account) => account.id === expense.paid_with
   )[0].name;
+
+  let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
   return (
     <StyledListItem>
@@ -106,6 +124,12 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
           <pre>id: {expense.id}</pre>
           <pre>datetime: {expense.datetime}</pre>
           <pre>paid_with: {paymentAccount}</pre>
+          <p onClick={() => copyToClipboard(expense.description)}>
+            Click to copy description
+          </p>
+          <pre onClick={() => copyToClipboard(splitwiseDescription)}>
+            Splitwise: {splitwiseDescription}
+          </pre>
         </Collapse>
       </DescriptionSlot>
     </StyledListItem>
