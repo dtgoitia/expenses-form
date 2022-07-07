@@ -94,12 +94,14 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
           </LoadingIconContainer>
         )}
       </SubmittedStatusSlot>
-      <DescriptionSlot onClick={() => setIsOpen(!isOpen)}>
-        {formatDate(expense.datetime)}{" "}
-        <b>
-          {expense.amount} {expense.currency}
-        </b>{" "}
-        {expense.description}
+      <DescriptionSlot>
+        <p onClick={() => setIsOpen(!isOpen)}>
+          {formatDate(expense.datetime)}{" "}
+          <b>
+            {expense.amount} {expense.currency}
+          </b>{" "}
+          {expense.description}
+        </p>
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
           <pre>datetime: {expense.datetime}</pre>
