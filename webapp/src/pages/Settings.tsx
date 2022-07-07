@@ -1,4 +1,5 @@
 import CenteredPage from "../components/CenteredPage";
+import { AccountName } from "../domain";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { SyntheticEvent, useEffect, useState } from "react";
@@ -26,6 +27,9 @@ function SettingsPage() {
   );
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<string | undefined>(undefined);
+  const [paymentMethod, setPaymentMethod] = useState<AccountName | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
@@ -37,9 +41,11 @@ function SettingsPage() {
     if (storage.tripTags.exists()) {
       setTripTags(listToInputField(storage.tripTags.read() as string[]));
     }
-
     if (storage.people.exists()) {
       setPeople(listToInputField(storage.people.read() as string[]));
+    }
+    if (storage.defaultPaymentAccount.exists()) {
+      setPaymentMethod(storage.defaultPaymentAccount.read());
     }
   }, []);
 
@@ -100,6 +106,20 @@ function SettingsPage() {
     storage.people.set(peopleNames);
   }
 
+  function handlePaymentMethodChange(
+    _: SyntheticEvent,
+    { value }: InputOnChangeData
+  ) {
+    if (value === undefined || value === null || value === "") {
+      setPaymentMethod(undefined);
+      storage.defaultPaymentAccount.delete();
+      return;
+    }
+
+    setPaymentMethod(value);
+    storage.defaultPaymentAccount.set(value);
+  }
+
   return (
     <CenteredPage>
       <h1>Settings</h1>
@@ -134,6 +154,14 @@ function SettingsPage() {
         value={people}
         fluid
         onChange={handlePeopleChange}
+      />
+      <Form.Input
+        label="Default payment method"
+        placeholder="amex"
+        name="payment-method"
+        value={paymentMethod}
+        fluid
+        onChange={handlePaymentMethodChange}
       />
       <Link to={Paths.root}>
         <Button>

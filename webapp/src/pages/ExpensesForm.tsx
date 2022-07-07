@@ -11,6 +11,7 @@ import {
 } from "../constants";
 import { now } from "../datetimeUtils";
 import { AccountName, CurrencyCode } from "../domain";
+import storage from "../localStorage";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
 import React, { SyntheticEvent, useState } from "react";
@@ -49,8 +50,11 @@ const pendingPaymentMethods = new Set(
   )
 );
 
+const paymentMethod: AccountName =
+  storage.defaultPaymentAccount.read() || DEFAULT_PAYMENT_METHOD;
+
 function ExpensesForm() {
-  const [paidWith, setPaidWith] = useState<AccountName>(DEFAULT_PAYMENT_METHOD);
+  const [paidWith, setPaidWith] = useState<AccountName>(paymentMethod);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
     (account) => account.name === paidWith
   )[0].id;
