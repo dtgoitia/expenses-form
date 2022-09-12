@@ -100,7 +100,7 @@ function SettingsPage() {
       return;
     }
 
-    setPeople(value);
+    setPeople(value.replaceAll(",,", ",").trim());
 
     const peopleNames = inputFieldToList(value);
     storage.people.set(peopleNames);
