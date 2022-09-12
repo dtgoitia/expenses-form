@@ -33,7 +33,7 @@ function buildDescription({
   const chunks = [];
 
   if (main) {
-    chunks.push(main);
+    chunks.push(main.trim());
   }
 
   if (people && people.length > 0) {
