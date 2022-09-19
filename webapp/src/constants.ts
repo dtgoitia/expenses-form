@@ -58,7 +58,7 @@ export const PAYMENT_ACCOUNTS: Account[] = [
   {
     id: 1,
     name: "monzo",
-    pending: false,
+    pending: true,
   },
   {
     id: 2,
@@ -114,6 +114,11 @@ export const PAYMENT_ACCOUNTS: Account[] = [
     id: 12,
     name: "paid by somebody else",
     pending: false,
+  },
+  {
+    id: 13,
+    name: "chase",
+    pending: true,
   },
 ];
 
