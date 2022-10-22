@@ -1,8 +1,8 @@
 import ExpenseQueue from "../ExpenseQueue";
-import hasura from "../clients/hasura";
 import CenteredPage from "../components/CenteredPage";
 import DateTimePicker from "../components/DateTimePicker";
 import Description from "../components/Description";
+import DownloadJson from "../components/DownloadJson";
 import {
   CURRENCIES,
   DEFAULT_CURRENCY,
@@ -10,12 +10,14 @@ import {
   PAYMENT_ACCOUNTS,
 } from "../constants";
 import { now } from "../datetimeUtils";
-import { AccountName, CurrencyCode } from "../domain/model";
+import { ExpenseManager, NewExpense } from "../domain/expenses";
+import { AccountName, CurrencyCode, Expense, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { first } from "rxjs";
 import {
   Button,
   DropdownItemProps,
@@ -53,7 +55,12 @@ const pendingPaymentMethods = new Set(
 const paymentMethod: AccountName =
   storage.defaultPaymentAccount.read() || DEFAULT_PAYMENT_METHOD;
 
-function ExpensesForm() {
+interface ExpensesFormProps {
+  expenseManager: ExpenseManager;
+}
+
+function ExpensesForm({ expenseManager }: ExpensesFormProps) {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [paidWith, setPaidWith] = useState<AccountName>(paymentMethod);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
     (account) => account.name === paidWith
@@ -85,6 +92,17 @@ function ExpensesForm() {
       text: name,
     })
   ) as unknown as DropdownItemProps[];
+
+  useEffect(() => {
+    const subscription = expenseManager.change$.subscribe((_) => {
+      setExpenses(expenseManager.getAll());
+      // TODO: update rendered list of expenses
+    });
+
+    setExpenses(expenseManager.getAll());
+
+    return subscription.unsubscribe;
+  }, [expenseManager]);
 
   function handleAccountChange(_: any, data: DropdownProps): void {
     const value = data.value as string;
@@ -132,20 +150,35 @@ function ExpensesForm() {
       return;
     }
 
+    const newExpense: NewExpense = {
+      datetime: date,
+      amount: amount as number,
+      currency,
+      description: description as string,
+      shared,
+      pending,
+      paid_with: accountIndex,
+    };
+
     setSubmitting(true);
-    hasura
-      .addExpense$({
-        paidWith: accountIndex,
-        datetime: date,
-        amount: amount as number,
-        currency,
-        description: description as string,
-        shared,
-        pending,
-      })
-      .subscribe(() => {
-        setSubmitting(false);
-      });
+    // hasura
+    //   .addExpense$({
+    //     paidWith: accountIndex,
+    //     datetime: date,
+    //     amount: amount as number,
+    //     currency,
+    //     description: description as string,
+    //     shared,
+    //     pending,
+    //   })
+    //   .subscribe(() => {
+    //     setSubmitting(false);
+    //   });
+
+    expenseManager.change$.pipe(first()).subscribe((_) => {
+      setSubmitting(false);
+    });
+    expenseManager.add(newExpense);
   }
 
   function refreshDate(e: SyntheticEvent) {
@@ -237,7 +270,12 @@ function ExpensesForm() {
         </Form.Group>
       </Form>
 
-      <ExpenseQueue />
+      <DownloadJson expenses={expenses} />
+
+      <ExpenseQueue
+        expenses={expenses}
+        onDelete={(id: ExpenseId) => expenseManager.delete(id)}
+      />
 
       <pre>
         {JSON.stringify(

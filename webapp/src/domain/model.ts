@@ -6,10 +6,14 @@ export interface Expense {
   amount: number;
   currency: string;
   description: string;
-  datetime: DatetimeISOString;
-  submitted: boolean;
+  datetime: Date;
+  // The domain should not contain data about the persistence layer, instead, the
+  // orchestration layer should enrich/wrap/attach the value with any extra data
+  // required
+  // submitted: boolean;
   paid_with: number;
   shared: boolean;
+  pending: boolean;
 }
 
 export type AccountId = number;

@@ -1,10 +1,9 @@
-import hasura from "./clients/hasura";
 import { PAYMENT_ACCOUNTS } from "./constants";
 import { Expense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Collapse } from "@blueprintjs/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -43,9 +42,7 @@ const MONTH_INDEX_TO_NAME: { [x: number]: string } = {
   12: "Dec",
 };
 
-function formatDate(isoDatetime: string): string {
-  const date = new Date(isoDatetime);
-
+function formatDate(date: Date): string {
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -54,10 +51,6 @@ function formatDate(isoDatetime: string): string {
 
   return `${formattedMonth}-${formattedDay}`;
 }
-
-const LoadingIconContainer = styled.div`
-  margin-right: 0.4rem;
-`;
 
 function copyToClipboard(text: string): Promise<void> {
   return navigator.clipboard
@@ -82,6 +75,7 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   function handleOnDeleteClick() {
+    console.debug(`ExpenseQueue.handleOnDeleteClick:: ${expense.id}`);
     if (deleting) return; // Do nothing if already removing item
     remove();
   }
@@ -104,13 +98,7 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
         </Button>
       </DeleteActionSlot>
       <SubmittedStatusSlot onClick={() => setIsOpen(!isOpen)}>
-        {expense.submitted ? (
-          <Icon name="check" />
-        ) : (
-          <LoadingIconContainer>
-            <Loader active inline size="mini" />
-          </LoadingIconContainer>
-        )}
+        <Icon name="check" />
       </SubmittedStatusSlot>
       <DescriptionSlot>
         <p onClick={() => setIsOpen(!isOpen)}>
@@ -122,7 +110,7 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
         </p>
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
-          <pre>datetime: {expense.datetime}</pre>
+          <pre>datetime: {expense.datetime.toISOString()}</pre>
           <pre>paid_with: {paymentAccount}</pre>
           <p onClick={() => copyToClipboard(expense.description)}>
             Click to copy description
@@ -136,86 +124,41 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
   );
 }
 
-function sortExpensesByDate(a: ExpenseItem, b: ExpenseItem): number {
-  const date_a = new Date(a.expense.datetime);
-  const date_b = new Date(b.expense.datetime);
+// function sortExpensesByDate(a: ExpenseItem, b: ExpenseItem): number {
+//   const date_a = new Date(a.expense.datetime);
+//   const date_b = new Date(b.expense.datetime);
 
-  if (date_a < date_b) {
-    return -1;
-  }
+//   if (date_a < date_b) {
+//     return -1;
+//   }
 
-  return 1;
+//   return 1;
+// }
+
+// const Container = styled.div`
+//   display: flex;
+//   flex: row nowrap;
+//   justify-content: center;
+//   gap: 0.8rem;
+// `;
+// const LoaderText = styled.span`
+//   font-size: 0.8rem;
+// `;
+
+interface Props {
+  expenses: Expense[];
+  onDelete: (id: ExpenseId) => void;
 }
-
-const Container = styled.div`
-  display: flex;
-  flex: row nowrap;
-  justify-content: center;
-  gap: 0.8rem;
-`;
-const LoaderText = styled.span`
-  font-size: 0.8rem;
-`;
-
-interface ExpenseItem {
-  expense: Expense;
-  deleting: boolean;
-}
-
-function List() {
-  const [items, setItems] = useState<ExpenseItem[]>([]);
-  const [listIsLoading, setListIsLoading] = useState(false);
-
-  function deleteExpense(id: ExpenseId) {
-    hasura.deleteExpense(id);
-  }
-
-  useEffect(() => {
-    const subscription = hasura.expenses$.subscribe((request) => {
-      setListIsLoading(request.loading);
-
-      if (request.data === undefined) return;
-
-      const updatedItems = (request.data as Expense[]).map((expense) => ({
-        deleting: false,
-        expense,
-      }));
-      setItems(updatedItems);
-    });
-
-    hasura.getExpenses();
-
-    return subscription.unsubscribe;
-  }, []);
-
-  if (listIsLoading) {
-    return (
-      <Container>
-        <Loader active inline size="mini" />
-        <LoaderText>Loading submitted expenses from server... </LoaderText>
-      </Container>
-    );
-  }
-
-  const itemsSortedByDate = items.concat().sort(sortExpensesByDate);
-
+function ExpenseList({ expenses, onDelete }: Props) {
   return (
     <div>
-      {itemsSortedByDate.map(({ expense, deleting }, i) => {
-        const onDelete = () => {
-          const updatedItems = items.map((item) => {
-            if (item.expense.id !== expense.id) return item;
-            return { deleting: true, expense };
-          });
-          setItems(updatedItems);
-          deleteExpense(expense.id);
-        };
+      {expenses.map((expense) => {
         return (
           <ListItem
-            key={`queued-expense-${i}`}
-            deleting={deleting}
+            key={`queued-expense-${expense.id}`}
+            deleting={false} // TODO: integrate this in the new domain
             expense={expense}
-            remove={onDelete}
+            remove={() => onDelete(expense.id)}
           />
         );
       })}
@@ -223,6 +166,6 @@ function List() {
   );
 }
 
-const ExpenseQueue = List;
+const ExpenseQueue = ExpenseList;
 
 export default ExpenseQueue;

@@ -78,12 +78,13 @@ class StoredItem<T> {
   }
 }
 
-class Storage {
+export class Storage {
   hasuraApiToken: StoredItem<string | undefined>;
   splitwiseApiToken: StoredItem<string | undefined>;
   tripTags: StoredItem<string[] | undefined>;
   people: StoredItem<string[] | undefined>;
   defaultPaymentAccount: StoredItem<string | undefined>;
+  expenses: StoredItem<object | undefined>;
 
   constructor() {
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
@@ -97,6 +98,7 @@ class Storage {
       "defaultPaymentAccount",
       ValueType.string
     );
+    this.expenses = new StoredItem("exp__expenses", ValueType.object);
   }
 }
 
