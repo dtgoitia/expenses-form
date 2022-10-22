@@ -1,4 +1,4 @@
-import { TagName } from "../../domain";
+import { TagName } from "../../domain/model";
 import { SyntheticEvent } from "react";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";

@@ -10,7 +10,7 @@ import {
   PAYMENT_ACCOUNTS,
 } from "../constants";
 import { now } from "../datetimeUtils";
-import { AccountName, CurrencyCode } from "../domain";
+import { AccountName, CurrencyCode } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";

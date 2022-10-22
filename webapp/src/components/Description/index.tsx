@@ -1,6 +1,6 @@
 import Shortcuts from "../../PredefinedButtons";
 import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
-import { Person, Seller, ShortcutId, TagName } from "../../domain";
+import { Person, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
 import TagSelector, { SelectableTag } from "./TagSelector";
 import { useEffect, useState } from "react";

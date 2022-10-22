@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "../constants";
-import { AccountId, CurrencyCode, ExpenseId } from "../domain";
+import { AccountId, CurrencyCode, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import { errorsService } from "../services/errors";
 import {

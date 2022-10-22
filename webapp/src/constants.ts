@@ -4,7 +4,7 @@ import {
   Currency,
   CurrencyCode,
   Shortcut,
-} from "./domain";
+} from "./domain/model";
 import LoadEnvVar from "./environment";
 
 export const SHORTCUTS: Shortcut[] = [

@@ -1,5 +1,5 @@
 import CenteredPage from "../components/CenteredPage";
-import { AccountName } from "../domain";
+import { AccountName } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { SyntheticEvent, useEffect, useState } from "react";

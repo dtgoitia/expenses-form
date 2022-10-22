@@ -1,6 +1,6 @@
 import hasura from "./clients/hasura";
 import { PAYMENT_ACCOUNTS } from "./constants";
-import { Expense, ExpenseId } from "./domain";
+import { Expense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Collapse } from "@blueprintjs/core";

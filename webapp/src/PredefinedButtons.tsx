@@ -1,4 +1,4 @@
-import { ShortcutId } from "./domain";
+import { ShortcutId } from "./domain/model";
 import { SyntheticEvent } from "react";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
