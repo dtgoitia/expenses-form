@@ -45,16 +45,13 @@ rebuild-webapp:
 	docker-compose build --no-cache $(WEBAPP_NAME)
 
 shell-webapp:
-	docker-compose run --rm $(WEBAPP_NAME) /bin/bash
+	docker-compose run --rm $(WEBAPP_NAME) bash
 
 test-dev-webapp:
 	docker-compose run --rm $(WEBAPP_NAME) npm test
 
 run-full-stack:
 	 bash scripts/run_webapp_with_local_backend.sh
-
-shell-webapp:
-	docker-compose run --rm $(WEBAPP_NAME) bash
 
 deploy-webapp-from-local:
 	cd ./webapp \
