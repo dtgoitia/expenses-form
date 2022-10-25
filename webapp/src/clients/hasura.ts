@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../constants";
+import { generatePrefixedId } from "../domain/idGeneration";
 import { AccountId, CurrencyCode, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import { errorsService } from "../services/errors";
@@ -256,7 +257,7 @@ class HasuraClient {
   }
 
   public addExpense$(expense: AddExpenseProps): Observable<void> {
-    const tempId: ExpenseId = -1;
+    const tempId: ExpenseId = generatePrefixedId("inflight_exp");
 
     this.addInflightExpense(expense, tempId);
     const newExpenseId = this.submitExpense(expense);

@@ -1,3 +1,4 @@
+import { generatePrefixedId } from "./idGeneration";
 import { Expense, ExpenseId } from "./model";
 import { Observable, Subject } from "rxjs";
 
@@ -76,14 +77,7 @@ export class ExpenseManager {
   }
 
   private generateId(): ExpenseId {
-    // TODO: replace number-like IDs with prefixed hashes - like Stripe: "exp_abc123"
-
-    // Find next available number
-    let id: ExpenseId = 0;
-    while (this.expenses.has(id)) {
-      id++;
-    }
-    return id;
+    return generatePrefixedId("exp");
   }
 }
 

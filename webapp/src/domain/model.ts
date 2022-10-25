@@ -1,4 +1,4 @@
-export type ExpenseId = number;
+export type ExpenseId = string;
 export type DatetimeISOString = string; // "2022-01-17T08:19:26+00:00"
 
 export interface Expense {
