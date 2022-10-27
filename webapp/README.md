@@ -16,6 +16,21 @@ As per [official docs][1], navigate to the directory where your `package.json` i
 npx msw init public/ --save
 ```
 
+## Install/upgrade NPM dependencies
+
+1. Upgrade NPM packages ignoring docker:
+
+   ```shell
+   cd webapp
+   npm install --save foo
+   ```
+
+1. Rebuild docker image with new `package.json`
+
+   ```shell
+   make rebuild-webapp
+   ```
+
 ## Build
 
 ### Compilation fails due lack of permissions to access `node_modules`
