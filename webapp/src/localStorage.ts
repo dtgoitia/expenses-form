@@ -85,6 +85,7 @@ export class Storage {
   people: StoredItem<string[] | undefined>;
   defaultPaymentAccount: StoredItem<string | undefined>;
   expenses: StoredItem<object | undefined>;
+  peerHostname: StoredItem<string | undefined>;
 
   constructor() {
     this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
@@ -99,6 +100,7 @@ export class Storage {
       ValueType.string
     );
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
+    this.peerHostname = new StoredItem("exp__peer_hostname", ValueType.string);
   }
 }
 

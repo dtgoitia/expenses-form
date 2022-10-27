@@ -1,5 +1,8 @@
 import { Expense } from "../domain/model";
+import { postExpensesToLaptop } from "../domain/transferToLaptop";
+import storage from "../localStorage";
 import { Button } from "@blueprintjs/core";
+import { useState } from "react";
 import styled from "styled-components";
 
 function buildJson(expenses: Expense[]): Blob {
@@ -60,6 +63,8 @@ interface DownloadJsonProps {
   expenses: Expense[];
 }
 function DownloadJson({ expenses }: DownloadJsonProps) {
+  const [pushing, setPushing] = useState(false);
+
   const timestamp = getTimestamp();
   const fileName = `expenses-form-${timestamp}.json`;
   const shareApiAvailable = shareApiNotAvailable() === false;
@@ -96,6 +101,22 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
       });
   }
 
+  function pushToServer() {
+    const url = storage.peerHostname.read();
+    if (url === undefined) {
+      alert(`Please, set up peer hostname in settings`);
+      return;
+    }
+    setPushing(true);
+    postExpensesToLaptop({ url, expenses }).then(({ success }) => {
+      console.log(success);
+      setPushing(false);
+      if (success === false) {
+        alert("Something went wrong");
+      }
+    });
+  }
+
   return (
     <Container>
       <Button intent="success" text="Download CSV" onClick={() => download()} />
@@ -104,6 +125,13 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
         text="Share CSV"
         onClick={() => share()}
         disabled={shareApiAvailable === false}
+      />
+      <Button
+        intent="success"
+        text="Push JSON to server"
+        onClick={() => pushToServer()}
+        disabled={pushing}
+        icon={pushing ? "refresh" : "airplane"}
       />
     </Container>
   );

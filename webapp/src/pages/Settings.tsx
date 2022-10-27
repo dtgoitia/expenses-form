@@ -30,6 +30,9 @@ function SettingsPage() {
   const [paymentMethod, setPaymentMethod] = useState<AccountName | undefined>(
     undefined
   );
+  const [peerHostname, setPeerHostname] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
@@ -46,6 +49,9 @@ function SettingsPage() {
     }
     if (storage.defaultPaymentAccount.exists()) {
       setPaymentMethod(storage.defaultPaymentAccount.read());
+    }
+    if (storage.peerHostname.exists()) {
+      setPeerHostname(storage.peerHostname.read());
     }
   }, []);
 
@@ -120,6 +126,20 @@ function SettingsPage() {
     storage.defaultPaymentAccount.set(value);
   }
 
+  function handlePeerHostnameChange(
+    _: SyntheticEvent,
+    { value }: InputOnChangeData
+  ) {
+    if (value === undefined || value === null || value === "") {
+      setPaymentMethod(undefined);
+      storage.peerHostname.delete();
+      return;
+    }
+
+    setPeerHostname(value);
+    storage.peerHostname.set(value);
+  }
+
   return (
     <CenteredPage>
       <h1>Settings</h1>
@@ -162,6 +182,14 @@ function SettingsPage() {
         value={paymentMethod}
         fluid
         onChange={handlePaymentMethodChange}
+      />
+      <Form.Input
+        label="Peer hostname"
+        placeholder="http://localhost:1234"
+        name="peer-hostname"
+        value={peerHostname}
+        fluid
+        onChange={handlePeerHostnameChange}
       />
       <Link to={Paths.root}>
         <Button>
