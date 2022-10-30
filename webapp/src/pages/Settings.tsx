@@ -30,7 +30,7 @@ function SettingsPage() {
   const [paymentMethod, setPaymentMethod] = useState<AccountName | undefined>(
     undefined
   );
-  const [peerHostname, setPeerHostname] = useState<string | undefined>(
+  const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(
     undefined
   );
 
@@ -50,8 +50,9 @@ function SettingsPage() {
     if (storage.defaultPaymentAccount.exists()) {
       setPaymentMethod(storage.defaultPaymentAccount.read());
     }
-    if (storage.peerHostname.exists()) {
-      setPeerHostname(storage.peerHostname.read());
+    if (storage.firestoreConfig.exists()) {
+      const config = storage.firestoreConfig.read();
+      setFirestoreConfig(JSON.stringify(config));
     }
   }, []);
 
@@ -132,12 +133,13 @@ function SettingsPage() {
   ) {
     if (value === undefined || value === null || value === "") {
       setPaymentMethod(undefined);
-      storage.peerHostname.delete();
+      storage.firestoreConfig.delete();
       return;
     }
 
-    setPeerHostname(value);
-    storage.peerHostname.set(value);
+    setFirestoreConfig(value);
+    const config = JSON.parse(value);
+    storage.firestoreConfig.set(config);
   }
 
   return (
@@ -184,10 +186,10 @@ function SettingsPage() {
         onChange={handlePaymentMethodChange}
       />
       <Form.Input
-        label="Peer hostname"
-        placeholder="http://localhost:1234"
-        name="peer-hostname"
-        value={peerHostname}
+        label="Firestore config"
+        placeholder={`{"a":1,"b":2}`}
+        name="firestore-config"
+        value={firestoreConfig}
         fluid
         onChange={handlePeerHostnameChange}
       />

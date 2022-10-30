@@ -1,6 +1,7 @@
+import { FirestoreClient } from "../domain/firebase";
 import { Expense } from "../domain/model";
-import { postExpensesToLaptop } from "../domain/transferToLaptop";
 import storage from "../localStorage";
+import { errorsService } from "../services/errors";
 import { Button } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";
@@ -101,20 +102,26 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
       });
   }
 
-  function pushToServer() {
-    const url = storage.peerHostname.read();
-    if (url === undefined) {
-      alert(`Please, set up peer hostname in settings`);
+  function pushToFirestore() {
+    const config = storage.firestoreConfig.read();
+    if (config === undefined) {
+      alert(`Please, set up Firestore config in settings`);
       return;
     }
+    // TODO: use a React.Context for this - makes it more testable and modular
+    const firestore = new FirestoreClient({ config });
     setPushing(true);
-    postExpensesToLaptop({ url, expenses }).then(({ success }) => {
-      console.log(success);
-      setPushing(false);
-      if (success === false) {
-        alert("Something went wrong");
-      }
-    });
+    firestore
+      .setAll(expenses)
+      .then(() => {
+        setPushing(false);
+      })
+      .catch((error) => {
+        errorsService.add({
+          header: `Failed to push all expenses to Firestore`,
+          description: error,
+        });
+      });
   }
 
   return (
@@ -128,8 +135,8 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
       />
       <Button
         intent="success"
-        text="Push JSON to server"
-        onClick={() => pushToServer()}
+        text="Push to Firestore"
+        onClick={() => pushToFirestore()}
         disabled={pushing}
         icon={pushing ? "refresh" : "airplane"}
       />
