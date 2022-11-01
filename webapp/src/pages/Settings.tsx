@@ -127,12 +127,12 @@ function SettingsPage() {
     storage.defaultPaymentAccount.set(value);
   }
 
-  function handlePeerHostnameChange(
+  function handleFirestoreConfigChange(
     _: SyntheticEvent,
     { value }: InputOnChangeData
   ) {
     if (value === undefined || value === null || value === "") {
-      setPaymentMethod(undefined);
+      setFirestoreConfig(undefined);
       storage.firestoreConfig.delete();
       return;
     }
@@ -191,7 +191,7 @@ function SettingsPage() {
         name="firestore-config"
         value={firestoreConfig}
         fluid
-        onChange={handlePeerHostnameChange}
+        onChange={handleFirestoreConfigChange}
       />
       <Link to={Paths.root}>
         <Button>
