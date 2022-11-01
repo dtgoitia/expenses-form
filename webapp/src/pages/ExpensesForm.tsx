@@ -15,7 +15,8 @@ import { AccountName, CurrencyCode, Expense, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import { Button as BlueprintButton, Checkbox } from "@blueprintjs/core";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { first } from "rxjs";
 import {
@@ -123,24 +124,6 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
     setAmount(Number(value));
   }
 
-  function handleChange(_: any, { name, value }: InputOnChangeData): void {
-    console.debug(`handleChange(name=${name}, value=${value})`);
-    if (value === undefined) {
-      return;
-    }
-
-    switch (name) {
-      case FieldName.pending:
-        setPending(value === "true");
-        break;
-      case FieldName.shared:
-        setShared(value === "true");
-        break;
-      default:
-        break;
-    }
-  }
-
   function handleSubmit() {
     if (!amount) {
       errorsService.add({
@@ -245,29 +228,31 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
 
         <Description onChange={setDescription} />
 
-        <Form.Group inline>
-          <Form.Input
-            type="checkbox"
-            label="Splitwise"
-            name={FieldName.shared}
-            value={!shared}
-            checked={shared}
-            onChange={handleChange}
-          />
-          <Form.Input
-            type="checkbox"
-            label="Pending"
-            placeholder="Pending"
-            name={FieldName.pending}
-            value={!pending}
-            checked={pending}
-            onChange={handleChange}
-          />
+        <Checkbox
+          inline
+          checked={shared}
+          label="Splitwise"
+          onChange={(event) => {
+            const isChecked = (event.target as HTMLInputElement).checked;
+            setShared(isChecked);
+          }}
+        />
+        <Checkbox
+          inline
+          checked={pending}
+          label="Pending"
+          onChange={(event) => {
+            const isChecked = (event.target as HTMLInputElement).checked;
+            setPending(isChecked);
+          }}
+        />
 
-          <Button type="submit" loading={submitting}>
-            Add expense
-          </Button>
-        </Form.Group>
+        <BlueprintButton
+          large
+          text="Add expense"
+          loading={submitting}
+          onClick={handleSubmit}
+        />
       </Form>
 
       <DownloadJson expenses={expenses} />
