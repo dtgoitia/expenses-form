@@ -18,11 +18,11 @@ export interface Expense {
 
 export type AccountId = number;
 
-export type AccountName = string;
+export type AccountAlias = string;
 
 export interface Account {
   id: AccountId;
-  name: AccountName;
+  alias: AccountAlias;
   pending: boolean; // true if usually payments are pending when paid with this account
 }
 

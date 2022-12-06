@@ -1,6 +1,6 @@
 import {
   Account,
-  AccountName,
+  AccountAlias,
   Currency,
   CurrencyCode,
   Shortcut,
@@ -50,74 +50,74 @@ export const SHORTCUTS: Shortcut[] = [
   },
 ];
 
-export const DEFAULT_PAYMENT_METHOD: AccountName = "monzo";
+export const DEFAULT_PAYMENT_METHOD: AccountAlias = "monzo";
 
 export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
 
 export const PAYMENT_ACCOUNTS: Account[] = [
   {
     id: 1,
-    name: "monzo",
+    alias: "monzo",
     pending: true,
   },
   {
     id: 2,
-    name: "revolut business",
+    alias: "revolut business",
     pending: true,
   },
   {
     id: 3,
-    name: "amex",
+    alias: "amex",
     pending: true,
   },
   {
     id: 4,
-    name: "evo",
+    alias: "evo",
     pending: false,
   },
   {
     id: 5,
-    name: "evo bizum",
+    alias: "evo bizum",
     pending: false,
   },
   {
     id: 6,
-    name: "revolut personal GBP",
+    alias: "revolut personal GBP",
     pending: false,
   },
   {
     id: 7,
-    name: "revolut personal EUR",
+    alias: "revolut personal EUR",
     pending: false,
   },
   {
     id: 8,
-    name: "cash EUR",
+    alias: "cash EUR",
     pending: false,
   },
   {
     id: 9,
-    name: "cash GBP",
+    alias: "cash GBP",
     pending: false,
   },
   {
     id: 10,
-    name: "paid by Angela GBP",
+    alias: "paid by Angela GBP",
     pending: false,
   },
   {
     id: 11,
-    name: "paid by Angela EUR",
+    alias: "paid by Angela EUR",
     pending: false,
   },
   {
     id: 12,
-    name: "paid by somebody else",
+    alias: "paid by somebody else",
     pending: false,
   },
   {
     id: 13,
-    name: "chase",
+    alias: "chase",
     pending: true,
   },
 ];

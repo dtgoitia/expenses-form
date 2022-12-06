@@ -3,16 +3,17 @@ import CenteredPage from "../components/CenteredPage";
 import DateTimePicker from "../components/DateTimePicker";
 import Description from "../components/Description";
 import DownloadJson from "../components/DownloadJson";
-import {
-  CURRENCIES,
-  DEFAULT_CURRENCY,
-  DEFAULT_PAYMENT_METHOD,
-  PAYMENT_ACCOUNTS,
-} from "../constants";
+import { CURRENCIES, DEFAULT_CURRENCY, PAYMENT_ACCOUNTS } from "../constants";
 import { now } from "../datetimeUtils";
+import { unreachable } from "../devex";
+import { getAccountByAlias, getInitialPaymentMethod } from "../domain/accounts";
 import { ExpenseManager, AddExpenseArgs, AppExpense } from "../domain/expenses";
-import { AccountName, CurrencyCode, ExpenseId } from "../domain/model";
-import storage from "../localStorage";
+import {
+  Account,
+  AccountAlias,
+  CurrencyCode,
+  ExpenseId,
+} from "../domain/model";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
 import { Button as BlueprintButton, Checkbox } from "@blueprintjs/core";
@@ -47,15 +48,6 @@ const ReloadDate = styled.div`
   margin-bottom: 1rem;
 `;
 
-const pendingPaymentMethods = new Set(
-  PAYMENT_ACCOUNTS.filter((account) => account.pending).map(
-    (account) => account.name
-  )
-);
-
-const paymentMethod: AccountName =
-  storage.defaultPaymentAccount.read() || DEFAULT_PAYMENT_METHOD;
-
 interface ExpensesFormProps {
   expenseManager: ExpenseManager;
 }
@@ -65,23 +57,17 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
   const [expenseUnderEdition, setExpenseUnderEdition] = useState<
     ExpenseId | undefined
   >(undefined);
-  const [paidWith, setPaidWith] = useState<AccountName>(paymentMethod);
-  const accountIndex = PAYMENT_ACCOUNTS.filter(
-    (account) => account.name === paidWith
-  )[0].id;
+  const [account, setAccount] = useState<Account>(getInitialPaymentMethod());
 
   const [date, setDate] = useState<Date>(now());
   const [amount, setAmount] = useState<number>();
   const [currency, setCurrency] = useState<CurrencyCode>(DEFAULT_CURRENCY);
   const [description, setDescription] = useState<string | undefined>();
-  const [pending, setPending] = useState<boolean>(
-    pendingPaymentMethods.has(DEFAULT_PAYMENT_METHOD)
-  );
   const [shared, setShared] = useState<boolean>(false);
 
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.name).map(
+  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.alias).map(
     (name) => ({
       key: name,
       value: name,
@@ -108,9 +94,26 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
   }, [expenseManager]);
 
   function handleAccountChange(_: any, data: DropdownProps): void {
-    const value = data.value as string;
-    setPaidWith(value);
-    setPending(pendingPaymentMethods.has(value));
+    const alias = data.value as AccountAlias;
+
+    const account = getAccountByAlias(alias);
+    setAccount(account);
+
+    if (expenseUnderEdition === undefined) {
+      return;
+    }
+
+    const previous = expenseManager.get(expenseUnderEdition);
+    if (previous === undefined) {
+      throw unreachable(
+        `expected Expense ${expenseUnderEdition} to exist, but not found in ExpenseManager.`
+      );
+    }
+
+    expenseManager.update({
+      ...previous.expense,
+      paid_with: account.id,
+    });
   }
 
   function handleCurrencyChange(_: any, data: DropdownProps): void {
@@ -146,8 +149,8 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       currency,
       description: description as string,
       shared,
-      pending,
-      paid_with: accountIndex,
+      pending: account.pending,
+      paid_with: account.id,
     };
 
     expenseManager.add(newExpense);
@@ -196,7 +199,7 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
         <Form.Dropdown
           label="Paid with"
           name={FieldName.paidWith}
-          value={paidWith}
+          value={account.alias}
           options={formAccounts}
           inline={true}
           onChange={handleAccountChange}
@@ -230,15 +233,6 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
             setShared(isChecked);
           }}
         />
-        <Checkbox
-          inline
-          checked={pending}
-          label="Pending"
-          onChange={(event) => {
-            const isChecked = (event.target as HTMLInputElement).checked;
-            setPending(isChecked);
-          }}
-        />
 
         <BlueprintButton
           large
@@ -262,11 +256,11 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       <pre>
         {JSON.stringify(
           {
-            paidWith,
+            paidWith: account.alias,
             amount,
             currency,
             shared,
-            pending,
+            pending: account.pending,
             date,
             description,
           },

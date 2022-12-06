@@ -1,6 +1,6 @@
-import { PAYMENT_ACCOUNTS } from "./constants";
+import { getAccountById } from "./domain/accounts";
 import { AppExpense } from "./domain/expenses";
-import { ExpenseId } from "./domain/model";
+import { AccountId, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Collapse } from "@blueprintjs/core";
@@ -95,9 +95,7 @@ function ListItem({
     remove();
   }
 
-  const paymentAccount = PAYMENT_ACCOUNTS.filter(
-    (account) => account.id === expense.paid_with
-  )[0].name;
+  const account = getAccountById(expense.paid_with as AccountId);
 
   let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
@@ -133,7 +131,7 @@ function ListItem({
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
           <pre>datetime: {expense.datetime.toISOString()}</pre>
-          <pre>paid_with: {paymentAccount}</pre>
+          <pre>paid_with: {account.alias}</pre>
           <p onClick={() => copyToClipboard(expense.description)}>
             Click to copy description
           </p>

@@ -95,7 +95,8 @@ export class ExpenseManager {
   }
 
   public initialize({ appExpenses }: { appExpenses: AppExpense[] }): void {
-    console.debug(`ExpenseManager.initialize()`);
+    console.debug(`ExpenseManager.initialize::Starting initialization...`);
+
     const ids = new Set<ExpenseId>();
     appExpenses.forEach((appExpense) => {
       const id = appExpense.expense.id;
@@ -107,6 +108,8 @@ export class ExpenseManager {
       ids.add(id);
       this.expenses.set(id, appExpense);
     });
+
+    console.debug(`ExpenseManager.initialize::Run to completion`);
   }
 
   private generateId(): ExpenseId {

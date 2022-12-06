@@ -1,5 +1,5 @@
 import CenteredPage from "../components/CenteredPage";
-import { AccountName } from "../domain/model";
+import { AccountAlias } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { SyntheticEvent, useEffect, useState } from "react";
@@ -27,7 +27,7 @@ function SettingsPage() {
   );
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<string | undefined>(undefined);
-  const [paymentMethod, setPaymentMethod] = useState<AccountName | undefined>(
+  const [paymentMethod, setPaymentMethod] = useState<AccountAlias | undefined>(
     undefined
   );
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(
