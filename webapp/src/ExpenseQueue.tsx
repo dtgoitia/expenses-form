@@ -1,5 +1,6 @@
 import { PAYMENT_ACCOUNTS } from "./constants";
-import { Expense, ExpenseId } from "./domain/model";
+import { AppExpense } from "./domain/expenses";
+import { ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Collapse } from "@blueprintjs/core";
@@ -67,12 +68,26 @@ function copyToClipboard(text: string): Promise<void> {
 }
 
 interface ListItemProps {
-  expense: Expense;
+  appExpense: AppExpense;
+  editing: boolean;
   deleting: boolean;
+  edit: () => void;
   remove: () => void;
 }
-function ListItem({ expense, deleting, remove }: ListItemProps) {
+function ListItem({
+  appExpense,
+  editing,
+  deleting,
+  edit,
+  remove,
+}: ListItemProps) {
+  const { expense } = appExpense;
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  function handleOnEditClick() {
+    console.debug(`ExpenseQueue.handleOnEditClick:: ${expense.id}`);
+    edit();
+  }
 
   function handleOnDeleteClick() {
     console.debug(`ExpenseQueue.handleOnDeleteClick:: ${expense.id}`);
@@ -94,6 +109,13 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
             <Loader active inline size="mini" />
           ) : (
             <Icon name="delete" />
+          )}
+        </Button>
+        <Button onClick={handleOnEditClick}>
+          {editing ? (
+            <Loader active inline size="mini" />
+          ) : (
+            <Icon name="edit" />
           )}
         </Button>
       </DeleteActionSlot>
@@ -146,19 +168,32 @@ function ListItem({ expense, deleting, remove }: ListItemProps) {
 // `;
 
 interface Props {
-  expenses: Expense[];
+  expenses: AppExpense[];
+  underEdition: ExpenseId | undefined;
+  onEditExpense: (id: ExpenseId) => void;
   onDelete: (id: ExpenseId) => void;
 }
-function ExpenseList({ expenses, onDelete }: Props) {
+function ExpenseList({
+  expenses,
+  underEdition,
+  onEditExpense,
+  onDelete,
+}: Props) {
   return (
     <div>
-      {expenses.map((expense) => {
+      {expenses.map((appExpense) => {
+        const {
+          expense: { id },
+        } = appExpense;
+
         return (
           <ListItem
-            key={`queued-expense-${expense.id}`}
+            key={`queued-expense-${id}`}
+            editing={underEdition === id}
             deleting={false} // TODO: integrate this in the new domain
-            expense={expense}
-            remove={() => onDelete(expense.id)}
+            appExpense={appExpense}
+            edit={() => onEditExpense(id)}
+            remove={() => onDelete(id)}
           />
         );
       })}

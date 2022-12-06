@@ -10,8 +10,8 @@ export function initialize() {
     client: new Storage(),
   });
 
-  const expenses = browserStorage.readExpenses();
-  expenseManager.initialize({ expenses });
+  const appExpenses = browserStorage.readExpenses();
+  expenseManager.initialize({ appExpenses });
 
   return { expenseManager, browserStorage };
 }

@@ -2,31 +2,52 @@ import { generatePrefixedId } from "./idGeneration";
 import { Expense, ExpenseId } from "./model";
 import { Observable, Subject } from "rxjs";
 
-export type NewExpense = Omit<Expense, "id">;
+export type AddExpenseArgs = Omit<Expense, "id">;
+
+/**
+ * As opposed to `Expense` - which is a domain-only concept, agnostic to the expense
+ * being successfully persisted or not -, the `AppExpense` is aware of the expense
+ * lifecycle withing the application, e.g.: expense is draft, submitted, etc.
+ */
+export interface AppExpense {
+  status: ExpenseStatus;
+  expense: Expense;
+}
+
+export enum ExpenseStatus {
+  local = "local",
+  pushed = "pushed",
+  changedSincePushed = "changedSincePushed",
+}
 
 export class ExpenseManager {
   public change$: Observable<ExpenseChange>;
 
   private changeSubject: Subject<ExpenseChange>;
-  private expenses: Map<ExpenseId, Expense>;
+  private expenses: Map<ExpenseId, AppExpense>;
 
   constructor() {
     this.changeSubject = new Subject<ExpenseChange>();
     this.change$ = this.changeSubject.asObservable();
 
-    this.expenses = new Map<ExpenseId, Expense>();
+    this.expenses = new Map<ExpenseId, AppExpense>();
   }
 
-  public add(newExpense: NewExpense): void {
+  public add(newExpense: AddExpenseArgs): void {
     console.debug(`ExpenseManager.add()`);
     const id = this.generateId();
     const expense: Expense = { id, ...newExpense };
 
-    this.expenses.set(id, expense);
+    const appExpense: AppExpense = {
+      expense,
+      status: ExpenseStatus.local,
+    };
+
+    this.expenses.set(id, appExpense);
     this.changeSubject.next(new ExpenseAdded(id));
   }
 
-  public get(id: ExpenseId): Expense {
+  public get(id: ExpenseId): AppExpense {
     const expense = this.expenses.get(id);
     if (expense === undefined) {
       throw new Error(
@@ -37,22 +58,34 @@ export class ExpenseManager {
     return expense;
   }
 
-  public getAll(): Expense[] {
+  public getAll(): AppExpense[] {
     console.debug(`ExpenseManager.getAll()`);
-    const expenses: Expense[] = [];
-    for (const expense of this.expenses.values()) {
-      expenses.push(expense);
+    const appExpenses: AppExpense[] = [];
+    for (const appExpense of this.expenses.values()) {
+      appExpenses.push(appExpense);
     }
 
-    return expenses.sort((a: Expense, b: Expense) => {
+    return appExpenses.sort((a: AppExpense, b: AppExpense) => {
       // TODO: this needs a tidy up: move -1/0/1 to an easy-to-read enum
-      if (a.datetime < b.datetime) return -1;
+      if (a.expense.datetime < b.expense.datetime) return -1;
       return 0;
     });
   }
 
   public update(expense: Expense): void {
-    throw new Error("Not implemented yet");
+    console.debug(`ExpenseManager.update::expense:`, expense);
+
+    const { id } = expense;
+
+    const previous = this.expenses.get(id);
+    if (previous === undefined) {
+      throw new Error(`Expected an Expense with ID ${id}, but none found.`);
+    }
+
+    const updated: AppExpense = { ...previous, expense };
+
+    this.expenses.set(id, updated);
+    this.changeSubject.next(new ExpenseUpdated(id));
   }
 
   public delete(id: ExpenseId): void {
@@ -61,18 +94,18 @@ export class ExpenseManager {
     this.changeSubject.next(new ExpenseDeleted(id));
   }
 
-  public initialize({ expenses }: { expenses: Expense[] }): void {
+  public initialize({ appExpenses }: { appExpenses: AppExpense[] }): void {
     console.debug(`ExpenseManager.initialize()`);
     const ids = new Set<ExpenseId>();
-    expenses.forEach((expense) => {
-      const id = expense.id;
+    appExpenses.forEach((appExpense) => {
+      const id = appExpense.expense.id;
 
       if (ids.has(id)) {
         throw new Error(`IDs must be unique, and ${id} is repeated`);
       }
 
       ids.add(id);
-      this.expenses.set(id, expense);
+      this.expenses.set(id, appExpense);
     });
   }
 
@@ -85,8 +118,12 @@ export class ExpenseAdded {
   constructor(public readonly expenseId: ExpenseId) {}
 }
 
+export class ExpenseUpdated {
+  constructor(public readonly expenseId: ExpenseId) {}
+}
+
 export class ExpenseDeleted {
   constructor(public readonly expenseId: ExpenseId) {}
 }
 
-type ExpenseChange = ExpenseAdded | ExpenseDeleted;
+type ExpenseChange = ExpenseAdded | ExpenseUpdated | ExpenseDeleted;

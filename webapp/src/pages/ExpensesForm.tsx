@@ -10,8 +10,8 @@ import {
   PAYMENT_ACCOUNTS,
 } from "../constants";
 import { now } from "../datetimeUtils";
-import { ExpenseManager, NewExpense } from "../domain/expenses";
-import { AccountName, CurrencyCode, Expense, ExpenseId } from "../domain/model";
+import { ExpenseManager, AddExpenseArgs, AppExpense } from "../domain/expenses";
+import { AccountName, CurrencyCode, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { errorsService } from "../services/errors";
@@ -61,7 +61,10 @@ interface ExpensesFormProps {
 }
 
 function ExpensesForm({ expenseManager }: ExpensesFormProps) {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [appExpenses, setAppExpenses] = useState<AppExpense[]>([]);
+  const [expenseUnderEdition, setExpenseUnderEdition] = useState<
+    ExpenseId | undefined
+  >(undefined);
   const [paidWith, setPaidWith] = useState<AccountName>(paymentMethod);
   const accountIndex = PAYMENT_ACCOUNTS.filter(
     (account) => account.name === paidWith
@@ -96,11 +99,10 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
 
   useEffect(() => {
     const subscription = expenseManager.change$.subscribe((_) => {
-      setExpenses(expenseManager.getAll());
-      // TODO: update rendered list of expenses
+      setAppExpenses(expenseManager.getAll());
     });
 
-    setExpenses(expenseManager.getAll());
+    setAppExpenses(expenseManager.getAll());
 
     return subscription.unsubscribe;
   }, [expenseManager]);
@@ -133,7 +135,12 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       return;
     }
 
-    const newExpense: NewExpense = {
+    setSubmitting(true);
+    expenseManager.change$.pipe(first()).subscribe((_) => {
+      setSubmitting(false);
+    });
+
+    const newExpense: AddExpenseArgs = {
       datetime: date,
       amount: amount as number,
       currency,
@@ -143,24 +150,6 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       paid_with: accountIndex,
     };
 
-    setSubmitting(true);
-    // hasura
-    //   .addExpense$({
-    //     paidWith: accountIndex,
-    //     datetime: date,
-    //     amount: amount as number,
-    //     currency,
-    //     description: description as string,
-    //     shared,
-    //     pending,
-    //   })
-    //   .subscribe(() => {
-    //     setSubmitting(false);
-    //   });
-
-    expenseManager.change$.pipe(first()).subscribe((_) => {
-      setSubmitting(false);
-    });
     expenseManager.add(newExpense);
   }
 
@@ -175,6 +164,10 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
     // `.reload(true)` is supported in Firefox and Chrome, but it's not standard
     // @ts-ignore
     window.location.reload(true);
+  }
+
+  function handleOnEditExpense(id: ExpenseId): void {
+    setExpenseUnderEdition(id);
   }
 
   return (
@@ -255,10 +248,14 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
         />
       </Form>
 
-      <DownloadJson expenses={expenses} />
+      <DownloadJson
+        expenses={appExpenses.map((appExpense) => appExpense.expense)}
+      />
 
       <ExpenseQueue
-        expenses={expenses}
+        expenses={appExpenses}
+        underEdition={expenseUnderEdition}
+        onEditExpense={handleOnEditExpense}
         onDelete={(id: ExpenseId) => expenseManager.delete(id)}
       />
 

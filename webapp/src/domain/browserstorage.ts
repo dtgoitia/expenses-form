@@ -1,6 +1,13 @@
 import { Storage } from "../localStorage";
-import { ExpenseAdded, ExpenseDeleted, ExpenseManager } from "./expenses";
-import { Expense, ExpenseId } from "./model";
+import {
+  AppExpense,
+  ExpenseAdded,
+  ExpenseDeleted,
+  ExpenseManager,
+  ExpenseStatus,
+  ExpenseUpdated,
+} from "./expenses";
+import { ExpenseId } from "./model";
 
 type GenericObject = { [key: string]: any };
 
@@ -21,6 +28,8 @@ export class BrowserStorage {
       switch (true) {
         case change instanceof ExpenseAdded:
           return this.handleExpenseAdded(change);
+        case change instanceof ExpenseUpdated:
+          return this.handleExpenseUpdated(change);
         case change instanceof ExpenseDeleted:
           return this.handleExpenseDeleted(change);
         default:
@@ -29,30 +38,34 @@ export class BrowserStorage {
     });
   }
 
-  public readExpenses(): Expense[] {
+  public readExpenses(): AppExpense[] {
     console.debug(`BrowserStorage.readExpenses()`);
     const current = this.client.expenses.read() || {};
-    const expenses: Expense[] = [];
+    const allExpenses: AppExpense[] = [];
     for (const storedItem of Object.values(current)) {
-      const expense: Expense = {
-        id: storedItem.id,
-        amount: storedItem.amount,
-        currency: storedItem.currency,
-        description: storedItem.description,
-        datetime: new Date(storedItem.datetime),
-        paid_with: storedItem.paid_with,
-        shared: storedItem.shared,
-        pending: storedItem.pending,
+      const appExpense: AppExpense = {
+        expense: {
+          id: storedItem.expense.id,
+          amount: storedItem.expense.amount,
+          currency: storedItem.expense.currency,
+          description: storedItem.expense.description,
+          datetime: new Date(storedItem.expense.datetime),
+          paid_with: storedItem.expense.paid_with,
+          shared: storedItem.expense.shared,
+          pending: storedItem.expense.pending,
+        },
+        status: ExpenseStatus[storedItem.status as keyof typeof ExpenseStatus],
       };
-      expenses.push(expense);
+
+      allExpenses.push(appExpense);
     }
-    return expenses;
+    return allExpenses;
   }
 
-  private persistExpense(expense: Expense): void {
+  private persistAppExpense(appExpense: AppExpense): void {
     // Overwrites any existing value
     const current: GenericObject = this.client.expenses.read() || {};
-    const updated = { ...current, [expense.id]: expense };
+    const updated = { ...current, [appExpense.expense.id]: appExpense };
     this.client.expenses.set(updated);
   }
 
@@ -65,8 +78,13 @@ export class BrowserStorage {
   }
 
   private handleExpenseAdded(change: ExpenseAdded): void {
-    const expense = this.expenseManager.get(change.expenseId);
-    this.persistExpense(expense);
+    const appExpense = this.expenseManager.get(change.expenseId);
+    this.persistAppExpense(appExpense);
+  }
+
+  private handleExpenseUpdated(change: ExpenseUpdated): void {
+    const appExpense = this.expenseManager.get(change.expenseId);
+    this.persistAppExpense(appExpense);
   }
 
   private handleExpenseDeleted(change: ExpenseDeleted): void {
