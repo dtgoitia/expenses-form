@@ -55,6 +55,7 @@ export class BrowserStorage {
           pending: storedItem.expense.pending,
         },
         status: ExpenseStatus[storedItem.status as keyof typeof ExpenseStatus],
+        readyToPublish: storedItem.readyToPublish,
       };
 
       allExpenses.push(appExpense);

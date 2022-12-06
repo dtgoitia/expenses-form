@@ -16,6 +16,10 @@ export interface Expense {
   pending: boolean;
 }
 
+export interface DraftExpense extends Omit<Expense, "amount"> {
+  amount: number | undefined;
+}
+
 export type AccountId = number;
 
 export type AccountAlias = string;

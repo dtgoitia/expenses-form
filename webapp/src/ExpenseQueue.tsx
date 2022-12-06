@@ -27,6 +27,9 @@ const StyledListItem = styled.div`
   display: flex;
   flex-flow: row nowrap;
 `;
+const RedListItem = styled(StyledListItem)`
+  background-color: rgba(255, 0, 0, 0.2);
+`;
 
 const MONTH_INDEX_TO_NAME: { [x: number]: string } = {
   1: "Jan",
@@ -99,8 +102,10 @@ function ListItem({
 
   let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
+  const ListItem = appExpense.readyToPublish ? StyledListItem : RedListItem;
+
   return (
-    <StyledListItem>
+    <ListItem>
       <DeleteActionSlot>
         <Button onClick={handleOnDeleteClick}>
           {deleting ? (
@@ -140,7 +145,7 @@ function ListItem({
           </pre>
         </Collapse>
       </DescriptionSlot>
-    </StyledListItem>
+    </ListItem>
   );
 }
 
@@ -180,9 +185,7 @@ function ExpenseList({
   return (
     <div>
       {expenses.map((appExpense) => {
-        const {
-          expense: { id },
-        } = appExpense;
+        const id = appExpense.expense.id;
 
         return (
           <ListItem

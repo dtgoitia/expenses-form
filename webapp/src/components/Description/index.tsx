@@ -2,12 +2,13 @@ import Shortcuts from "../../PredefinedButtons";
 import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
 import { Person, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
-import TagSelector, { SelectableTag } from "./TagSelector";
-import { useEffect, useState } from "react";
+import TagSelector from "./TagSelector";
+import { useState } from "react";
 import { DropdownProps, Form, InputOnChangeData } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface DescriptionProps {
+  description: string;
   onChange: (description: string) => void;
 }
 
@@ -17,19 +18,12 @@ enum DescriptionSubfield {
   seller = "seller",
 }
 
-interface buildDescriptionArgs {
-  main: string | undefined;
-  people: Person[];
-  seller: Seller;
-  selectedTags: TagName[];
-}
-
-function buildDescription({
+export function descriptionToString({
   main,
   people,
   seller,
-  selectedTags,
-}: buildDescriptionArgs): string {
+  tags,
+}: Description): string {
   const chunks = [];
 
   if (main) {
@@ -45,18 +39,39 @@ function buildDescription({
     chunks.push(`at @${seller}`);
   }
 
-  if (selectedTags.length > 0) {
-    const formattedTags = selectedTags.map((name) => `#${name}`).join(" ");
+  if (tags.length > 0) {
+    const formattedTags = tags.map((name) => `#${name}`).join(" ");
     chunks.push(formattedTags);
   }
 
   return chunks.join(" ");
 }
 
+interface Description {
+  main: string;
+  people: Person[]; // TODO: make a Set
+  seller: Seller | undefined;
+  tags: TagName[]; // TODO: make a Set
+}
+export function stringToDescription({ raw }: { raw: string }): Description {
+  let reminder = raw;
+  let seller: Seller | undefined = undefined;
+  let tags: TagName[] = [];
+  let rawPeople: string | undefined = undefined;
+  let people: Person[] = [];
+
+  [reminder, ...tags] = raw.split(" #");
+  [reminder, seller] = reminder.split(" at @");
+  [reminder, rawPeople] = reminder.split(" with @");
+  if (rawPeople) {
+    people = rawPeople.split(",@");
+  }
+
+  return { main: reminder, people, seller, tags };
+}
+
 const tagsInConfig = storage.tripTags.read() || [];
-const defaultTags: SelectableTag[] = mergeStringLists([TAGS, tagsInConfig]).map(
-  (tag: string): SelectableTag => ({ name: tag, selected: false })
-);
+const availableTags: TagName[] = mergeStringLists([TAGS, tagsInConfig]);
 
 const peopleInConfig = storage.people.read() || [];
 const defaultPeople: Person[] = mergeStringLists([
@@ -112,19 +127,18 @@ function mergeStringLists(listOfStringLists: string[][]): string[] {
   return unique;
 }
 
-function Description({ onChange }: DescriptionProps) {
-  const [main, setMain] = useState<string | undefined>();
-  const [seller, setSeller] = useState<Seller | undefined>();
-  const [people, setPeople] = useState<Person[]>([]);
-  const [selectableTags, setSelectableTags] =
-    useState<SelectableTag[]>(defaultTags);
-
-  const selectedTags: TagName[] = selectableTags
-    .filter((tag) => tag.selected === true)
-    .map((tag) => tag.name);
+function DescriptionForm({
+  description: raw,
+  onChange: update,
+}: DescriptionProps) {
+  const description = stringToDescription({ raw });
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);
-  const selectablePeople = [...defaultPeople, ...peopleAddedByUser];
+  const selectablePeople = [
+    ...defaultPeople,
+    ...peopleAddedByUser, // TODO: add these to Settings
+    ...description.people,
+  ];
 
   function handleChange(_: any, { name, value }: InputOnChangeData): void {
     if (value === undefined) {
@@ -133,12 +147,20 @@ function Description({ onChange }: DescriptionProps) {
 
     switch (name) {
       case DescriptionSubfield.main:
-        setMain(value);
+        handleMainChange(value);
         break;
       case DescriptionSubfield.seller:
-        setSeller(value);
+        handleSellerChange(value);
         break;
     }
+  }
+
+  function handleMainChange(main: string): void {
+    update(descriptionToString({ ...description, main }));
+  }
+
+  function handleSellerChange(seller: string): void {
+    update(descriptionToString({ ...description, seller }));
   }
 
   function handlePeopleChange(_: any, { value }: DropdownProps): void {
@@ -159,38 +181,27 @@ function Description({ onChange }: DescriptionProps) {
       setPeopleAddedByUser([...peopleAddedByUser, ...addedByUser]);
     }
 
-    setPeople(selectedPeople.sort());
+    const people = selectedPeople.sort();
+
+    update(descriptionToString({ ...description, people: people }));
   }
 
-  useEffect(() => {
-    if (main === undefined && seller === undefined) {
-      return;
-    }
-
-    const fullDescription = buildDescription({
-      main,
-      people,
-      seller: seller as Seller,
-      selectedTags,
-    });
-
-    onChange(fullDescription);
-  }, [onChange, main, seller, people, selectedTags]);
+  function handleTagChange(selectedTags: Set<TagName>): void {
+    const tags = [...selectedTags.values()];
+    update(descriptionToString({ ...description, tags }));
+  }
 
   function handleShortcutSelection(id: ShortcutId) {
     const shortcut = SHORTCUTS.filter((shortcut) => shortcut.id === id)[0];
 
-    setMain(shortcut.main);
-    setSeller(shortcut.seller);
-    setPeople(shortcut.people);
-
-    // Change tag desired selection
-    const mustSelect = new Set(shortcut.tags);
-    const rightSelection = selectableTags.map(({ name }) => ({
-      name,
-      selected: mustSelect.has(name),
-    }));
-    setSelectableTags(rightSelection);
+    update(
+      descriptionToString({
+        main: shortcut.main,
+        people: shortcut.people,
+        seller: shortcut.seller,
+        tags: shortcut.tags,
+      })
+    );
   }
 
   return (
@@ -199,18 +210,19 @@ function Description({ onChange }: DescriptionProps) {
         data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
         select={handleShortcutSelection}
       />
+
       <Grid>
         <MainInput
           name={DescriptionSubfield.main}
           placeholder="Description"
-          value={main}
+          value={description.main}
           fluid
           onChange={handleChange}
         />
         <SellerInput
           name={DescriptionSubfield.seller}
           placeholder="seller"
-          value={seller}
+          value={description.seller}
           fluid
           onChange={handleChange}
         />
@@ -225,14 +237,19 @@ function Description({ onChange }: DescriptionProps) {
             text: person,
             value: person,
           }))}
-          value={people}
+          value={description.people}
           onChange={handlePeopleChange}
           allowAdditions
         />
       </Grid>
-      <TagSelector tags={selectableTags} onChange={setSelectableTags} />
+
+      <TagSelector
+        tags={availableTags}
+        selected={new Set(description.tags)}
+        onChange={handleTagChange}
+      />
     </Container>
   );
 }
 
-export default Description;
+export default DescriptionForm;

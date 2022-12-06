@@ -1,8 +1,8 @@
 import { generatePrefixedId } from "./idGeneration";
-import { Expense, ExpenseId } from "./model";
+import { DraftExpense, ExpenseId } from "./model";
 import { Observable, Subject } from "rxjs";
 
-export type AddExpenseArgs = Omit<Expense, "id">;
+export type AddExpenseArgs = Omit<DraftExpense, "id">;
 
 /**
  * As opposed to `Expense` - which is a domain-only concept, agnostic to the expense
@@ -10,8 +10,9 @@ export type AddExpenseArgs = Omit<Expense, "id">;
  * lifecycle withing the application, e.g.: expense is draft, submitted, etc.
  */
 export interface AppExpense {
+  expense: DraftExpense;
   status: ExpenseStatus;
-  expense: Expense;
+  readyToPublish: boolean;
 }
 
 export enum ExpenseStatus {
@@ -34,13 +35,14 @@ export class ExpenseManager {
   }
 
   public add(newExpense: AddExpenseArgs): void {
-    console.debug(`ExpenseManager.add()`);
+    console.debug(`ExpenseManager.add::newExpense:`, newExpense);
     const id = this.generateId();
-    const expense: Expense = { id, ...newExpense };
+    const expense: DraftExpense = { id, ...newExpense };
 
     const appExpense: AppExpense = {
       expense,
       status: ExpenseStatus.local,
+      readyToPublish: false,
     };
 
     this.expenses.set(id, appExpense);
@@ -72,7 +74,7 @@ export class ExpenseManager {
     });
   }
 
-  public update(expense: Expense): void {
+  public update(expense: DraftExpense): void {
     console.debug(`ExpenseManager.update::expense:`, expense);
 
     const { id } = expense;
@@ -82,7 +84,11 @@ export class ExpenseManager {
       throw new Error(`Expected an Expense with ID ${id}, but none found.`);
     }
 
-    const updated: AppExpense = { ...previous, expense };
+    const updated: AppExpense = {
+      ...previous,
+      expense,
+      readyToPublish: isReadyToPublish(expense),
+    };
 
     this.expenses.set(id, updated);
     this.changeSubject.next(new ExpenseUpdated(id));
@@ -130,3 +136,11 @@ export class ExpenseDeleted {
 }
 
 type ExpenseChange = ExpenseAdded | ExpenseUpdated | ExpenseDeleted;
+
+function isReadyToPublish(draft: DraftExpense): boolean {
+  if (draft.amount === undefined) {
+    return false;
+  }
+
+  return true;
+}

@@ -32,24 +32,21 @@ const StyledTagContainer = styled.div`
   column-gap: 0.5rem;
 `;
 
-export interface SelectableTag {
-  name: TagName;
-  selected: boolean;
-}
-
 interface TagSelectorProps {
-  tags: SelectableTag[];
-  onChange: (tags: SelectableTag[]) => void;
+  tags: TagName[];
+  selected: Set<TagName>;
+  onChange: (tags: Set<TagName>) => void;
 }
 
-function TagSelector({ tags, onChange }: TagSelectorProps) {
-  function toggleTag(name: TagName) {
-    const updatedTags = tags.map((tag) => {
-      if (tag.name !== name) return tag;
+function TagSelector({ tags, selected, onChange }: TagSelectorProps) {
+  function toggleTag(clickedTag: TagName) {
+    const updatedTags = new Set<TagName>([...selected.values()]);
 
-      const toggledTag: SelectableTag = { ...tag, selected: !tag.selected };
-      return toggledTag;
-    });
+    if (selected.has(clickedTag)) {
+      updatedTags.delete(clickedTag);
+    } else {
+      updatedTags.add(clickedTag);
+    }
 
     onChange(updatedTags);
   }
@@ -58,10 +55,10 @@ function TagSelector({ tags, onChange }: TagSelectorProps) {
     <StyledTagContainer>
       {tags.map((tag, i) => (
         <TagComponent
-          key={`${tag.name}-${i}`}
-          name={tag.name}
-          selected={tag.selected}
-          onClick={() => toggleTag(tag.name)}
+          key={`${tag}-${i}`}
+          name={tag}
+          selected={selected.has(tag)}
+          onClick={() => toggleTag(tag)}
         />
       ))}
     </StyledTagContainer>
