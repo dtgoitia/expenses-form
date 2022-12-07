@@ -2,9 +2,9 @@ import CenteredPage from "../components/CenteredPage";
 import { AccountAlias } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { Button, Label } from "@blueprintjs/core";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Form, Icon, InputOnChangeData } from "semantic-ui-react";
 
 function listToInputField(items: string[]): string {
   return items.join(",");
@@ -21,7 +21,6 @@ function inputFieldToList(inputValue: string): string[] {
 }
 
 function SettingsPage() {
-  const [hasuraToken, setHasuraToken] = useState<string | undefined>(undefined);
   const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<string | undefined>(undefined);
@@ -29,9 +28,6 @@ function SettingsPage() {
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (storage.hasuraApiToken.exists()) {
-      setHasuraToken(storage.hasuraApiToken.read());
-    }
     if (storage.splitwiseApiToken.exists()) {
       setSplitwiseToken(storage.splitwiseApiToken.read());
     }
@@ -50,21 +46,8 @@ function SettingsPage() {
     }
   }, []);
 
-  function handleHasuraApiTokenChange(_: SyntheticEvent, { value }: InputOnChangeData) {
-    if (value === undefined || value === null || value === "") {
-      setHasuraToken(undefined);
-      storage.hasuraApiToken.delete();
-      return;
-    }
-
-    setHasuraToken(value);
-    storage.hasuraApiToken.set(value);
-  }
-
-  function handleSplitwiseApiTokenChange(
-    _: SyntheticEvent,
-    { value }: InputOnChangeData
-  ) {
+  function handleSplitwiseApiTokenChange(event: any): void {
+    const value = event.target.value;
     if (value === undefined || value === null || value === "") {
       setSplitwiseToken(undefined);
       storage.splitwiseApiToken.delete();
@@ -75,7 +58,8 @@ function SettingsPage() {
     storage.splitwiseApiToken.set(value);
   }
 
-  function handleTripTagsChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+  function handleTripTagsChange(event: any): void {
+    const value = event.target.value;
     if (value === undefined || value === null || value === "") {
       setTripTags(undefined);
       storage.tripTags.delete();
@@ -88,7 +72,8 @@ function SettingsPage() {
     storage.tripTags.set(tags);
   }
 
-  function handlePeopleChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+  function handlePeopleChange(event: any): void {
+    const value = event.target.value;
     if (value === undefined || value === null || value === "") {
       setPeople(undefined);
       storage.people.delete();
@@ -101,7 +86,8 @@ function SettingsPage() {
     storage.people.set(peopleNames);
   }
 
-  function handlePaymentMethodChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+  function handlePaymentMethodChange(event: any): void {
+    const value = event.target.value;
     if (value === undefined || value === null || value === "") {
       setPaymentMethod(undefined);
       storage.defaultPaymentAccount.delete();
@@ -112,7 +98,8 @@ function SettingsPage() {
     storage.defaultPaymentAccount.set(value);
   }
 
-  function handleFirestoreConfigChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+  function handleFirestoreConfigChange(event: any): void {
+    const value = event.target.value;
     if (value === undefined || value === null || value === "") {
       setFirestoreConfig(undefined);
       storage.firestoreConfig.delete();
@@ -127,59 +114,69 @@ function SettingsPage() {
   return (
     <CenteredPage>
       <h1>Settings</h1>
-      <Form.Input
-        label="Hasura API token"
-        placeholder="Hasura API token"
-        name="hasura-api-token"
-        value={hasuraToken}
-        fluid
-        onChange={handleHasuraApiTokenChange}
-      />
-      <Form.Input
-        label="Splitwise API token"
-        placeholder="Splitwise API token"
-        name="splitwise-api-token"
-        value={splitwiseToken}
-        fluid
-        onChange={handleSplitwiseApiTokenChange}
-      />
-      <Form.Input
-        label="Trip tags"
-        placeholder="trip tags"
-        name="trip-tags"
-        value={tripTags}
-        fluid
-        onChange={handleTripTagsChange}
-      />
-      <Form.Input
-        label="People"
-        placeholder="JohnDoe,JaneDoe"
-        name="people"
-        value={people}
-        fluid
-        onChange={handlePeopleChange}
-      />
-      <Form.Input
-        label="Default payment method"
-        placeholder="amex"
-        name="payment-method"
-        value={paymentMethod}
-        fluid
-        onChange={handlePaymentMethodChange}
-      />
-      <Form.Input
-        label="Firestore config"
-        placeholder={`{"a":1,"b":2}`}
-        name="firestore-config"
-        value={firestoreConfig}
-        fluid
-        onChange={handleFirestoreConfigChange}
-      />
+
+      <Label htmlFor="splitwise-api-token">
+        Splitwise API token
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="splitwise-api-token"
+          value={splitwiseToken}
+          placeholder="Splitwise API token"
+          onChange={handleSplitwiseApiTokenChange}
+        />
+      </Label>
+
+      <Label htmlFor="trip-tags">
+        Trip tags
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="trip-tags"
+          value={tripTags}
+          placeholder="trip tags"
+          onChange={handleTripTagsChange}
+        />
+      </Label>
+
+      <Label htmlFor="people">
+        People
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="people"
+          value={people}
+          placeholder="JohnDoe,JaneDoe"
+          onChange={handlePeopleChange}
+        />
+      </Label>
+
+      <Label htmlFor="payment-method">
+        Default payment method
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="payment-method"
+          value={paymentMethod}
+          placeholder="amex"
+          onChange={handlePaymentMethodChange}
+        />
+      </Label>
+
+      <Label htmlFor="firestore-config">
+        Firestore config
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="firestore-config"
+          value={firestoreConfig}
+          placeholder={`{"a":1,"b":2}`}
+          onChange={handleFirestoreConfigChange}
+        />
+      </Label>
+
       <Link to={Paths.root}>
-        <Button>
-          <Icon name="close"></Icon>
-          Close
-        </Button>
+        <Button icon="cross">Close</Button>
       </Link>
     </CenteredPage>
   );

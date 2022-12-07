@@ -1,6 +1,6 @@
 import { TagName } from "../../domain/model";
+import { Button } from "@blueprintjs/core";
 import { SyntheticEvent } from "react";
-import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface TagProps {
@@ -16,7 +16,7 @@ function TagComponent({ name, selected, onClick }: TagProps) {
   };
 
   return (
-    <Button size="mini" primary={selected} onClick={customOnClick}>
+    <Button large active={selected} onClick={customOnClick}>
       {name}
     </Button>
   );

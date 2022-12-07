@@ -1,6 +1,6 @@
 import { ErrorMessage, errorsService } from "../services/errors";
+import { Button, Callout } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { Button, Message } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface ErrorsProps {
@@ -8,12 +8,7 @@ interface ErrorsProps {
 }
 
 function Error({ error: { header, description } }: ErrorsProps) {
-  return (
-    <Message negative>
-      <Message.Header>{header}</Message.Header>
-      <pre>{description}</pre>
-    </Message>
-  );
+  return <Callout title={header}>{description}</Callout>;
 }
 
 const ErrorsContainer = styled.div`
@@ -31,9 +26,10 @@ export default function Errors() {
 
   return (
     <ErrorsContainer>
-      <Button onClick={() => errorsService.deleteAll()}>
+      <Button large onClick={() => errorsService.deleteAll()}>
         Clear all error messages
       </Button>
+
       {errors.map((error, i) => (
         <Error key={`error-${i}`} error={error} />
       ))}

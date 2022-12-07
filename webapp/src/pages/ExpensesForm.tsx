@@ -8,11 +8,10 @@ import { ExpenseManager, AppExpense, AddExpenseArgs } from "../domain/expenses";
 import { DraftExpense, Expense, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
-import { Button as BlueprintButton } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { first } from "rxjs";
-import { Button, Icon } from "semantic-ui-react";
 
 interface ExpensesFormProps {
   expenseManager: ExpenseManager;
@@ -87,13 +86,11 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
 
   return (
     <CenteredPage>
-      <Button onClick={refreshPage}>
-        <Icon name="refresh"></Icon>
+      <Button large icon="refresh" onClick={refreshPage}>
         reload PWA
       </Button>
       <Link to={Paths.settings}>
-        <Button>
-          <Icon name="setting"></Icon>
+        <Button large icon="cog">
           Settings
         </Button>
       </Link>
@@ -108,9 +105,9 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       )}
 
       {expenseIdUnderEdition ? (
-        <BlueprintButton large text="Close" onClick={handleStopEditingExpense} />
+        <Button large text="Close" onClick={handleStopEditingExpense} />
       ) : (
-        <BlueprintButton large text="Add expense" onClick={handleAddExpense} />
+        <Button large text="Add expense" onClick={handleAddExpense} />
       )}
 
       <DownloadJson expenses={publishableExpenses} />

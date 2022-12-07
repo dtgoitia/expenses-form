@@ -79,7 +79,6 @@ class StoredItem<T> {
 }
 
 export class Storage {
-  hasuraApiToken: StoredItem<string | undefined>;
   splitwiseApiToken: StoredItem<string | undefined>;
   tripTags: StoredItem<string[] | undefined>;
   people: StoredItem<string[] | undefined>;
@@ -88,7 +87,6 @@ export class Storage {
   firestoreConfig: StoredItem<object | undefined>;
 
   constructor() {
-    this.hasuraApiToken = new StoredItem("hasura_api_token", ValueType.string);
     this.splitwiseApiToken = new StoredItem("splitwise_api_token", ValueType.string);
     this.tripTags = new StoredItem("trip_tags", ValueType.object);
     this.people = new StoredItem("people", ValueType.object);

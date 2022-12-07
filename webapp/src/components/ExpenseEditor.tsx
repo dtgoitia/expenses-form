@@ -4,15 +4,13 @@ import { getAccountByAlias, getAccountById } from "../domain/accounts";
 import { AccountAlias, CurrencyCode, DraftExpense } from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
-import { Button as BlueprintButton } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { Checkbox, Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useState } from "react";
 import {
-  Button,
   DropdownItemProps,
   DropdownProps,
   Form,
-  Icon,
   InputOnChangeData,
 } from "semantic-ui-react";
 import styled from "styled-components";
@@ -106,14 +104,13 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
 
       <DateSlot>
         <ReloadDate onClick={setDateToNow}>
-          <Button onClick={setDateToNow}>
-            <Icon name="refresh"></Icon>
+          <Button large icon="refresh" onClick={setDateToNow}>
             now
           </Button>
         </ReloadDate>
       </DateSlot>
 
-      <Form onSubmit={() => {}}>
+      <Form>
         <Form.Dropdown
           label="Paid with"
           name="paidWithField"
@@ -153,7 +150,7 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
         />
       </Form>
 
-      <BlueprintButton
+      <Button
         text={showDetails ? "Hide JSON" : "Show JSON"}
         icon={showDetails ? "collapse-all" : "bring-data"}
         onClick={toggleShowDetails}

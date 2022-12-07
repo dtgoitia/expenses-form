@@ -1,6 +1,6 @@
 import { ShortcutId } from "./domain/model";
+import { Button } from "@blueprintjs/core";
 import { SyntheticEvent } from "react";
-import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface ButtonData {
@@ -31,7 +31,7 @@ function Shortcuts({ data, select }: ShortcutsProps) {
   return (
     <Container>
       {data.map((shortcut, i) => (
-        <Button key={`shortcut-${i}`} onClick={(e) => handleClick(e, shortcut.id)}>
+        <Button large key={`shortcut-${i}`} onClick={(e) => handleClick(e, shortcut.id)}>
           {shortcut.buttonName}
         </Button>
       ))}
