@@ -16,7 +16,7 @@ export function descriptionToSplitwiseFormat(raw: string): string {
     .map((tag) => `#${tag}`)
     .join(" ");
 
-  let splitwiseDescription = `${description.main} @ ${description.seller}`;
+  let splitwiseDescription = `${description.main?.trim()} @ ${description.seller}`;
   if (tripTags) {
     splitwiseDescription = `${splitwiseDescription} ${tripTags}`;
   }

@@ -139,7 +139,7 @@ describe("Description", () => {
     });
   });
 
-  describe("edge cases", () => {
+  describe("cases that caused bugs in the past", () => {
     it("no main description, but has seller", () => {
       const before = {
         main: undefined,
@@ -166,7 +166,7 @@ describe("Description", () => {
       expect(after).toEqual(before);
     });
 
-    it("no main description, but has tags", () => {
+    it("user adds tags first", () => {
       const before = {
         main: undefined,
         people: [],
@@ -175,6 +175,45 @@ describe("Description", () => {
       };
       const raw = descriptionToString(before);
       expect(raw).toEqual("#foo #bar");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+
+    it("allow user to naturally type spaces in main", () => {
+      const before = {
+        main: "I'm half-way typing ", // <-- note the trailing space
+        people: [],
+        seller: undefined,
+        tags: [],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("I'm half-way typing ");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+
+    it("allow user to naturally type spaces in seller", () => {
+      const before = {
+        main: "Stuff",
+        people: [],
+        seller: "BigShop (via ", // <-- note the trailing space
+        tags: [],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("Stuff at @BigShop (via ");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+
+    it("allow user to naturally type spaces in seller after adding tags", () => {
+      const before = {
+        main: "Stuff",
+        people: [],
+        seller: "BigShop (via ", // <-- note the trailing space
+        tags: ["foo"],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("Stuff at @BigShop (via  #foo");
       const after = stringToDescription({ raw });
       expect(after).toEqual(before);
     });

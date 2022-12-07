@@ -27,7 +27,7 @@ export function descriptionToString({
   const chunks = [];
 
   if (main) {
-    chunks.push(main.trim());
+    chunks.push(main);
   }
 
   if (people && people.length > 0) {
@@ -61,22 +61,36 @@ export function stringToDescription({ raw }: { raw: string }): Description {
   let rawPeople: string | undefined = undefined;
   let people: Person[] = [];
 
-  // If the user starts adding tags first, without adding anything else to the
-  // description, it's hard to parse the description string. Adding a leading
-  // space makes it easier. Else, you would need to split the description by `#`
-  // which is a single character that might appear elsewhere not intending to be
-  // a tag
-  const rawWithLeadingSpace = ` ${raw}`;
-  [reminder, ...tags] = rawWithLeadingSpace.trimEnd().split(" #");
+  if (reminder.startsWith("#")) {
+    // user added tags first, without adding anything else to the description
+    tags = reminder
+      .split("#")
+      .map((chunk) => chunk.trim())
+      .filter((tag) => tag !== "");
+    return { main, people, seller, tags };
+  }
 
-  [reminder, seller] = reminder.trim().split("at @");
-  [reminder, rawPeople] = reminder.trim().split("with @");
+  [reminder, ...tags] = reminder.split(" #");
+
+  if (reminder.startsWith("at @")) {
+    seller = reminder.replace("at @", "").trim();
+    return { main, people, seller, tags };
+  }
+
+  [reminder, seller] = reminder.split(" at @");
+
+  if (reminder.startsWith("with @")) {
+    people = reminder.replace("with @", "").split(",@");
+    return { main, people, seller, tags };
+  }
+
+  [reminder, rawPeople] = reminder.split(" with @");
   if (rawPeople) {
     people = rawPeople.split(",@");
   }
 
-  reminder = reminder.trim();
-  if (reminder !== "") {
+  const notOnlyEmptySpaces = reminder.trim() !== "";
+  if (notOnlyEmptySpaces) {
     main = reminder;
   }
 
