@@ -1,59 +1,24 @@
-const singleTripTagPattern = new RegExp(/(#[0-9]{4}[a-z]+)/gm);
+import { stringToDescription } from "./components/Description";
+import { TagName } from "./domain/model";
 
-function getTripTag(description: string): string | undefined {
-  const tripTagMatch = singleTripTagPattern.exec(description);
-  if (tripTagMatch === null) {
-    return undefined;
-  }
+const SINGLE_TRIP_TAG_PATTERN = new RegExp(/([0-9]{4}[a-z]+)/gm);
 
-  const tripTag = tripTagMatch[0];
-  return tripTag;
+function isTripTag(tag: TagName): boolean {
+  const tripTagMatch = SINGLE_TRIP_TAG_PATTERN.exec(tag);
+  return tripTagMatch !== null;
 }
 
-type DescriptionWithoutTags = string;
+export function descriptionToSplitwiseFormat(raw: string): string {
+  const description = stringToDescription({ raw });
 
-function stripAllTags(description: string): string {
-  const chars: string[] = [];
+  const tripTags = description.tags
+    .filter(isTripTag)
+    .map((tag) => `#${tag}`)
+    .join(" ");
 
-  for (const char of description) {
-    if (char === "#") {
-      break;
-    }
-
-    chars.push(char);
-  }
-
-  // Remove last empty space
-  const lastChar = chars.pop();
-  if (lastChar && lastChar !== " ") {
-    chars.push(lastChar);
-  }
-
-  const textBeforeFirstHash = chars.join("");
-
-  return textBeforeFirstHash;
-}
-
-function getWhat(description: DescriptionWithoutTags): string {
-  const [what] = description.split(" with @");
-  return what;
-}
-function getSeller(description: DescriptionWithoutTags): string {
-  const [, seller] = description.split(" at @");
-  return seller;
-}
-
-export function descriptionToSplitwiseFormat(description: string): string {
-  const tripTag = getTripTag(description);
-
-  const withoutTags = stripAllTags(description);
-
-  const what = getWhat(withoutTags);
-  const seller = getSeller(withoutTags);
-
-  let splitwiseDescription = `${what} @ ${seller}`;
-  if (tripTag) {
-    splitwiseDescription = `${splitwiseDescription} ${tripTag}`;
+  let splitwiseDescription = `${description.main} @ ${description.seller}`;
+  if (tripTags) {
+    splitwiseDescription = `${splitwiseDescription} ${tripTags}`;
   }
   return splitwiseDescription;
 }
