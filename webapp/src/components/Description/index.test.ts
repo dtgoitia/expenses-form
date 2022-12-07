@@ -138,4 +138,45 @@ describe("Description", () => {
       );
     });
   });
+
+  describe("edge cases", () => {
+    it("no main description, but has seller", () => {
+      const before = {
+        main: undefined,
+        people: [],
+        seller: "BigShop",
+        tags: [],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("at @BigShop");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+
+    it("no main description, but has people", () => {
+      const before = {
+        main: undefined,
+        people: ["JohnDoe", "JaneDoe"],
+        seller: undefined,
+        tags: [],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("with @JohnDoe,@JaneDoe");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+
+    it("no main description, but has tags", () => {
+      const before = {
+        main: undefined,
+        people: [],
+        seller: undefined,
+        tags: ["foo", "bar"],
+      };
+      const raw = descriptionToString(before);
+      expect(raw).toEqual("#foo #bar");
+      const after = stringToDescription({ raw });
+      expect(after).toEqual(before);
+    });
+  });
 });

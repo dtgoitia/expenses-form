@@ -47,27 +47,40 @@ export function descriptionToString({
   return chunks.join(" ");
 }
 
-interface Description {
-  main: string;
+export interface Description {
+  main: string | undefined;
   people: Person[]; // TODO: make a Set
   seller: Seller | undefined;
   tags: TagName[]; // TODO: make a Set
 }
 export function stringToDescription({ raw }: { raw: string }): Description {
-  let reminder = raw;
+  let reminder: string = raw;
   let seller: Seller | undefined = undefined;
+  let main: string | undefined = undefined;
   let tags: TagName[] = [];
   let rawPeople: string | undefined = undefined;
   let people: Person[] = [];
 
-  [reminder, ...tags] = raw.split(" #");
-  [reminder, seller] = reminder.split(" at @");
-  [reminder, rawPeople] = reminder.split(" with @");
+  // If the user starts adding tags first, without adding anything else to the
+  // description, it's hard to parse the description string. Adding a leading
+  // space makes it easier. Else, you would need to split the description by `#`
+  // which is a single character that might appear elsewhere not intending to be
+  // a tag
+  const rawWithLeadingSpace = ` ${raw}`;
+  [reminder, ...tags] = rawWithLeadingSpace.trimEnd().split(" #");
+
+  [reminder, seller] = reminder.trim().split("at @");
+  [reminder, rawPeople] = reminder.trim().split("with @");
   if (rawPeople) {
     people = rawPeople.split(",@");
   }
 
-  return { main: reminder, people, seller, tags };
+  reminder = reminder.trim();
+  if (reminder !== "") {
+    main = reminder;
+  }
+
+  return { main, people, seller, tags };
 }
 
 const tagsInConfig = storage.tripTags.read() || [];
