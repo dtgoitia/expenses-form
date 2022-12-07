@@ -112,12 +112,14 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
 
       <DownloadJson expenses={publishableExpenses} />
 
-      <ExpenseQueue
-        expenses={appExpenses}
-        underEdition={expenseIdUnderEdition}
-        onEditExpense={handleOnEditExpense}
-        onDelete={(id: ExpenseId) => expenseManager.delete(id)}
-      />
+      {appExpenses.length > 0 && (
+        <ExpenseQueue
+          expenses={appExpenses}
+          underEdition={expenseIdUnderEdition}
+          onEditExpense={handleOnEditExpense}
+          onDelete={(id: ExpenseId) => expenseManager.delete(id)}
+        />
+      )}
     </CenteredPage>
   );
 }
