@@ -12,7 +12,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_BASE_URL=${REACT_APP_API_BASE_URL}
       - REACT_APP_SPLITWISE_API_BASE_URL=${REACT_APP_SPLITWISE_API_BASE_URL}
       - REACT_APP_MOCK_APIS=${REACT_APP_MOCK_APIS:-false}
     volumes:

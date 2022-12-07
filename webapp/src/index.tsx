@@ -1,11 +1,10 @@
 import App from "./App";
 import "./blueprint.css";
-import { API_BASE_URL, BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
+import { BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { GlobalStyle } from "./style/globalStyle";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
@@ -16,19 +15,12 @@ if (DEVELOPMENT_MODE && MOCK_APIS) {
   worker.start();
 }
 
-const client = new ApolloClient({
-  uri: `${API_BASE_URL}/graphql`,
-  cache: new InMemoryCache(),
-});
-
 ReactDOM.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <BrowserRouter basename={BASE_URL}>
-        <GlobalStyle />
-        <App />
-      </BrowserRouter>
-    </ApolloProvider>
+    <BrowserRouter basename={BASE_URL}>
+      <GlobalStyle />
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );

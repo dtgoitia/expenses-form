@@ -50,9 +50,6 @@ shell-webapp:
 test-dev-webapp:
 	docker-compose run --rm $(WEBAPP_NAME) npm test
 
-run-full-stack:
-	 bash scripts/run_webapp_with_local_backend.sh
-
 deploy-webapp-from-local:
 	cd ./webapp \
 		&& npm run deploy_from_local

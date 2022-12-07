@@ -155,7 +155,6 @@ export const SELLERS = [
 ];
 
 export const BASE_URL = "expenses-form"; // must match "homepage" field in package.json
-export const API_BASE_URL = LoadEnvVar.asUrl("REACT_APP_API_BASE_URL");
 export const SPLITWISE_API_BASE_URL = LoadEnvVar.asUrl(
   "REACT_APP_SPLITWISE_API_BASE_URL"
 );

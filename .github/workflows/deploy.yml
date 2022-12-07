@@ -40,7 +40,6 @@ jobs:
       - name: Create a production build
         run: npm run build
         env:
-          REACT_APP_API_BASE_URL: ${{ secrets.API_BASE_URL }}
           REACT_APP_MOCK_APIS: ${{ secrets.MOCK_APIS }}
           REACT_APP_SPLITWISE_API_BASE_URL: ${{ secrets.SPLITWISE_API_BASE_URL }}
 
