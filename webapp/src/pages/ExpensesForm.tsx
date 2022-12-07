@@ -58,6 +58,10 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
     expenseManager.add(newExpense);
   }
 
+  function handleStopEditingExpense(): void {
+    setExpenseUnderEdition(undefined);
+  }
+
   function refreshPage() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/reload
     // `.reload(true)` is supported in Firefox and Chrome, but it's not standard
@@ -103,7 +107,15 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
         <p>Add expense or select an existing one</p>
       )}
 
-      <BlueprintButton large text="Add expense" onClick={handleAddExpense} />
+      {expenseIdUnderEdition ? (
+        <BlueprintButton
+          large
+          text="Close"
+          onClick={handleStopEditingExpense}
+        />
+      ) : (
+        <BlueprintButton large text="Add expense" onClick={handleAddExpense} />
+      )}
 
       <DownloadJson expenses={publishableExpenses} />
 
