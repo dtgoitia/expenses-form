@@ -3,29 +3,26 @@ import { AppExpense } from "./domain/expenses";
 import { AccountId, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
+import { Button, Switch } from "@blueprintjs/core";
 import { Collapse } from "@blueprintjs/core";
 import { useState } from "react";
-import { Button, Icon, Loader } from "semantic-ui-react";
 import styled from "styled-components";
 
-const DeleteActionSlot = styled.div`
+const ActionSlot = styled.div`
   order: 1;
   flex-grow: 0;
   flex-shrink: 1;
 `;
-const SubmittedStatusSlot = styled.div`
-  order: 2;
-  flex-grow: 0;
-  flex-shrink: 1;
-`;
 const DescriptionSlot = styled.div`
-  order: 3;
+  order: 2;
   flex-grow: 1;
   flex-shrink: 1;
 `;
 const StyledListItem = styled.div`
   display: flex;
   flex-flow: row nowrap;
+  column-gap: 0.5rem;
+  padding: 0.3rem;
 `;
 const RedListItem = styled(StyledListItem)`
   background-color: rgba(255, 0, 0, 0.2);
@@ -76,8 +73,16 @@ interface ListItemProps {
   deleting: boolean;
   edit: () => void;
   remove: () => void;
+  deleteMode: boolean;
 }
-function ListItem({ appExpense, editing, deleting, edit, remove }: ListItemProps) {
+function ListItem({
+  appExpense,
+  editing,
+  deleting,
+  edit,
+  remove,
+  deleteMode,
+}: ListItemProps) {
   const { expense } = appExpense;
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -100,25 +105,22 @@ function ListItem({ appExpense, editing, deleting, edit, remove }: ListItemProps
 
   return (
     <ListItem>
-      <DeleteActionSlot>
-        <Button onClick={handleOnDeleteClick}>
-          {deleting ? <Loader active inline size="mini" /> : <Icon name="delete" />}
-        </Button>
-        <Button onClick={handleOnEditClick}>
-          {editing ? <Loader active inline size="mini" /> : <Icon name="edit" />}
-        </Button>
-      </DeleteActionSlot>
-      <SubmittedStatusSlot onClick={() => setIsOpen(!isOpen)}>
-        <Icon name="check" />
-      </SubmittedStatusSlot>
+      <ActionSlot>
+        {deleteMode ? (
+          <Button onClick={handleOnDeleteClick} loading={deleting} icon="delete" />
+        ) : (
+          <Button onClick={handleOnEditClick} loading={editing} icon="edit" />
+        )}
+      </ActionSlot>
+
       <DescriptionSlot>
-        <p onClick={() => setIsOpen(!isOpen)}>
+        <span onClick={() => setIsOpen(!isOpen)}>
           {formatDate(expense.datetime)}{" "}
           <b>
             {expense.amount} {expense.currency}
           </b>{" "}
           {expense.description}
-        </p>
+        </span>
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
           <pre>datetime: {expense.datetime.toISOString()}</pre>
@@ -152,8 +154,16 @@ interface Props {
   onDelete: (id: ExpenseId) => void;
 }
 function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props) {
+  const [inDeletionMode, setInDeletionMode] = useState<boolean>(false);
+
+  function toggleDeletionMode(): void {
+    setInDeletionMode(!inDeletionMode);
+  }
+
   return (
     <div>
+      <Switch label="deletion mode" onClick={() => toggleDeletionMode()} />
+
       {expenses.map((appExpense) => {
         const id = appExpense.expense.id;
 
@@ -165,6 +175,7 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props)
             appExpense={appExpense}
             edit={() => onEditExpense(id)}
             remove={() => onDelete(id)}
+            deleteMode={inDeletionMode}
           />
         );
       })}
