@@ -44,7 +44,7 @@ export const SHORTCUTS: Shortcut[] = [
   },
 ];
 
-export const DEFAULT_PAYMENT_METHOD: AccountAlias = "monzo";
+export const DEFAULT_ACCOUNT_ALIAS: AccountAlias = "monzo";
 
 export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
 

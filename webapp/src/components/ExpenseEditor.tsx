@@ -1,9 +1,10 @@
-import { CURRENCIES, PAYMENT_ACCOUNTS } from "../constants";
+import { CURRENCIES } from "../constants";
 import { now } from "../datetimeUtils";
-import { getAccountByAlias, getAccountById } from "../domain/accounts";
-import { AccountAlias, CurrencyCode, DraftExpense } from "../domain/model";
+import { getAccountById } from "../domain/accounts";
+import { Account, CurrencyCode, DraftExpense } from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
+import { PaidWithDropdown } from "./PaidWith";
 import { Button } from "@blueprintjs/core";
 import { Checkbox, Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useState } from "react";
@@ -31,11 +32,6 @@ interface ExpenseEditorProps {
 
 function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
-  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.alias).map((name) => ({
-    key: name,
-    value: name,
-    text: name,
-  })) as unknown as DropdownItemProps[];
 
   const formCurrencies = CURRENCIES.map((currency) => currency.code).map((name) => ({
     key: name,
@@ -53,9 +49,7 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
     handleDateChange(now());
   }
 
-  function handleAccountChange(_: any, data: DropdownProps): void {
-    const alias = data.value as AccountAlias;
-    const account = getAccountByAlias(alias);
+  function handleAccountChange(account: Account): void {
     update({ ...expense, paid_with: account.id });
   }
 
@@ -110,16 +104,9 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
         </ReloadDate>
       </DateSlot>
 
-      <Form>
-        <Form.Dropdown
-          label="Paid with"
-          name="paidWithField"
-          value={account.alias}
-          options={formAccounts}
-          inline={true}
-          onChange={handleAccountChange}
-        />
+      <PaidWithDropdown paidWith={expense.paid_with} onChange={handleAccountChange} />
 
+      <Form>
         <Form.Group inline>
           <Form.Input
             type="number"
