@@ -4,8 +4,9 @@ import { getAccountByAlias, getAccountById } from "../domain/accounts";
 import { AccountAlias, CurrencyCode, DraftExpense } from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
-import { Checkbox } from "@blueprintjs/core";
-import { SyntheticEvent } from "react";
+import { Button as BlueprintButton } from "@blueprintjs/core";
+import { Checkbox, Collapse } from "@blueprintjs/core";
+import { SyntheticEvent, useState } from "react";
 import {
   Button,
   DropdownItemProps,
@@ -31,21 +32,18 @@ interface ExpenseEditorProps {
 }
 
 function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
-  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.alias).map(
-    (name) => ({
-      key: name,
-      value: name,
-      text: name,
-    })
-  ) as unknown as DropdownItemProps[];
+  const [showDetails, setShowDetails] = useState<boolean>(false);
+  const formAccounts = PAYMENT_ACCOUNTS.map((account) => account.alias).map((name) => ({
+    key: name,
+    value: name,
+    text: name,
+  })) as unknown as DropdownItemProps[];
 
-  const formCurrencies = CURRENCIES.map((currency) => currency.code).map(
-    (name) => ({
-      key: name,
-      value: name,
-      text: name,
-    })
-  ) as unknown as DropdownItemProps[];
+  const formCurrencies = CURRENCIES.map((currency) => currency.code).map((name) => ({
+    key: name,
+    value: name,
+    text: name,
+  })) as unknown as DropdownItemProps[];
 
   function handleDateChange(date: Date): void {
     update({ ...expense, datetime: date });
@@ -78,10 +76,7 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
   }
 
   function handleDescriptionChange(description: string): void {
-    console.debug(
-      `ExpenseEditor::handleDescriptionChange:description:`,
-      description
-    );
+    console.debug(`ExpenseEditor::handleDescriptionChange:description:`, description);
 
     if (expense.description === description) {
       return;
@@ -93,6 +88,10 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
   function handleSplitwiseChange(event: SyntheticEvent): void {
     const shared = (event.target as HTMLInputElement).checked;
     update({ ...expense, shared });
+  }
+
+  function toggleShowDetails(): void {
+    setShowDetails(!showDetails);
   }
 
   const account = getAccountById(expense.paid_with);
@@ -154,16 +153,23 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
         />
       </Form>
 
-      <pre>
-        {JSON.stringify(
-          {
-            ...expense,
-            paid_with: `${expense.paid_with} -- ${account.alias}`,
-          },
-          null,
-          2
-        )}
-      </pre>
+      <BlueprintButton
+        text={showDetails ? "Hide JSON" : "Show JSON"}
+        icon={showDetails ? "collapse-all" : "bring-data"}
+        onClick={toggleShowDetails}
+      />
+      <Collapse isOpen={showDetails}>
+        <pre className="bp4-code-block">
+          {JSON.stringify(
+            {
+              ...expense,
+              paid_with: `${expense.paid_with} -- ${account.alias}`,
+            },
+            null,
+            2
+          )}
+        </pre>
+      </Collapse>
     </div>
   );
 }
