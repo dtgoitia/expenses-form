@@ -149,17 +149,6 @@ function ListItem({
   );
 }
 
-// function sortExpensesByDate(a: ExpenseItem, b: ExpenseItem): number {
-//   const date_a = new Date(a.expense.datetime);
-//   const date_b = new Date(b.expense.datetime);
-
-//   if (date_a < date_b) {
-//     return -1;
-//   }
-
-//   return 1;
-// }
-
 // const Container = styled.div`
 //   display: flex;
 //   flex: row nowrap;

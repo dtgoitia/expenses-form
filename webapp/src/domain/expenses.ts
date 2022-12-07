@@ -1,3 +1,4 @@
+import { SortAction } from "../sort";
 import { generatePrefixedId } from "./idGeneration";
 import { DraftExpense, ExpenseId } from "./model";
 import { Observable, Subject } from "rxjs";
@@ -68,9 +69,9 @@ export class ExpenseManager {
     }
 
     return appExpenses.sort((a: AppExpense, b: AppExpense) => {
-      // TODO: this needs a tidy up: move -1/0/1 to an easy-to-read enum
-      if (a.expense.datetime < b.expense.datetime) return -1;
-      return 0;
+      return a.expense.datetime < b.expense.datetime
+        ? SortAction.SwapOrder
+        : SortAction.KeepOrder;
     });
   }
 
