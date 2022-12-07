@@ -20,9 +20,9 @@ interface ExpensesFormProps {
 
 function ExpensesForm({ expenseManager }: ExpensesFormProps) {
   const [appExpenses, setAppExpenses] = useState<AppExpense[]>([]);
-  const [expenseIdUnderEdition, setExpenseUnderEdition] = useState<
-    ExpenseId | undefined
-  >(undefined);
+  const [expenseIdUnderEdition, setExpenseUnderEdition] = useState<ExpenseId | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const subscription = expenseManager.change$.subscribe((_) => {
@@ -108,11 +108,7 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       )}
 
       {expenseIdUnderEdition ? (
-        <BlueprintButton
-          large
-          text="Close"
-          onClick={handleStopEditingExpense}
-        />
+        <BlueprintButton large text="Close" onClick={handleStopEditingExpense} />
       ) : (
         <BlueprintButton large text="Add expense" onClick={handleAddExpense} />
       )}

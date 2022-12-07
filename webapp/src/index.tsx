@@ -1,11 +1,6 @@
 import App from "./App";
 import "./blueprint.css";
-import {
-  API_BASE_URL,
-  BASE_URL,
-  DEVELOPMENT_MODE,
-  MOCK_APIS,
-} from "./constants";
+import { API_BASE_URL, BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";

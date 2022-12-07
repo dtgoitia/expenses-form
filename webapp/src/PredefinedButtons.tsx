@@ -31,10 +31,7 @@ function Shortcuts({ data, select }: ShortcutsProps) {
   return (
     <Container>
       {data.map((shortcut, i) => (
-        <Button
-          key={`shortcut-${i}`}
-          onClick={(e) => handleClick(e, shortcut.id)}
-        >
+        <Button key={`shortcut-${i}`} onClick={(e) => handleClick(e, shortcut.id)}>
           {shortcut.buttonName}
         </Button>
       ))}

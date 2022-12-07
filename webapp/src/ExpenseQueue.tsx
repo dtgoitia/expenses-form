@@ -77,13 +77,7 @@ interface ListItemProps {
   edit: () => void;
   remove: () => void;
 }
-function ListItem({
-  appExpense,
-  editing,
-  deleting,
-  edit,
-  remove,
-}: ListItemProps) {
+function ListItem({ appExpense, editing, deleting, edit, remove }: ListItemProps) {
   const { expense } = appExpense;
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -108,18 +102,10 @@ function ListItem({
     <ListItem>
       <DeleteActionSlot>
         <Button onClick={handleOnDeleteClick}>
-          {deleting ? (
-            <Loader active inline size="mini" />
-          ) : (
-            <Icon name="delete" />
-          )}
+          {deleting ? <Loader active inline size="mini" /> : <Icon name="delete" />}
         </Button>
         <Button onClick={handleOnEditClick}>
-          {editing ? (
-            <Loader active inline size="mini" />
-          ) : (
-            <Icon name="edit" />
-          )}
+          {editing ? <Loader active inline size="mini" /> : <Icon name="edit" />}
         </Button>
       </DeleteActionSlot>
       <SubmittedStatusSlot onClick={() => setIsOpen(!isOpen)}>
@@ -165,12 +151,7 @@ interface Props {
   onEditExpense: (id: ExpenseId) => void;
   onDelete: (id: ExpenseId) => void;
 }
-function ExpenseList({
-  expenses,
-  underEdition,
-  onEditExpense,
-  onDelete,
-}: Props) {
+function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props) {
   return (
     <div>
       {expenses.map((appExpense) => {

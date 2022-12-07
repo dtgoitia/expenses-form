@@ -18,12 +18,7 @@ enum DescriptionSubfield {
   seller = "seller",
 }
 
-export function descriptionToString({
-  main,
-  people,
-  seller,
-  tags,
-}: Description): string {
+export function descriptionToString({ main, people, seller, tags }: Description): string {
   const chunks = [];
 
   if (main) {
@@ -101,10 +96,7 @@ const tagsInConfig = storage.tripTags.read() || [];
 const availableTags: TagName[] = mergeStringLists([TAGS, tagsInConfig]);
 
 const peopleInConfig = storage.people.read() || [];
-const defaultPeople: Person[] = mergeStringLists([
-  DEFAULT_PEOPLE,
-  peopleInConfig,
-]);
+const defaultPeople: Person[] = mergeStringLists([DEFAULT_PEOPLE, peopleInConfig]);
 
 const Grid = styled.div`
   display: grid;
@@ -154,10 +146,7 @@ function mergeStringLists(listOfStringLists: string[][]): string[] {
   return unique;
 }
 
-function DescriptionForm({
-  description: raw,
-  onChange: update,
-}: DescriptionProps) {
+function DescriptionForm({ description: raw, onChange: update }: DescriptionProps) {
   const description = stringToDescription({ raw });
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);

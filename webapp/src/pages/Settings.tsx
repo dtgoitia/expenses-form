@@ -22,17 +22,11 @@ function inputFieldToList(inputValue: string): string[] {
 
 function SettingsPage() {
   const [hasuraToken, setHasuraToken] = useState<string | undefined>(undefined);
-  const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(
-    undefined
-  );
+  const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<string | undefined>(undefined);
-  const [paymentMethod, setPaymentMethod] = useState<AccountAlias | undefined>(
-    undefined
-  );
-  const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(
-    undefined
-  );
+  const [paymentMethod, setPaymentMethod] = useState<AccountAlias | undefined>(undefined);
+  const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (storage.hasuraApiToken.exists()) {
@@ -56,10 +50,7 @@ function SettingsPage() {
     }
   }, []);
 
-  function handleHasuraApiTokenChange(
-    _: SyntheticEvent,
-    { value }: InputOnChangeData
-  ) {
+  function handleHasuraApiTokenChange(_: SyntheticEvent, { value }: InputOnChangeData) {
     if (value === undefined || value === null || value === "") {
       setHasuraToken(undefined);
       storage.hasuraApiToken.delete();
@@ -84,10 +75,7 @@ function SettingsPage() {
     storage.splitwiseApiToken.set(value);
   }
 
-  function handleTripTagsChange(
-    _: SyntheticEvent,
-    { value }: InputOnChangeData
-  ) {
+  function handleTripTagsChange(_: SyntheticEvent, { value }: InputOnChangeData) {
     if (value === undefined || value === null || value === "") {
       setTripTags(undefined);
       storage.tripTags.delete();
@@ -113,10 +101,7 @@ function SettingsPage() {
     storage.people.set(peopleNames);
   }
 
-  function handlePaymentMethodChange(
-    _: SyntheticEvent,
-    { value }: InputOnChangeData
-  ) {
+  function handlePaymentMethodChange(_: SyntheticEvent, { value }: InputOnChangeData) {
     if (value === undefined || value === null || value === "") {
       setPaymentMethod(undefined);
       storage.defaultPaymentAccount.delete();
@@ -127,10 +112,7 @@ function SettingsPage() {
     storage.defaultPaymentAccount.set(value);
   }
 
-  function handleFirestoreConfigChange(
-    _: SyntheticEvent,
-    { value }: InputOnChangeData
-  ) {
+  function handleFirestoreConfigChange(_: SyntheticEvent, { value }: InputOnChangeData) {
     if (value === undefined || value === null || value === "") {
       setFirestoreConfig(undefined);
       storage.firestoreConfig.delete();

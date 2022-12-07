@@ -133,9 +133,7 @@ describe("Description", () => {
         tags: ["foo", "bar"],
       };
       const str = descriptionToString(description);
-      expect(str).toEqual(
-        "Something with @JohnDoe,@JaneDoe at @BigShop #foo #bar"
-      );
+      expect(str).toEqual("Something with @JohnDoe,@JaneDoe at @BigShop #foo #bar");
     });
   });
 
