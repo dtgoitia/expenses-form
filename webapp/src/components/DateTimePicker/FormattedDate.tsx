@@ -7,6 +7,22 @@ const GrayedOutText = styled.span`
   margin-left: 1rem;
 `;
 
+function getFormattedTimezone(date: Date): string {
+  const timezoneOffset = date.getTimezoneOffset();
+  const absoluteTimezone = Math.abs(timezoneOffset);
+  const m = absoluteTimezone % 60;
+  const h = (absoluteTimezone - m) / 60;
+
+  const sign = timezoneOffset < 0 ? "+" : "-";
+  const formattedTime = [h, m]
+    .map((n) => n.toString())
+    .map((s) => (s.length === 1 ? `0${s}` : s))
+    .join(":");
+
+  const formattedTimezone = `${sign}${formattedTime}`;
+  return formattedTimezone;
+}
+
 interface Props {
   date: Date;
 }
@@ -25,13 +41,11 @@ function FormattedDate({ date }: Props) {
     return () => clearInterval(intervalId);
   }, [date]);
 
-  const formattedDate = date
-    .toISOString()
-    .replace("T", " ") // improve readability
-    .replace(".000", "") // drop milliseconds
-    .replace("Z", " +00:00"); // improve timezone readability
-
-  const [isoDate, isoTime, timezone] = formattedDate.split(" ");
+  const localDate = date.toISOString().split("T")[0];
+  const localTime = [`${date.getHours()}`, `${date.getMinutes()}`, `${date.getSeconds()}`]
+    .map((n) => (n.length === 1 ? `0${n}` : n))
+    .join(":");
+  const localTimezone = getFormattedTimezone(date);
 
   const secs = secondsDiff % 60;
   const mins = (secondsDiff - secs) / 60;
@@ -44,7 +58,7 @@ function FormattedDate({ date }: Props) {
 
   return (
     <span>
-      {isoDate} <b>{isoTime}</b> {timezone}
+      {localDate} <b>{localTime}</b> {localTimezone}
       <GrayedOutText>{formattedDiff}</GrayedOutText>
     </span>
   );
