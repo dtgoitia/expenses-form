@@ -48,6 +48,8 @@ export class BrowserStorage {
           id: storedItem.expense.id,
           amount: storedItem.expense.amount,
           currency: storedItem.expense.currency,
+          originalAmount: storedItem.expense.originalAmount,
+          originalCurrency: storedItem.expense.originalCurrency,
           description: storedItem.expense.description,
           datetime: new Date(storedItem.expense.datetime),
           paid_with: storedItem.expense.paid_with,

@@ -67,6 +67,20 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
     update({ ...expense, currency });
   }
 
+  function handleOriginalAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
+    if (value === undefined || value === null || value === "") {
+      update({ ...expense, originalAmount: undefined });
+      return;
+    }
+
+    update({ ...expense, originalAmount: Number(value) });
+  }
+
+  function handleOriginalCurrencyChange(_: any, data: DropdownProps): void {
+    const originalCurrency = data.value as CurrencyCode;
+    update({ ...expense, originalCurrency });
+  }
+
   function handleDescriptionChange(description: string): void {
     console.debug(`ExpenseEditor::handleDescriptionChange:description:`, description);
 
@@ -121,6 +135,20 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
             value={expense.currency}
             options={formCurrencies}
             onChange={handleCurrencyChange}
+          />
+          <Form.Input
+            type="number"
+            placeholder="Amount"
+            name="originalAmountField"
+            value={expense.originalAmount}
+            step="any"
+            onChange={handleOriginalAmountChange}
+          />
+          <Form.Dropdown
+            name="originalCurrencyField"
+            value={expense.originalCurrency}
+            options={formCurrencies}
+            onChange={handleOriginalCurrencyChange}
           />
         </Form.Group>
 

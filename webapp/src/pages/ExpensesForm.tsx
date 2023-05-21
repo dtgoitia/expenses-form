@@ -47,7 +47,9 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
     const newExpense: AddExpenseArgs = {
       datetime: now(),
       amount: undefined,
+      originalAmount: undefined,
       currency: DEFAULT_CURRENCY,
+      originalCurrency: DEFAULT_CURRENCY,
       description: "",
       shared: false,
       pending: defaultAccount.pending,

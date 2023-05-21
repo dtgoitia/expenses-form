@@ -5,6 +5,8 @@ export interface Expense {
   id: ExpenseId;
   amount: number;
   currency: string;
+  originalAmount: number;
+  originalCurrency: string;
   description: string;
   datetime: Date;
   // The domain should not contain data about the persistence layer, instead, the
@@ -16,8 +18,9 @@ export interface Expense {
   pending: boolean;
 }
 
-export interface DraftExpense extends Omit<Expense, "amount"> {
+export interface DraftExpense extends Omit<Expense, "amount" | "originalAmount"> {
   amount: number | undefined;
+  originalAmount: number | undefined;
 }
 
 export type AccountId = number;
