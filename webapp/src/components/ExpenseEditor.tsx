@@ -125,20 +125,6 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
           <Form.Input
             type="number"
             placeholder="Amount"
-            name="amountField"
-            value={expense.amount}
-            step="any"
-            onChange={handleAmountChange}
-          />
-          <Form.Dropdown
-            name="currencyField"
-            value={expense.currency}
-            options={formCurrencies}
-            onChange={handleCurrencyChange}
-          />
-          <Form.Input
-            type="number"
-            placeholder="Amount"
             name="originalAmountField"
             value={expense.originalAmount}
             step="any"
@@ -149,6 +135,20 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
             value={expense.originalCurrency}
             options={formCurrencies}
             onChange={handleOriginalCurrencyChange}
+          />
+          <Form.Input
+            type="number"
+            placeholder="Amount"
+            name="amountField"
+            value={expense.amount}
+            step="any"
+            onChange={handleAmountChange}
+          />
+          <Form.Dropdown
+            name="currencyField"
+            value={expense.currency}
+            options={formCurrencies}
+            onChange={handleCurrencyChange}
           />
         </Form.Group>
 
