@@ -125,6 +125,9 @@ function ListItem({
           <pre>id: {expense.id}</pre>
           <pre>datetime: {expense.datetime.toISOString()}</pre>
           <pre>paid_with: {account.alias}</pre>
+          <pre>
+            original_amount: {expense.originalAmount} {expense.originalCurrency}
+          </pre>
           <p onClick={() => copyToClipboard(expense.description)}>
             Click to copy description
           </p>
