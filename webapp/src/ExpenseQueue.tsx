@@ -1,3 +1,4 @@
+import { dateToLocale } from "./datetimeUtils";
 import { getAccountById } from "./domain/accounts";
 import { AppExpense } from "./domain/expenses";
 import { AccountId, ExpenseId } from "./domain/model";
@@ -123,7 +124,7 @@ function ListItem({
         </span>
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
-          <pre>datetime: {expense.datetime.toISOString()}</pre>
+          <pre>datetime: {dateToLocale(expense.datetime)}</pre>
           <pre>paid_with: {account.alias}</pre>
           <pre>
             original_amount: {expense.originalAmount} {expense.originalCurrency}
