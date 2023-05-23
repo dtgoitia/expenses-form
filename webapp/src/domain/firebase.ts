@@ -1,11 +1,11 @@
 import { Expense, ExpenseId } from "./model";
 import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
 import {
-  deleteDoc,
-  doc,
   DocumentData,
   DocumentReference,
   Firestore,
+  deleteDoc,
+  doc,
   getFirestore,
   setDoc,
   writeBatch,
@@ -38,16 +38,23 @@ export class FirestoreClient {
 
   public async setAll(expenses: Expense[]): Promise<void> {
     const batch = writeBatch(this.db);
-    expenses.forEach((expense) => {
+    expenses.map(dropUndefinedFields).forEach((expense) => {
       const ref = this.getExpenseDocRef(expense.id);
       batch.set(ref, expense);
     });
     await batch.commit();
   }
 
-  private getExpenseDocRef(
-    expenseId: ExpenseId
-  ): DocumentReference<DocumentData> {
+  private getExpenseDocRef(expenseId: ExpenseId): DocumentReference<DocumentData> {
     return doc(this.db, this.expenseCollection, expenseId);
   }
+}
+
+function dropUndefinedFields(expense: Expense): any {
+  return Object.entries(expense)
+    .filter(([key, value]) => value !== undefined)
+    .reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {} as any);
 }

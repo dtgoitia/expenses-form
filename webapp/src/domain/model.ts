@@ -5,8 +5,8 @@ export interface Expense {
   id: ExpenseId;
   amount: number;
   currency: string;
-  originalAmount: number;
-  originalCurrency: string;
+  originalAmount: number | undefined;
+  originalCurrency: string | undefined;
   description: string;
   datetime: Date;
   // The domain should not contain data about the persistence layer, instead, the

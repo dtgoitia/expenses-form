@@ -103,16 +103,18 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
   }
 
   function pushToFirestore() {
+    const cleanExpenses = expenses.map(cleanExpense);
     const config = storage.firestoreConfig.read();
     if (config === undefined) {
       alert(`Please, set up Firestore config in settings`);
       return;
     }
+
     // TODO: use a React.Context for this - makes it more testable and modular
     const firestore = new FirestoreClient({ config });
     setPushing(true);
     firestore
-      .setAll(expenses)
+      .setAll(cleanExpenses)
       .then(() => {
         setPushing(false);
       })
@@ -145,3 +147,28 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
 }
 
 export default DownloadJson;
+
+function cleanExpense(expense: Expense): any {
+  const clean: any = {
+    id: expense.id,
+    amount: expense.amount,
+    currency: expense.currency,
+    description: expense.description,
+    datetime: expense.datetime,
+    paid_with: expense.paid_with,
+    shared: expense.shared,
+    pending: expense.pending,
+  };
+
+  if (!expense.originalAmount) {
+    return clean;
+  }
+
+  const inDifferentCurrency = {
+    ...clean,
+    originalAmount: expense.originalAmount,
+    originalCurrency: expense.originalCurrency,
+  };
+
+  return inDifferentCurrency;
+}
