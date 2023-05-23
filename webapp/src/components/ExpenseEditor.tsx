@@ -33,6 +33,10 @@ interface ExpenseEditorProps {
 function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
+  // If true, the user has paid with a different currency to the default
+  // currency of the account used to pay
+  const [otherCurrency, setOtherCurrency] = useState<boolean>(!!expense.originalAmount);
+
   const formCurrencies = CURRENCIES.map((currency) => currency.code).map((name) => ({
     key: name,
     value: name,
@@ -120,37 +124,65 @@ function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
 
       <PaidWithDropdown paidWith={expense.paid_with} onChange={handleAccountChange} />
 
+      <Checkbox
+        inline
+        checked={otherCurrency}
+        label="paid with different currency"
+        onChange={() => setOtherCurrency(!otherCurrency)}
+      />
+
       <Form>
-        <Form.Group inline>
-          <Form.Input
-            type="number"
-            placeholder="Amount"
-            name="originalAmountField"
-            value={expense.originalAmount}
-            step="any"
-            onChange={handleOriginalAmountChange}
-          />
-          <Form.Dropdown
-            name="originalCurrencyField"
-            value={expense.originalCurrency}
-            options={formCurrencies}
-            onChange={handleOriginalCurrencyChange}
-          />
-          <Form.Input
-            type="number"
-            placeholder="Amount"
-            name="amountField"
-            value={expense.amount}
-            step="any"
-            onChange={handleAmountChange}
-          />
-          <Form.Dropdown
-            name="currencyField"
-            value={expense.currency}
-            options={formCurrencies}
-            onChange={handleCurrencyChange}
-          />
-        </Form.Group>
+        {otherCurrency ? (
+          <>
+            <Form.Group inline>
+              <Form.Input
+                type="number"
+                placeholder="Original amount"
+                name="originalAmountField"
+                value={expense.originalAmount}
+                step="any"
+                onChange={handleOriginalAmountChange}
+              />
+              <Form.Dropdown
+                name="originalCurrencyField"
+                value={expense.originalCurrency}
+                options={formCurrencies}
+                onChange={handleOriginalCurrencyChange}
+              />
+              <Form.Input
+                type="number"
+                placeholder="Amount in account"
+                name="amountField"
+                value={expense.amount}
+                step="any"
+                onChange={handleAmountChange}
+              />
+              <Form.Dropdown
+                name="currencyField"
+                value={expense.currency}
+                options={formCurrencies}
+                onChange={handleCurrencyChange}
+              />
+            </Form.Group>
+          </>
+        ) : (
+          <Form.Group inline>
+            <Form.Input
+              type="number"
+              placeholder="Amount"
+              name="amountField"
+              value={expense.amount}
+              step="any"
+              onChange={handleAmountChange}
+            />
+            <Form.Dropdown
+              name="currencyField"
+              value={expense.currency}
+              options={formCurrencies}
+              onChange={handleCurrencyChange}
+            />
+          </Form.Group>
+        )}
 
         <DescriptionForm
           description={expense.description}
