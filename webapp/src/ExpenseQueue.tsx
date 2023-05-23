@@ -1,7 +1,7 @@
 import { dateToLocale } from "./datetimeUtils";
 import { getAccountById } from "./domain/accounts";
 import { AppExpense } from "./domain/expenses";
-import { AccountId, ExpenseId } from "./domain/model";
+import { AccountId, DraftExpense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Button, Switch } from "@blueprintjs/core";
@@ -68,6 +68,20 @@ function copyToClipboard(text: string): Promise<void> {
     });
 }
 
+function formatAmount(expense: DraftExpense): string {
+  const isPaidInAnotherCurrency = !!expense.originalAmount;
+
+  if (isPaidInAnotherCurrency) {
+    return `${expense.originalAmount} ${expense.originalCurrency}`;
+  }
+
+  if (expense.amount === undefined) {
+    return `?`;
+  }
+
+  return `${expense.amount} ${expense.currency}`;
+}
+
 interface ListItemProps {
   appExpense: AppExpense;
   editing: boolean;
@@ -116,10 +130,7 @@ function ListItem({
 
       <DescriptionSlot>
         <span onClick={() => setIsOpen(!isOpen)}>
-          {formatDate(expense.datetime)}{" "}
-          <b>
-            {expense.amount} {expense.currency}
-          </b>{" "}
+          {formatDate(expense.datetime)} <b>{formatAmount(expense)}</b>{" "}
           {expense.description}
         </span>
         <Collapse isOpen={isOpen}>
