@@ -1,0 +1,92 @@
+- [x] Add PaymentAccounts dummy page
+- [x] Add PaymentAccountsManager
+- [x] Initialize PaymentAccountsManager in initialize()
+- [x] Extend `PaymentAccount` to support default currency
+- [x] Build PaymentAccounts page
+
+# 2023-05-30
+
+- [x] Build `CurrencyManager`
+- [x] Reactively read/write currencies from/to browser storage via Setting page
+- [x] Initialize `CurrencyManager` in `App`
+
+# 2023-05-31
+
+- [x] Use `CurrencyManager` currencies in `ExpensesForm` dropdown
+- [x] Use `CurrencyManager` currencies in `PaymentAccountManager` and in Payment Accounts page
+- [x] Allow user to select default `PaymentAccount` from Accounts page
+
+- [x] Update `ExpenseForm` to display accounts in PaymentAccountsManager
+  - Update default currency using chosen PaymentAccount currency
+
+# 2023-06-01
+
+- [x] Delete "default account" from Settings - it's no longer used
+- [x] feat(currencies): on App.init, initialize CurrencyManager with currencies in PaymentAccounts
+- [x] refactor(payment accounts): move data interfaces to model.ts
+- [x] chore(unused code): try to delete code in the right commits
+- [x] feat(ExpenseForm): if no default payment account set on load, hint user to add it (show simple instructions)
+- [x] feat(ExpenseForm): if only 1 payment account, no need to store in browser the default account ID, the PaymentAccountManager will return that account as default
+- [x] feat(payment accounts): hint user to select a PaymentAccount as default in Payment Accounts page
+- [x] feat(payment accounts): do not allow user to add payment accounts if no currencies found
+- [x] **BEFORE DEPLOYING**, make sure you back up accounts in production webapp storage
+- [x] **BEFORE DEPLOYING**, make sure you update `make scrape_webapp` script to understand new data shape in Firestore
+- [x] fix(currencies): make sure selected account currency is assigned to draft expense
+- [x] fix(payment accounts): remove false error
+- [x] fix(currencies): if user unchecks 'paid with different currency' remove `originalAmount` and `originalCurrency` from expense
+- [x] fix(currencies): set draft expense `originalCurrency` to undefined
+- [x] chore: remove `defaultPaymentAccount` key in local storage
+- [x] refactor(local storage): make sure all keys are prefixed
+
+- [ ] feat(expenses): replace Date with string to record date with timezone
+
+- [ ] fix(ExpenseForm): if default payment account set in browser, but no payment accounts found --> data is corrupted, delete default account from browser
+- [ ] fix(ExpenseForm): on edit expense, during initial renders, some things are undefined and you get errors that should not be there
+
+- [ ] feat(currencies): allow user to select a default currency - useful when abroad and you want to pay in EUR by default (hence enable 'paid in other currency' mode)
+- [ ] BUG: when there is only one account and no currencies, the only account is chosen as default -- behaviour is okay-ish, but without currencies, accounts should somehow show an error
+
+
+
+- [ ] Allow user to record transfers between different accounts
+
+- [ ] Add MerchantsManager
+- [ ] Expose MerchantsManager in ExpenseManager
+- [ ] Suggest merchants
+
+- [ ] feat(currencies): on App.init, persist any currency in PaymentAccounts that is not in browser storage currencies
+
+- [ ] Delete:
+  - AccountId
+  - PAYMENT_ACCOUNTS
+
+
+
+
+
+CurrencyManager
+  - dropdown for foreign currency  // probably good to allow user to add a new currency from form, instead of from Settings page
+
+PaymentAccountsManager
+  set default payment account <-- by user from SettingsPage
+
+  get defaultAccount.defaultCurrency --> show in ExpensesEditor dropdown
+
+
+
+---
+
+On init
+
+Local storage
+  --> accounts
+  --> PaymentAccountsManager.init
+
+
+const currencies = new Set<CurrencyCode>(
+  [
+    ...PaymentAccountsManager.getAll().map(account => account.currencies),
+    ...local_storage.other_currencies,
+  ]);
+
+CurrencyManager.init(currencies)
