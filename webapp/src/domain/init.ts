@@ -16,5 +16,8 @@ export function initialize() {
   const appExpenses = browserStorage.readExpenses();
   expenseManager.initialize({ appExpenses });
 
-  return { expenseManager, browserStorage };
+  const accounts = browserStorage.readPaymentAccounts();
+  paymentAccountsManager.initialize({ accounts });
+
+  return { expenseManager, browserStorage, paymentAccountsManager };
 }
