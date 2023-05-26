@@ -2,6 +2,7 @@ import ErrorPanel from "./components/ErrorPanel";
 import { initialize } from "./domain/init";
 import ExpensesForm from "./pages/ExpensesForm";
 import PageNotFound from "./pages/PageNotFound";
+import PaymentAccountsPage from "./pages/PaymentAccountsPage";
 import SettingsPage from "./pages/Settings";
 import Paths from "./routes";
 import { Route, Routes } from "react-router-dom";
@@ -16,6 +17,7 @@ function App() {
           path={Paths.root}
           element={<ExpensesForm expenseManager={expenseManager} />}
         />
+        <Route path={Paths.paymentAccounts} element={<PaymentAccountsPage />} />
         <Route path={Paths.settings} element={<SettingsPage />} />
         <Route path={Paths.notFound} element={<PageNotFound />} />
       </Routes>

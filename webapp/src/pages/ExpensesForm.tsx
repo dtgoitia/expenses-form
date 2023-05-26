@@ -91,6 +91,9 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       <Button large icon="refresh" onClick={refreshPage}>
         reload PWA
       </Button>
+      <Link to={Paths.paymentAccounts}>
+        <Button large>Accounts</Button>
+      </Link>
       <Link to={Paths.settings}>
         <Button large icon="cog">
           Settings
