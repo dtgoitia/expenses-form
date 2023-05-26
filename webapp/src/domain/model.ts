@@ -38,6 +38,18 @@ export interface Currency {
   code: CurrencyCode;
 }
 
+export type PaymentAccountId = string;
+type PaymentAccountName = string;
+type LedgerAccountName = string;
+
+export interface PaymentAccount {
+  id: PaymentAccountId;
+  name: PaymentAccountName; // the one displayed in the UI dropdown
+  ledgerName: LedgerAccountName;
+  currency: CurrencyCode;
+}
+export type DraftPaymentAccount = Omit<PaymentAccount, "id">;
+
 export type ShortcutId = number;
 
 export type Seller = string;
