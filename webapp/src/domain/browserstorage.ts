@@ -7,21 +7,26 @@ import {
   ExpenseStatus,
   ExpenseUpdated,
 } from "./expenses";
-import { ExpenseId } from "./model";
+import { ExpenseId, PaymentAccount } from "./model";
+import { PaymentAccountsManager } from "./paymentAccounts";
 
 type GenericObject = { [key: string]: any };
 
 interface BrowserStorageParams {
   client: Storage;
   expenseManager: ExpenseManager;
+  paymentAccountsManager: PaymentAccountsManager;
 }
+
 export class BrowserStorage {
   private client: Storage;
   private expenseManager: ExpenseManager;
+  private paymentAccountsManager: PaymentAccountsManager;
 
-  constructor({ expenseManager, client }: BrowserStorageParams) {
+  constructor({ expenseManager, paymentAccountsManager, client }: BrowserStorageParams) {
     this.client = client;
     this.expenseManager = expenseManager;
+    this.paymentAccountsManager = paymentAccountsManager;
 
     this.expenseManager.change$.subscribe((change) => {
       console.debug(`BrowserStorage.expenseManager.changes: ${change}`);
@@ -34,6 +39,20 @@ export class BrowserStorage {
           return this.handleExpenseDeleted(change);
         default:
           throw new Error(`BrowserStorage: unsupported change: ${change}`);
+      }
+    });
+
+    this.paymentAccountsManager.change$.subscribe((change) => {
+      console.debug(`BrowserStorage.paymentAccountsManager.change$:`, change);
+      switch (change.kind) {
+        case "PaymentAccountManagerInitialized":
+          return;
+        case "PaymentAccountAdded":
+          return this.persistAllPaymentAccounts();
+        case "PaymentAccountUpdated":
+          return this.persistAllPaymentAccounts();
+        case "PaymentAccountDeleted":
+          return this.persistAllPaymentAccounts();
       }
     });
   }
@@ -65,6 +84,24 @@ export class BrowserStorage {
     return allExpenses;
   }
 
+  public readPaymentAccounts(): PaymentAccount[] {
+    console.debug(`${BrowserStorage.name}.${this.readPaymentAccounts.name}()`);
+    const raw: any[] = this.client.paymentAccounts.read() || [];
+    const accounts: PaymentAccount[] = [];
+    for (const storedItem of raw) {
+      const account: PaymentAccount = {
+        id: storedItem.id,
+        name: storedItem.name,
+        ledgerName: storedItem.ledgerName,
+        currency: storedItem.currency,
+      };
+
+      accounts.push(account);
+    }
+
+    return accounts;
+  }
+
   private persistAppExpense(appExpense: AppExpense): void {
     // Overwrites any existing value
     const current: GenericObject = this.client.expenses.read() || {};
@@ -92,5 +129,10 @@ export class BrowserStorage {
 
   private handleExpenseDeleted(change: ExpenseDeleted): void {
     this.deleteExpense(change.expenseId);
+  }
+
+  private persistAllPaymentAccounts(): void {
+    const accounts = this.paymentAccountsManager.getAll();
+    this.client.paymentAccounts.set(accounts);
   }
 }
