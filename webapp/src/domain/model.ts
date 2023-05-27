@@ -39,8 +39,8 @@ export interface Currency {
 }
 
 export type PaymentAccountId = string;
-type PaymentAccountName = string;
-type LedgerAccountName = string;
+export type PaymentAccountName = string;
+export type LedgerAccountName = string;
 
 export interface PaymentAccount {
   id: PaymentAccountId;

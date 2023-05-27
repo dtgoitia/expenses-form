@@ -8,7 +8,7 @@ import Paths from "./routes";
 import { Route, Routes } from "react-router-dom";
 
 function App() {
-  const { expenseManager } = initialize();
+  const { expenseManager, paymentAccountsManager } = initialize();
   return (
     <div>
       <ErrorPanel />
@@ -17,7 +17,12 @@ function App() {
           path={Paths.root}
           element={<ExpensesForm expenseManager={expenseManager} />}
         />
-        <Route path={Paths.paymentAccounts} element={<PaymentAccountsPage />} />
+        <Route
+          path={Paths.paymentAccounts}
+          element={
+            <PaymentAccountsPage paymentAccountsManager={paymentAccountsManager} />
+          }
+        />
         <Route path={Paths.settings} element={<SettingsPage />} />
         <Route path={Paths.notFound} element={<PageNotFound />} />
       </Routes>
