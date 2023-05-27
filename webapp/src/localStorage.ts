@@ -84,6 +84,7 @@ export class Storage {
   people: StoredItem<string[] | undefined>;
   defaultPaymentAccount: StoredItem<string | undefined>;
   expenses: StoredItem<object | undefined>;
+  paymentAccounts: StoredItem<object[] | undefined>;
   firestoreConfig: StoredItem<object | undefined>;
 
   constructor() {
@@ -95,6 +96,7 @@ export class Storage {
       ValueType.string
     );
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
+    this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
     this.firestoreConfig = new StoredItem("exp__firestore_config", ValueType.object);
   }
 }
