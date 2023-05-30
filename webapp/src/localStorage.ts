@@ -86,6 +86,7 @@ export class Storage {
   expenses: StoredItem<object | undefined>;
   paymentAccounts: StoredItem<object[] | undefined>;
   firestoreConfig: StoredItem<object | undefined>;
+  currencies: StoredItem<string | undefined>;
 
   constructor() {
     this.splitwiseApiToken = new StoredItem("splitwise_api_token", ValueType.string);
@@ -98,6 +99,7 @@ export class Storage {
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
     this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
     this.firestoreConfig = new StoredItem("exp__firestore_config", ValueType.object);
+    this.currencies = new StoredItem("exp__currencies", ValueType.string);
   }
 }
 

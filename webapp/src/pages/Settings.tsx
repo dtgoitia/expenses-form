@@ -26,6 +26,7 @@ function SettingsPage() {
   const [people, setPeople] = useState<string | undefined>(undefined);
   const [paymentMethod, setPaymentMethod] = useState<AccountAlias | undefined>(undefined);
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
+  const [currencies, setCurrencies] = useState<string | undefined>();
 
   useEffect(() => {
     if (storage.splitwiseApiToken.exists()) {
@@ -43,6 +44,9 @@ function SettingsPage() {
     if (storage.firestoreConfig.exists()) {
       const config = storage.firestoreConfig.read();
       setFirestoreConfig(JSON.stringify(config));
+    }
+    if (storage.currencies.exists()) {
+      setCurrencies(storage.currencies.read());
     }
   }, []);
 
@@ -111,6 +115,18 @@ function SettingsPage() {
     storage.firestoreConfig.set(config);
   }
 
+  function handleCurrenciesChange(event: any): void {
+    const value = event.target.value;
+    if (value === undefined || value === null || value === "") {
+      setCurrencies(undefined);
+      storage.currencies.delete();
+      return;
+    }
+
+    setCurrencies(value);
+    storage.currencies.set(value);
+  }
+
   return (
     <CenteredPage>
       <h1>Settings</h1>
@@ -172,6 +188,18 @@ function SettingsPage() {
           value={firestoreConfig}
           placeholder={`{"a":1,"b":2}`}
           onChange={handleFirestoreConfigChange}
+        />
+      </Label>
+
+      <Label htmlFor="currencies">
+        Currencies
+        <input
+          className="bp4-input bp4-fill"
+          type="text"
+          id="currencies"
+          value={currencies}
+          placeholder={`GBP,EUR,USD`}
+          onChange={handleCurrenciesChange}
         />
       </Label>
 
