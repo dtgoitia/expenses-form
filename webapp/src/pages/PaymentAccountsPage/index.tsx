@@ -1,10 +1,10 @@
 import CenteredPage from "../../components/CenteredPage";
+import { App } from "../../domain/app";
 import {
   DraftPaymentAccount,
   PaymentAccount,
   PaymentAccountId,
 } from "../../domain/model";
-import { PaymentAccountsManager } from "../../domain/paymentAccounts";
 import Paths from "../../routes";
 import { AddPaymentAccount } from "./AddPaymentAccount";
 import { ListedPaymentAccount } from "./ListedPaymentAccount";
@@ -13,32 +13,32 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 interface Props {
-  paymentAccountsManager: PaymentAccountsManager;
+  app: App;
 }
 
-export default function PaymentAccountsPage({ paymentAccountsManager }: Props) {
+export default function PaymentAccountsPage({ app }: Props) {
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
 
   useEffect(() => {
-    const subscription = paymentAccountsManager.change$.subscribe((_) => {
-      setAccounts(paymentAccountsManager.getAll());
+    const subscription = app.paymentAccountsManager.change$.subscribe((_) => {
+      setAccounts(app.paymentAccountsManager.getAll());
     });
 
-    setAccounts(paymentAccountsManager.getAll());
+    setAccounts(app.paymentAccountsManager.getAll());
 
     return subscription.unsubscribe;
-  }, [paymentAccountsManager]);
+  }, [app]);
 
   function handleAddPaymentAccount(account: DraftPaymentAccount): void {
-    paymentAccountsManager.add({ draft: account });
+    app.paymentAccountsManager.add({ draft: account });
   }
 
   function handleUpdatePaymentAccount(account: PaymentAccount): void {
-    paymentAccountsManager.update({ account });
+    app.paymentAccountsManager.update({ account });
   }
 
   function handleDeletePaymentAccount(id: PaymentAccountId): void {
-    paymentAccountsManager.delete({ id });
+    app.paymentAccountsManager.delete({ id });
   }
 
   return (

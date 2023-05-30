@@ -16,7 +16,7 @@ interface Props {
 function AppUI({ app }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { expenseManager, paymentAccountsManager } = initialize();
+  const { expenseManager } = initialize();
 
   useEffect(() => {
     app.initialize();
@@ -35,12 +35,7 @@ function AppUI({ app }: Props) {
           path={Paths.root}
           element={<ExpensesForm expenseManager={expenseManager} />}
         />
-        <Route
-          path={Paths.paymentAccounts}
-          element={
-            <PaymentAccountsPage paymentAccountsManager={paymentAccountsManager} />
-          }
-        />
+        <Route path={Paths.paymentAccounts} element={<PaymentAccountsPage app={app} />} />
         <Route path={Paths.settings} element={<SettingsPage />} />
         <Route path={Paths.notFound} element={<PageNotFound />} />
       </Routes>
