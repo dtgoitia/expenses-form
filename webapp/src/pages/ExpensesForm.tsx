@@ -4,7 +4,8 @@ import DownloadJson from "../components/DownloadJson";
 import ExpenseEditor from "../components/ExpenseEditor";
 import { DEFAULT_CURRENCY, PAYMENT_ACCOUNTS } from "../constants";
 import { now } from "../datetimeUtils";
-import { ExpenseManager, AppExpense, AddExpenseArgs } from "../domain/expenses";
+import { App } from "../domain/app";
+import { AppExpense, AddExpenseArgs } from "../domain/expenses";
 import { DraftExpense, Expense, ExpenseId } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
@@ -14,27 +15,27 @@ import { Link } from "react-router-dom";
 import { first } from "rxjs";
 
 interface ExpensesFormProps {
-  expenseManager: ExpenseManager;
+  app: App;
 }
 
-function ExpensesForm({ expenseManager }: ExpensesFormProps) {
+function ExpensesForm({ app }: ExpensesFormProps) {
   const [appExpenses, setAppExpenses] = useState<AppExpense[]>([]);
   const [expenseIdUnderEdition, setExpenseUnderEdition] = useState<ExpenseId | undefined>(
     undefined
   );
 
   useEffect(() => {
-    const subscription = expenseManager.change$.subscribe((_) => {
-      setAppExpenses(expenseManager.getAll());
+    const subscription = app.expenseManager.change$.subscribe((_) => {
+      setAppExpenses(app.expenseManager.getAll());
     });
 
-    setAppExpenses(expenseManager.getAll());
+    setAppExpenses(app.expenseManager.getAll());
 
     return subscription.unsubscribe;
-  }, [expenseManager]);
+  }, [app]);
 
   function handleAddExpense() {
-    expenseManager.change$.pipe(first()).subscribe((change) => {
+    app.expenseManager.change$.pipe(first()).subscribe((change) => {
       setExpenseUnderEdition(change.expenseId);
     });
 
@@ -56,7 +57,7 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       paid_with: defaultAccount.id,
     };
 
-    expenseManager.add(newExpense);
+    app.expenseManager.add(newExpense);
   }
 
   function handleStopEditingExpense(): void {
@@ -76,11 +77,11 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
 
   function handleExpenseEdition(expense: DraftExpense): void {
     console.debug(`ExpensesForm::handleExpenseEdition::expense`, expense);
-    expenseManager.update(expense);
+    app.expenseManager.update(expense);
   }
 
   const expenseUnderEdition =
-    expenseIdUnderEdition && expenseManager.get(expenseIdUnderEdition);
+    expenseIdUnderEdition && app.expenseManager.get(expenseIdUnderEdition);
 
   const publishableExpenses = appExpenses
     .filter((appExpense) => appExpense.readyToPublish)
@@ -118,7 +119,7 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
         expenses={appExpenses}
         underEdition={expenseIdUnderEdition}
         onEditExpense={handleOnEditExpense}
-        onDelete={(id: ExpenseId) => expenseManager.delete(id)}
+        onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
       />
     </CenteredPage>
   );
