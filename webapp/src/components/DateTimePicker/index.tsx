@@ -1,9 +1,6 @@
 import FormattedDate from "./FormattedDate";
-import { Button, Collapse } from "@blueprintjs/core";
-import {
-  TimePicker as BlueprintTimePicker,
-  TimePrecision,
-} from "@blueprintjs/datetime";
+import { Button, Dialog } from "@blueprintjs/core";
+import { DatePicker, TimePrecision } from "@blueprintjs/datetime";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -15,6 +12,11 @@ const Row = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: space-between;
+`;
+
+const FormattedDateContainer = styled.div`
+  background-color: white;
+  padding: 1rem;
 `;
 
 interface Props {
@@ -29,20 +31,38 @@ function DateTimePicker({ defaultDate, date, onChange }: Props) {
   return (
     <Container className="bp4-text-large">
       <Row>
-        <Collapse isOpen={isOpen}>
-          <BlueprintTimePicker
-            value={date}
-            defaultValue={defaultDate}
-            showArrowButtons
-            precision={TimePrecision.SECOND}
-            onChange={onChange}
-          />
-        </Collapse>
+        <Dialog
+          title="Select a date"
+          isOpen={isOpen}
+          autoFocus={true}
+          canOutsideClickClose={true}
+          isCloseButtonShown={true}
+          canEscapeKeyClose={true}
+          transitionDuration={0}
+          onClose={() => setIsOpen(false)}
+        >
+          <div className="bp4-dialog-body">
+            <DatePicker
+              value={date}
+              defaultValue={defaultDate}
+              timePrecision={TimePrecision.SECOND}
+              shortcuts={true}
+              highlightCurrentDay={true}
+              timePickerProps={{ showArrowButtons: true }}
+              onChange={onChange}
+            />
+            <FormattedDateContainer>
+              <FormattedDate date={date} />
+            </FormattedDateContainer>
+          </div>
+          <div className="bp4-dialog-footer">Changes are saved automatically</div>
+        </Dialog>
       </Row>
       <Row>
         <FormattedDate date={date} />
         <Button
           text={isOpen ? "Close" : "Edit time"}
+          disabled={isOpen}
           onClick={() => setIsOpen(!isOpen)}
         />
       </Row>
