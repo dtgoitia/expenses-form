@@ -3,6 +3,7 @@ import "./blueprint.css";
 import { BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import { App } from "./domain/app";
 import { BrowserStorage } from "./domain/browserstorage";
+import { CurrencyManager } from "./domain/currencies";
 import { ExpenseManager } from "./domain/expenses";
 import { PaymentAccountsManager } from "./domain/paymentAccounts";
 import "./index.css";
@@ -27,11 +28,13 @@ const browserStorage = new BrowserStorage({
   paymentAccountsManager,
   client: new Storage(),
 });
+const currencyManager = new CurrencyManager();
 
 const app = new App({
   browserStorage,
   expenseManager,
   paymentAccountsManager,
+  currencyManager,
 });
 
 ReactDOM.render(
