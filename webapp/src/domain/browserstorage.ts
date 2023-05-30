@@ -7,7 +7,7 @@ import {
   ExpenseStatus,
   ExpenseUpdated,
 } from "./expenses";
-import { ExpenseId, PaymentAccount } from "./model";
+import { CurrencyCode, ExpenseId, PaymentAccount } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 
 type GenericObject = { [key: string]: any };
@@ -82,6 +82,13 @@ export class BrowserStorage {
       allExpenses.push(appExpense);
     }
     return allExpenses;
+  }
+
+  public readCurrencies(): CurrencyCode[] {
+    console.debug(`${BrowserStorage.name}.${this.readCurrencies.name}()`);
+    const raw = this.client.currencies.read() || "";
+    const currencies: CurrencyCode[] = raw.split(",");
+    return currencies;
   }
 
   public readPaymentAccounts(): PaymentAccount[] {
