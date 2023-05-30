@@ -1,7 +1,12 @@
 import AppUI from "./AppUI";
 import "./blueprint.css";
 import { BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
+import { App } from "./domain/app";
+import { BrowserStorage } from "./domain/browserstorage";
+import { ExpenseManager } from "./domain/expenses";
+import { PaymentAccountsManager } from "./domain/paymentAccounts";
 import "./index.css";
+import { Storage } from "./localStorage";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { GlobalStyle } from "./style/globalStyle";
@@ -15,11 +20,25 @@ if (DEVELOPMENT_MODE && MOCK_APIS) {
   worker.start();
 }
 
+const expenseManager = new ExpenseManager();
+const paymentAccountsManager = new PaymentAccountsManager();
+const browserStorage = new BrowserStorage({
+  expenseManager,
+  paymentAccountsManager,
+  client: new Storage(),
+});
+
+const app = new App({
+  browserStorage,
+  expenseManager,
+  paymentAccountsManager,
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename={BASE_URL}>
       <GlobalStyle />
-      <AppUI />
+      <AppUI app={app} />
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
