@@ -179,21 +179,25 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props)
     <div>
       <Switch label="deletion mode" onClick={() => toggleDeletionMode()} />
 
-      {expenses.map((appExpense) => {
-        const id = appExpense.expense.id;
+      {expenses.length > 0 ? (
+        expenses.map((appExpense) => {
+          const id = appExpense.expense.id;
 
-        return (
-          <ListItem
-            key={`queued-expense-${id}`}
-            editing={underEdition === id}
-            deleting={false} // TODO: integrate this in the new domain
-            appExpense={appExpense}
-            edit={() => onEditExpense(id)}
-            remove={() => onDelete(id)}
-            deleteMode={inDeletionMode}
-          />
-        );
-      })}
+          return (
+            <ListItem
+              key={`queued-expense-${id}`}
+              editing={underEdition === id}
+              deleting={false} // TODO: integrate this in the new domain
+              appExpense={appExpense}
+              edit={() => onEditExpense(id)}
+              remove={() => onDelete(id)}
+              deleteMode={inDeletionMode}
+            />
+          );
+        })
+      ) : (
+        <p>No expenses :)</p>
+      )}
     </div>
   );
 }

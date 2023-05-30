@@ -96,7 +96,6 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
           Settings
         </Button>
       </Link>
-
       {expenseUnderEdition ? (
         <ExpenseEditor
           expense={expenseUnderEdition.expense}
@@ -105,23 +104,19 @@ function ExpensesForm({ expenseManager }: ExpensesFormProps) {
       ) : (
         <p>Add expense or select an existing one</p>
       )}
-
       {expenseIdUnderEdition ? (
         <Button large text="Close" onClick={handleStopEditingExpense} />
       ) : (
         <Button large text="Add expense" onClick={handleAddExpense} />
       )}
-
       <DownloadJson expenses={publishableExpenses} />
 
-      {appExpenses.length > 0 && (
-        <ExpenseQueue
-          expenses={appExpenses}
-          underEdition={expenseIdUnderEdition}
-          onEditExpense={handleOnEditExpense}
-          onDelete={(id: ExpenseId) => expenseManager.delete(id)}
-        />
-      )}
+      <ExpenseQueue
+        expenses={appExpenses}
+        underEdition={expenseIdUnderEdition}
+        onEditExpense={handleOnEditExpense}
+        onDelete={(id: ExpenseId) => expenseManager.delete(id)}
+      />
     </CenteredPage>
   );
 }
