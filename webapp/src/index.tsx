@@ -1,4 +1,4 @@
-import App from "./App";
+import AppUI from "./AppUI";
 import "./blueprint.css";
 import { BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import "./index.css";
@@ -19,7 +19,7 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename={BASE_URL}>
       <GlobalStyle />
-      <App />
+      <AppUI />
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
