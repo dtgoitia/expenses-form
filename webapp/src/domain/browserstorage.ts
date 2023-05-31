@@ -7,7 +7,7 @@ import {
   ExpenseStatus,
   ExpenseUpdated,
 } from "./expenses";
-import { CurrencyCode, ExpenseId, PaymentAccount } from "./model";
+import { CurrencyCode, ExpenseId, PaymentAccount, PaymentAccountId } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 
 type GenericObject = { [key: string]: any };
@@ -107,6 +107,17 @@ export class BrowserStorage {
     }
 
     return accounts;
+  }
+
+  public readDefaultAccountId(): PaymentAccountId | undefined {
+    console.debug(`${BrowserStorage.name}.${this.readDefaultAccountId.name}()`);
+    const id = this.client.defaultPaymentAccountId.read();
+    return id;
+  }
+
+  public setDefaultAccountId({ id }: { id: PaymentAccountId }): void {
+    console.debug(`${BrowserStorage.name}.${this.setDefaultAccountId.name}()`);
+    this.client.defaultPaymentAccountId.set(id);
   }
 
   private persistAppExpense(appExpense: AppExpense): void {

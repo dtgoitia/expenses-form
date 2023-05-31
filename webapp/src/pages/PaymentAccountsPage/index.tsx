@@ -19,17 +19,20 @@ interface Props {
 
 export default function PaymentAccountsPage({ app }: Props) {
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
+  const [defaultAccount, setDefaultAccount] = useState<PaymentAccountId | undefined>();
   const [currencies, setCurrencies] = useState<CurrencyCode[]>([]);
 
   useEffect(() => {
     const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
       setAccounts(app.paymentAccountsManager.getAll());
+      setDefaultAccount(app.paymentAccountsManager.getDefault()?.id);
     });
     const currenciesSubscription = app.currencyManager.change$.subscribe((_) => {
       setCurrencies([...app.currencyManager.getAll()].sort());
     });
 
     setAccounts(app.paymentAccountsManager.getAll());
+    setDefaultAccount(app.paymentAccountsManager.getDefault()?.id);
     setCurrencies([...app.currencyManager.getAll()].sort());
 
     return () => {
@@ -48,6 +51,10 @@ export default function PaymentAccountsPage({ app }: Props) {
 
   function handleDeletePaymentAccount(id: PaymentAccountId): void {
     app.paymentAccountsManager.delete({ id });
+  }
+
+  function handleMarkPaymentAccountAsDefault(id: PaymentAccountId): void {
+    app.paymentAccountsManager.setDefault({ id });
   }
 
   return (
@@ -70,9 +77,11 @@ export default function PaymentAccountsPage({ app }: Props) {
           <ListedPaymentAccount
             key={`${i}-${account.id}`}
             account={account}
+            isDefault={defaultAccount !== undefined && account.id === defaultAccount}
             currencies={currencies}
             onUpdate={handleUpdatePaymentAccount}
             onDelete={handleDeletePaymentAccount}
+            onMarkAsDefault={() => handleMarkPaymentAccountAsDefault(account.id)}
           />
         ))
       ) : (

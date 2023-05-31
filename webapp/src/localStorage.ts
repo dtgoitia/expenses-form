@@ -85,6 +85,7 @@ export class Storage {
   defaultPaymentAccount: StoredItem<string | undefined>;
   expenses: StoredItem<object | undefined>;
   paymentAccounts: StoredItem<object[] | undefined>;
+  defaultPaymentAccountId: StoredItem<string | undefined>;
   firestoreConfig: StoredItem<object | undefined>;
   currencies: StoredItem<string | undefined>;
 
@@ -98,6 +99,10 @@ export class Storage {
     );
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
     this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
+    this.defaultPaymentAccountId = new StoredItem(
+      "exp__default_payment_account_id",
+      ValueType.string
+    );
     this.firestoreConfig = new StoredItem("exp__firestore_config", ValueType.object);
     this.currencies = new StoredItem("exp__currencies", ValueType.string);
   }

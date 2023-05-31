@@ -1,7 +1,12 @@
+import { assertNever } from "../exhaustive-match";
 import { BrowserStorage } from "./browserstorage";
 import { CurrencyManager } from "./currencies";
 import { ExpenseManager } from "./expenses";
-import { PaymentAccountsManager } from "./paymentAccounts";
+import { PaymentAccountId } from "./model";
+import {
+  PaymentAccountChanges as PaymentAccountChange,
+  PaymentAccountsManager,
+} from "./paymentAccounts";
 
 interface Props {
   expenseManager: ExpenseManager;
@@ -27,6 +32,10 @@ export class App {
     this.paymentAccountsManager = paymentAccountsManager;
     this.browserStorage = browserStorage;
     this.currencyManager = currencyManager;
+
+    this.paymentAccountsManager.change$.subscribe((change) =>
+      this.handlePaymentAccountChange(change)
+    );
   }
 
   public initialize(): void {
@@ -38,8 +47,31 @@ export class App {
     const currencies = this.browserStorage.readCurrencies();
     this.currencyManager.initialize({ currencies });
 
-    const accounts = this.browserStorage.readPaymentAccounts();
-    this.paymentAccountsManager.initialize({ accounts });
+    this.paymentAccountsManager.initialize({
+      accounts: this.browserStorage.readPaymentAccounts(),
+      defaultAccountId: this.browserStorage.readDefaultAccountId(),
+    });
     console.debug(`App.initialize::completed`);
+  }
+
+  private handlePaymentAccountChange(change: PaymentAccountChange): void {
+    switch (change.kind) {
+      case "PaymentAccountManagerInitialized":
+        return;
+      case "PaymentAccountAdded":
+        return;
+      case "PaymentAccountUpdated":
+        return;
+      case "PaymentAccountDeleted":
+        return;
+      case "DefaultPaymentAccountSet":
+        return this.handleDefaultPaymentAccountChange(change.id);
+      default:
+        assertNever(change, `unsupported PaymentAccountChange: ${change}`);
+    }
+  }
+
+  private handleDefaultPaymentAccountChange(id: PaymentAccountId): void {
+    this.browserStorage.setDefaultAccountId({ id });
   }
 }

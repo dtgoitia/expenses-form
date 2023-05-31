@@ -8,18 +8,31 @@ export class PaymentAccountsManager {
 
   private accounts: Map<PaymentAccountId, PaymentAccount>;
   private changeSubject: Subject<PaymentAccountChanges>;
+  private defaultAccountId: PaymentAccountId | undefined;
 
   constructor() {
     this.accounts = new Map<PaymentAccountId, PaymentAccount>();
     this.changeSubject = new Subject<PaymentAccountChanges>();
     this.change$ = this.changeSubject.asObservable();
+    this.defaultAccountId = undefined;
 
     this.change$.subscribe((change) =>
-      console.debug(`${PaymentAccountsManager.name}.change$::change:`, change)
+      console.debug(`${PaymentAccountsManager.name}.change$:`, change)
     );
   }
 
-  public initialize({ accounts }: { accounts: PaymentAccount[] }): void {
+  public initialize({
+    accounts,
+    defaultAccountId,
+  }: {
+    accounts: PaymentAccount[];
+    defaultAccountId: PaymentAccountId | undefined;
+  }): void {
+    console.debug(`${PaymentAccountsManager.name}.${this.initialize.name}::started`);
+    console.debug(
+      `${PaymentAccountsManager.name}.${this.initialize.name}::defaultAccountId`,
+      defaultAccountId
+    );
     for (const account of accounts) {
       const { id } = account;
 
@@ -30,7 +43,42 @@ export class PaymentAccountsManager {
       this.accounts.set(id, account);
     }
 
+    if (defaultAccountId && this.accounts.has(defaultAccountId) === false) {
+      this.error(
+        this.initialize,
+        `no account ID matches the defaultAccountId='${defaultAccountId}'`
+      );
+    }
+
+    this.defaultAccountId = defaultAccountId;
+
     this.changeSubject.next({ kind: "PaymentAccountManagerInitialized" });
+  }
+
+  public setDefault({ id }: { id: PaymentAccountId }): void {
+    if (this.accounts.has(id) === false) {
+      this.error(this.setDefault, `'${id}' must match an existing Payment Account ID`);
+    }
+
+    this.defaultAccountId = id;
+
+    this.changeSubject.next({ kind: "DefaultPaymentAccountSet", id });
+  }
+
+  public getDefault(): PaymentAccount | undefined {
+    if (this.accounts.size === 0) {
+      return undefined;
+    }
+
+    if (this.accounts.size === 1) {
+      return [...this.accounts.values()][0];
+    }
+
+    if (this.defaultAccountId === undefined) {
+      return undefined;
+    }
+
+    return this.accounts.get(this.defaultAccountId);
   }
 
   public getAll(): PaymentAccount[] {
@@ -90,8 +138,9 @@ function sortPaymentAccountsByName(a: PaymentAccount, b: PaymentAccount): SortAc
   return a.name <= b.name ? SortAction.KeepOrder : SortAction.SwapOrder;
 }
 
-type PaymentAccountChanges =
+export type PaymentAccountChanges =
   | { kind: "PaymentAccountManagerInitialized" }
   | { kind: "PaymentAccountAdded"; id: PaymentAccountId }
   | { kind: "PaymentAccountUpdated"; id: PaymentAccountId }
-  | { kind: "PaymentAccountDeleted"; id: PaymentAccountId };
+  | { kind: "PaymentAccountDeleted"; id: PaymentAccountId }
+  | { kind: "DefaultPaymentAccountSet"; id: PaymentAccountId };
