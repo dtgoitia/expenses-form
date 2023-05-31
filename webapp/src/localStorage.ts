@@ -17,12 +17,12 @@ class StoredItem<T> {
     return !!rawValue;
   }
 
-  public read(): T {
-    if (!this.exists) {
-      throw new Error(`Could not find ${this.key} in local storage`);
-    }
+  public read(): T | undefined {
+    const rawValue = window.localStorage.getItem(this.key);
 
-    const rawValue = window.localStorage.getItem(this.key) as string;
+    if (rawValue === null) {
+      return undefined;
+    }
 
     switch (this.type) {
       case ValueType.string:
