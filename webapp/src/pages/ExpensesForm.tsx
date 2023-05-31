@@ -80,8 +80,9 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     app.expenseManager.update(expense);
   }
 
-  const expenseUnderEdition =
-    expenseIdUnderEdition && app.expenseManager.get(expenseIdUnderEdition);
+  const expenseUnderEdition = expenseIdUnderEdition
+    ? app.expenseManager.get(expenseIdUnderEdition)
+    : undefined;
 
   const publishableExpenses = appExpenses
     .filter((appExpense) => appExpense.readyToPublish)
