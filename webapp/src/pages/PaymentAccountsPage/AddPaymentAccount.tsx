@@ -4,14 +4,19 @@ import {
   LedgerAccountName,
   PaymentAccountName,
 } from "../../domain/model";
-import { Button, Intent } from "@blueprintjs/core";
+import { Button, Intent, MenuItem } from "@blueprintjs/core";
+import { Select2 } from "@blueprintjs/select";
 import { useState } from "react";
 import styled from "styled-components";
 
 interface Props {
+  currencies: CurrencyCode[];
   onAddPaymentAccount: (account: DraftPaymentAccount) => void;
 }
-export function AddPaymentAccount({ onAddPaymentAccount: addPaymentAccount }: Props) {
+export function AddPaymentAccount({
+  currencies,
+  onAddPaymentAccount: addPaymentAccount,
+}: Props) {
   const [name, setName] = useState<PaymentAccountName | undefined>(undefined);
   const [ledgerName, setLedgerName] = useState<LedgerAccountName | undefined>(undefined);
   const [currency, setCurrency] = useState<CurrencyCode | undefined>(undefined);
@@ -40,13 +45,25 @@ export function AddPaymentAccount({ onAddPaymentAccount: addPaymentAccount }: Pr
         placeholder="Ledger name"
         onChange={(event) => setLedgerName(event.target.value)}
       />
-      <input
-        type="text"
-        className="bp4-input bp4-large bp4-fill"
-        value={currency}
-        placeholder="Currency"
-        onChange={(event) => setCurrency(event.target.value)}
-      />
+      <Select2<CurrencyCode>
+        items={currencies}
+        itemRenderer={(currency, { handleClick, modifiers }) => (
+          <MenuItem
+            active={modifiers.active}
+            key={currency}
+            label={currency}
+            onClick={handleClick}
+          />
+        )}
+        filterable={false}
+        onItemSelect={setCurrency}
+      >
+        <Button
+          text={currency}
+          rightIcon="double-caret-vertical"
+          placeholder="Select a currency"
+        />
+      </Select2>
       <Button
         intent={Intent.PRIMARY}
         icon="floppy-disk"

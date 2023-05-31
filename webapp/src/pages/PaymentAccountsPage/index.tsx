@@ -1,5 +1,6 @@
 import CenteredPage from "../../components/CenteredPage";
 import { App } from "../../domain/app";
+import { CurrencyCode } from "../../domain/model";
 import {
   DraftPaymentAccount,
   PaymentAccount,
@@ -18,15 +19,23 @@ interface Props {
 
 export default function PaymentAccountsPage({ app }: Props) {
   const [accounts, setAccounts] = useState<PaymentAccount[]>([]);
+  const [currencies, setCurrencies] = useState<CurrencyCode[]>([]);
 
   useEffect(() => {
-    const subscription = app.paymentAccountsManager.change$.subscribe((_) => {
+    const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
       setAccounts(app.paymentAccountsManager.getAll());
+    });
+    const currenciesSubscription = app.currencyManager.change$.subscribe((_) => {
+      setCurrencies([...app.currencyManager.getAll()].sort());
     });
 
     setAccounts(app.paymentAccountsManager.getAll());
+    setCurrencies([...app.currencyManager.getAll()].sort());
 
-    return subscription.unsubscribe;
+    return () => {
+      accountsSubscription.unsubscribe();
+      currenciesSubscription.unsubscribe();
+    };
   }, [app]);
 
   function handleAddPaymentAccount(account: DraftPaymentAccount): void {
@@ -51,13 +60,17 @@ export default function PaymentAccountsPage({ app }: Props) {
 
       <h3>Payment Accounts</h3>
 
-      <AddPaymentAccount onAddPaymentAccount={handleAddPaymentAccount} />
+      <AddPaymentAccount
+        currencies={currencies}
+        onAddPaymentAccount={handleAddPaymentAccount}
+      />
 
       {accounts.length > 0 ? (
         accounts.map((account, i) => (
           <ListedPaymentAccount
             key={`${i}-${account.id}`}
             account={account}
+            currencies={currencies}
             onUpdate={handleUpdatePaymentAccount}
             onDelete={handleDeletePaymentAccount}
           />
