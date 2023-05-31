@@ -26,16 +26,12 @@ export function PaidWithDropdown({
     <div>
       <Label>
         Paid with:
-        <HTMLSelect fill onChange={handleAccountSelection}>
-          {PAYMENT_ACCOUNTS.map(({ id, alias }) => {
-            return id === selectedAccountId ? (
-              <option key={id} value={id} selected>
-                {alias}
-              </option>
-            ) : (
-              <option value={id}>{alias}</option>
-            );
-          })}
+        <HTMLSelect value={selectedAccountId} fill onChange={handleAccountSelection}>
+          {PAYMENT_ACCOUNTS.map(({ id, alias }) => (
+            <option key={id} value={id}>
+              {alias}
+            </option>
+          ))}
         </HTMLSelect>
       </Label>
     </div>
