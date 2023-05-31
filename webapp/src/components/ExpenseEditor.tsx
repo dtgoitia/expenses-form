@@ -1,13 +1,13 @@
-import { CURRENCIES } from "../constants";
 import { now } from "../datetimeUtils";
 import { getAccountById } from "../domain/accounts";
+import { App } from "../domain/app";
 import { Account, CurrencyCode, DraftExpense } from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { PaidWithDropdown } from "./PaidWith";
 import { Button } from "@blueprintjs/core";
 import { Checkbox, Collapse } from "@blueprintjs/core";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import {
   DropdownItemProps,
   DropdownProps,
@@ -26,22 +26,30 @@ const ReloadDate = styled.div`
 `;
 
 interface ExpenseEditorProps {
+  app: App;
   expense: DraftExpense;
   update: (expense: DraftExpense) => void;
 }
 
-function ExpenseEditor({ expense, update }: ExpenseEditorProps) {
+function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
   // If true, the user has paid with a different currency to the default
   // currency of the account used to pay
   const [otherCurrency, setOtherCurrency] = useState<boolean>(!!expense.originalAmount);
+  const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
 
-  const formCurrencies = CURRENCIES.map((currency) => currency.code).map((name) => ({
-    key: name,
-    value: name,
-    text: name,
-  })) as unknown as DropdownItemProps[];
+  const formCurrencies = getCurrencyDropdownItems({ currencies });
+
+  useEffect(() => {
+    const subscription = app.currencyManager.change$.subscribe((_) => {
+      setCurrencies(app.currencyManager.getAll());
+    });
+
+    setCurrencies(app.currencyManager.getAll());
+
+    return subscription.unsubscribe;
+  }, [app]);
 
   function handleDateChange(date: Date): void {
     update({ ...expense, datetime: date });
@@ -224,3 +232,17 @@ export default ExpenseEditor;
  * The Expenses locally can have invalid data, that's fine - they might be drafts that need further edition
  * the Expenses must be validated when being pushed, shared or downloaded in CSV
  */
+
+function getCurrencyDropdownItems({
+  currencies,
+}: {
+  currencies: Set<CurrencyCode>;
+}): DropdownItemProps[] {
+  const dropdownItems = [...currencies.values()].map((currency) => ({
+    key: currency,
+    value: currency,
+    text: currency,
+  })) as unknown as DropdownItemProps[];
+
+  return dropdownItems;
+}

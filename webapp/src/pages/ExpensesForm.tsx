@@ -103,6 +103,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       {expenseUnderEdition ? (
         <ExpenseEditor
           expense={expenseUnderEdition.expense}
+          app={app}
           update={handleExpenseEdition}
         />
       ) : (

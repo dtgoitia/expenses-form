@@ -13,9 +13,9 @@ interface Props {
 export class App {
   public expenseManager: ExpenseManager;
   public paymentAccountsManager: PaymentAccountsManager;
+  public currencyManager: CurrencyManager;
 
   private browserStorage: BrowserStorage;
-  private currencyManager: CurrencyManager;
 
   constructor({
     expenseManager,

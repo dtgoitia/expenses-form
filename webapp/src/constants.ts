@@ -1,4 +1,4 @@
-import { Account, AccountAlias, Currency, CurrencyCode, Shortcut } from "./domain/model";
+import { Account, AccountAlias, CurrencyCode, Shortcut } from "./domain/model";
 import LoadEnvVar from "./environment";
 
 export const SHORTCUTS: Shortcut[] = [
@@ -113,18 +113,6 @@ export const PAYMENT_ACCOUNTS: Account[] = [
     id: 13,
     alias: "chase",
     pending: true,
-  },
-];
-
-export const CURRENCIES: Currency[] = [
-  {
-    code: "GBP",
-  },
-  {
-    code: "EUR",
-  },
-  {
-    code: "USD",
   },
 ];
 
