@@ -57,6 +57,8 @@ export default function PaymentAccountsPage({ app }: Props) {
     app.paymentAccountsManager.setDefault({ id });
   }
 
+  const canAddAccount = currencies.length > 0;
+
   return (
     <CenteredPage>
       <Link to={Paths.root}>
@@ -67,25 +69,34 @@ export default function PaymentAccountsPage({ app }: Props) {
 
       <h3>Payment Accounts</h3>
 
-      <AddPaymentAccount
-        currencies={currencies}
-        onAddPaymentAccount={handleAddPaymentAccount}
-      />
-
-      {accounts.length > 0 ? (
-        accounts.map((account, i) => (
-          <ListedPaymentAccount
-            key={`${i}-${account.id}`}
-            account={account}
-            isDefault={defaultAccount !== undefined && account.id === defaultAccount}
+      {canAddAccount ? (
+        <>
+          <AddPaymentAccount
             currencies={currencies}
-            onUpdate={handleUpdatePaymentAccount}
-            onDelete={handleDeletePaymentAccount}
-            onMarkAsDefault={() => handleMarkPaymentAccountAsDefault(account.id)}
+            onAddPaymentAccount={handleAddPaymentAccount}
           />
-        ))
+
+          {accounts.length > 0 ? (
+            accounts.map((account, i) => (
+              <ListedPaymentAccount
+                key={`${i}-${account.id}`}
+                account={account}
+                isDefault={defaultAccount !== undefined && account.id === defaultAccount}
+                currencies={currencies}
+                onUpdate={handleUpdatePaymentAccount}
+                onDelete={handleDeletePaymentAccount}
+                onMarkAsDefault={() => handleMarkPaymentAccountAsDefault(account.id)}
+              />
+            ))
+          ) : (
+            <p>No payment accounts :)</p>
+          )}
+        </>
       ) : (
-        <p>No payment accounts :)</p>
+        <div>
+          You must add currencies in the Settings page to be able to add Payment Accounts
+          here
+        </div>
       )}
     </CenteredPage>
   );
