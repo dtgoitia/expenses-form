@@ -73,7 +73,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   }
 
   function handleAccountChange(account: PaymentAccount): void {
-    update({ ...expense, paid_with: account.id });
+    update({ ...expense, paid_with: account.id, currency: account.currency });
   }
 
   function handleAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
