@@ -1,8 +1,6 @@
 import { now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { CurrencyCode, DraftExpense, PaymentAccount } from "../domain/model";
-import { PaymentAccountsManager } from "../domain/paymentAccounts";
-import { errorsService } from "../services/errors";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { PaidWithDropdown } from "./PaidWith";
@@ -124,13 +122,6 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   }
 
   if (account === undefined) {
-    errorsService.add({
-      header: `UNEXPECTED ERROR: no account found with ID ${expense.paid_with}`,
-      description:
-        `Context: ${ExpenseEditor.name} component, attempting to load from` +
-        ` ${PaymentAccountsManager.name} the payment account specified in the` +
-        ` expense.`,
-    });
     return (
       <div>
         Account <code>{expense.paid_with}</code> not found
