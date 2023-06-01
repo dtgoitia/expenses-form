@@ -121,6 +121,15 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     setShowDetails(!showDetails);
   }
 
+  function handlePaidInOtherCurrencyCheckboxChange(): void {
+    if (paidInOtherCurrency) {
+      setPaidInOtherCurrency(false);
+      update({ ...expense, originalAmount: undefined, originalCurrency: undefined });
+    } else {
+      setPaidInOtherCurrency(true);
+    }
+  }
+
   if (account === undefined) {
     return (
       <div>
@@ -155,7 +164,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         inline
         checked={paidInOtherCurrency}
         label="paid with different currency"
-        onChange={() => setPaidInOtherCurrency(!paidInOtherCurrency)}
+        onChange={handlePaidInOtherCurrencyCheckboxChange}
       />
 
       <Form>
