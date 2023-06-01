@@ -45,10 +45,19 @@ export class App {
     this.expenseManager.initialize({ appExpenses });
 
     const currencies = this.browserStorage.readCurrencies();
-    this.currencyManager.initialize({ currencies });
+    const accounts = this.browserStorage.readPaymentAccounts();
+
+    this.currencyManager.initialize({
+      currencies: [
+        ...currencies,
+        //
+        // Use currencies in Account too
+        ...accounts.map((account) => account.currency),
+      ],
+    });
 
     this.paymentAccountsManager.initialize({
-      accounts: this.browserStorage.readPaymentAccounts(),
+      accounts,
       defaultAccountId: this.browserStorage.readDefaultAccountId(),
     });
     console.debug(`App.initialize::completed`);
