@@ -89,9 +89,9 @@ export class Storage {
   currencies: StoredItem<string | undefined>;
 
   constructor() {
-    this.splitwiseApiToken = new StoredItem("splitwise_api_token", ValueType.string);
-    this.tripTags = new StoredItem("trip_tags", ValueType.object);
-    this.people = new StoredItem("people", ValueType.object);
+    this.splitwiseApiToken = new StoredItem("exp_splitwise_api_token", ValueType.string);
+    this.tripTags = new StoredItem("exp__trip_tags", ValueType.object);
+    this.people = new StoredItem("exp__people", ValueType.object);
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
     this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
     this.defaultPaymentAccountId = new StoredItem(
