@@ -76,6 +76,10 @@ export default function PaymentAccountsPage({ app }: Props) {
             onAddPaymentAccount={handleAddPaymentAccount}
           />
 
+          {defaultAccount === undefined && (
+            <h4>please, select your default payment account</h4>
+          )}
+
           {accounts.length > 0 ? (
             accounts.map((account, i) => (
               <ListedPaymentAccount
