@@ -10,10 +10,10 @@ import "./index.css";
 import { Storage } from "./localStorage";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
-import { GlobalStyle } from "./style/globalStyle";
+import { GlobalStyle, activeTheme } from "./style/globalStyle";
+import BlueprintThemeProvider from "./style/theme";
 import React from "react";
 import ReactDOM from "react-dom";
-import "semantic-ui-css/semantic.min.css";
 
 if (DEVELOPMENT_MODE && MOCK_APIS) {
   const { worker } = require("./mocks/browser");
@@ -38,8 +38,10 @@ const app = new App({
 
 ReactDOM.render(
   <React.StrictMode>
-    <GlobalStyle />
-    <AppUI app={app} />
+    <GlobalStyle theme={activeTheme} />
+    <BlueprintThemeProvider>
+      <AppUI app={app} />
+    </BlueprintThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
