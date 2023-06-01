@@ -51,7 +51,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       amount: undefined,
       originalAmount: undefined,
       currency: defaultAccount.currency,
-      originalCurrency: defaultAccount.currency,
+      originalCurrency: undefined,
       description: "",
       shared: false,
       pending: true,
