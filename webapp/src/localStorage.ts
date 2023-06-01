@@ -82,7 +82,6 @@ export class Storage {
   splitwiseApiToken: StoredItem<string | undefined>;
   tripTags: StoredItem<string[] | undefined>;
   people: StoredItem<string[] | undefined>;
-  defaultPaymentAccount: StoredItem<string | undefined>;
   expenses: StoredItem<object | undefined>;
   paymentAccounts: StoredItem<object[] | undefined>;
   defaultPaymentAccountId: StoredItem<string | undefined>;
@@ -93,10 +92,6 @@ export class Storage {
     this.splitwiseApiToken = new StoredItem("splitwise_api_token", ValueType.string);
     this.tripTags = new StoredItem("trip_tags", ValueType.object);
     this.people = new StoredItem("people", ValueType.object);
-    this.defaultPaymentAccount = new StoredItem(
-      "defaultPaymentAccount",
-      ValueType.string
-    );
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
     this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
     this.defaultPaymentAccountId = new StoredItem(
