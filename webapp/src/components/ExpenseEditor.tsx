@@ -1,7 +1,8 @@
 import { now } from "../datetimeUtils";
-import { getAccountById } from "../domain/accounts";
 import { App } from "../domain/app";
-import { Account, CurrencyCode, DraftExpense } from "../domain/model";
+import { CurrencyCode, DraftExpense, PaymentAccount } from "../domain/model";
+import { PaymentAccountsManager } from "../domain/paymentAccounts";
+import { errorsService } from "../services/errors";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { PaidWithDropdown } from "./PaidWith";
@@ -36,20 +37,30 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
 
   // If true, the user has paid with a different currency to the default
   // currency of the account used to pay
-  const [otherCurrency, setOtherCurrency] = useState<boolean>(!!expense.originalAmount);
+  const [paidInOtherCurrency, setPaidInOtherCurrency] = useState<boolean>(
+    expense.originalAmount !== undefined
+  );
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
+  const [account, setAccount] = useState<PaymentAccount | undefined>();
 
   const formCurrencies = getCurrencyDropdownItems({ currencies });
 
   useEffect(() => {
-    const subscription = app.currencyManager.change$.subscribe((_) => {
+    const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
+      setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
+    });
+    const currenciesSubscription = app.currencyManager.change$.subscribe((_) => {
       setCurrencies(app.currencyManager.getAll());
     });
 
+    setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
     setCurrencies(app.currencyManager.getAll());
 
-    return subscription.unsubscribe;
-  }, [app]);
+    return () => {
+      accountsSubscription.unsubscribe();
+      currenciesSubscription.unsubscribe();
+    };
+  }, [app, expense.paid_with]);
 
   function handleDateChange(date: Date): void {
     update({ ...expense, datetime: date });
@@ -61,7 +72,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     handleDateChange(now());
   }
 
-  function handleAccountChange(account: Account): void {
+  function handleAccountChange(account: PaymentAccount): void {
     update({ ...expense, paid_with: account.id });
   }
 
@@ -112,7 +123,20 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     setShowDetails(!showDetails);
   }
 
-  const account = getAccountById(expense.paid_with);
+  if (account === undefined) {
+    errorsService.add({
+      header: `UNEXPECTED ERROR: no account found with ID ${expense.paid_with}`,
+      description:
+        `Context: ${ExpenseEditor.name} component, attempting to load from` +
+        ` ${PaymentAccountsManager.name} the payment account specified in the` +
+        ` expense.`,
+    });
+    return (
+      <div>
+        Account <code>{expense.paid_with}</code> not found
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -130,17 +154,21 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         </ReloadDate>
       </DateSlot>
 
-      <PaidWithDropdown paidWith={expense.paid_with} onChange={handleAccountChange} />
+      <PaidWithDropdown
+        paidWith={expense.paid_with}
+        app={app}
+        onChange={handleAccountChange}
+      />
 
       <Checkbox
         inline
-        checked={otherCurrency}
+        checked={paidInOtherCurrency}
         label="paid with different currency"
-        onChange={() => setOtherCurrency(!otherCurrency)}
+        onChange={() => setPaidInOtherCurrency(!paidInOtherCurrency)}
       />
 
       <Form>
-        {otherCurrency ? (
+        {paidInOtherCurrency ? (
           <>
             <Form.Group inline>
               <Form.Input
@@ -167,8 +195,9 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
               />
               <Form.Dropdown
                 name="currencyField"
-                value={expense.currency}
+                value={account.currency}
                 options={formCurrencies}
+                disabled={true}
                 onChange={handleCurrencyChange}
               />
             </Form.Group>
@@ -185,8 +214,9 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
             />
             <Form.Dropdown
               name="currencyField"
-              value={expense.currency}
+              value={account.currency}
               options={formCurrencies}
+              disabled={true}
               onChange={handleCurrencyChange}
             />
           </Form.Group>
@@ -215,7 +245,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
           {JSON.stringify(
             {
               ...expense,
-              paid_with: `${expense.paid_with} -- ${account.alias}`,
+              paid_with: `${expense.paid_with} -- ${account && account.name}`,
             },
             null,
             2

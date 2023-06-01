@@ -13,7 +13,7 @@ export interface Expense {
   // orchestration layer should enrich/wrap/attach the value with any extra data
   // required
   // submitted: boolean;
-  paid_with: number;
+  paid_with: PaymentAccountId;
   shared: boolean;
   pending: boolean;
 }

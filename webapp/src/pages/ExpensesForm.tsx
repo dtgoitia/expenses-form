@@ -2,12 +2,10 @@ import ExpenseQueue from "../ExpenseQueue";
 import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
 import ExpenseEditor from "../components/ExpenseEditor";
-import { DEFAULT_CURRENCY, PAYMENT_ACCOUNTS } from "../constants";
 import { now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { AppExpense, AddExpenseArgs } from "../domain/expenses";
-import { DraftExpense, Expense, ExpenseId } from "../domain/model";
-import storage from "../localStorage";
+import { DraftExpense, Expense, ExpenseId, PaymentAccount } from "../domain/model";
 import Paths from "../routes";
 import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
@@ -23,37 +21,40 @@ function ExpensesForm({ app }: ExpensesFormProps) {
   const [expenseIdUnderEdition, setExpenseUnderEdition] = useState<ExpenseId | undefined>(
     undefined
   );
+  const [defaultAccount, setDefaultAccount] = useState<PaymentAccount | undefined>();
 
   useEffect(() => {
     const subscription = app.expenseManager.change$.subscribe((_) => {
+      setDefaultAccount(app.paymentAccountsManager.getDefault());
       setAppExpenses(app.expenseManager.getAll());
     });
 
+    setDefaultAccount(app.paymentAccountsManager.getDefault());
     setAppExpenses(app.expenseManager.getAll());
 
     return subscription.unsubscribe;
   }, [app]);
 
-  function handleAddExpense() {
+  function handleAddExpense(): void {
     app.expenseManager.change$.pipe(first()).subscribe((change) => {
       setExpenseUnderEdition(change.expenseId);
     });
 
-    // TODO: use a reactive AccountManager to handle these things...
-    const defaultAccountAlias = storage.defaultPaymentAccount.read();
-    const defaultAccount = PAYMENT_ACCOUNTS.filter(
-      (account) => account.alias === defaultAccountAlias
-    )[0];
+    const defaultAccount = app.paymentAccountsManager.getDefault();
+    if (defaultAccount === undefined) {
+      // TODO: push to error service
+      throw new Error("No default account found");
+    }
 
     const newExpense: AddExpenseArgs = {
       datetime: now(),
       amount: undefined,
       originalAmount: undefined,
-      currency: DEFAULT_CURRENCY,
-      originalCurrency: DEFAULT_CURRENCY,
+      currency: defaultAccount.currency,
+      originalCurrency: defaultAccount.currency,
       description: "",
       shared: false,
-      pending: defaultAccount.pending,
+      pending: true,
       paid_with: defaultAccount.id,
     };
 
@@ -79,6 +80,8 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     console.debug(`ExpensesForm::handleExpenseEdition::expense`, expense);
     app.expenseManager.update(expense);
   }
+
+  const canAddExpense = defaultAccount !== undefined;
 
   const expenseUnderEdition = expenseIdUnderEdition
     ? app.expenseManager.get(expenseIdUnderEdition)
@@ -113,15 +116,25 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       {expenseIdUnderEdition ? (
         <Button large text="Close" onClick={handleStopEditingExpense} />
       ) : (
-        <Button large text="Add expense" onClick={handleAddExpense} />
+        <Button
+          large
+          text={
+            canAddExpense
+              ? "Add expense"
+              : "Must select a default account to add an expense"
+          }
+          onClick={handleAddExpense}
+          disabled={canAddExpense === false}
+        />
       )}
-      <DownloadJson expenses={publishableExpenses} />
+      <DownloadJson expenses={publishableExpenses} app={app} />
 
       <ExpenseQueue
         expenses={appExpenses}
         underEdition={expenseIdUnderEdition}
         onEditExpense={handleOnEditExpense}
         onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
+        app={app}
       />
     </CenteredPage>
   );

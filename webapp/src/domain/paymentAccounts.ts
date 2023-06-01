@@ -55,6 +55,10 @@ export class PaymentAccountsManager {
     this.changeSubject.next({ kind: "PaymentAccountManagerInitialized" });
   }
 
+  public get({ id }: { id: PaymentAccountId }): PaymentAccount | undefined {
+    return this.accounts.get(id);
+  }
+
   public setDefault({ id }: { id: PaymentAccountId }): void {
     if (this.accounts.has(id) === false) {
       this.error(this.setDefault, `'${id}' must match an existing Payment Account ID`);

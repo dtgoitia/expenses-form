@@ -1,3 +1,5 @@
+import { unreachable } from "../devex";
+import { App } from "../domain/app";
 import { FirestoreClient } from "../domain/firebase";
 import { Expense } from "../domain/model";
 import storage from "../localStorage";
@@ -62,8 +64,9 @@ function getTimestamp(): string {
 
 interface DownloadJsonProps {
   expenses: Expense[];
+  app: App;
 }
-function DownloadJson({ expenses }: DownloadJsonProps) {
+function DownloadJson({ expenses, app }: DownloadJsonProps) {
   const [pushing, setPushing] = useState(false);
 
   const timestamp = getTimestamp();
@@ -100,6 +103,38 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
       .catch((error) => {
         alert(error);
       });
+  }
+
+  function cleanExpense(expense: Expense): any {
+    const account = app.paymentAccountsManager.get({ id: expense.paid_with });
+    if (account === undefined) {
+      throw unreachable(
+        `failed to clean Expense because Account ID ${expense.paid_with} was not found`
+      );
+    }
+
+    const clean: any = {
+      id: expense.id,
+      amount: expense.amount,
+      currency: expense.currency,
+      description: expense.description,
+      datetime: expense.datetime,
+      paid_with: account.ledgerName,
+      shared: expense.shared,
+      pending: expense.pending,
+    };
+
+    if (expense.originalAmount === undefined) {
+      return clean;
+    }
+
+    const inDifferentCurrency = {
+      ...clean,
+      originalAmount: expense.originalAmount,
+      originalCurrency: expense.originalCurrency,
+    };
+
+    return inDifferentCurrency;
   }
 
   function pushToFirestore() {
@@ -147,28 +182,3 @@ function DownloadJson({ expenses }: DownloadJsonProps) {
 }
 
 export default DownloadJson;
-
-function cleanExpense(expense: Expense): any {
-  const clean: any = {
-    id: expense.id,
-    amount: expense.amount,
-    currency: expense.currency,
-    description: expense.description,
-    datetime: expense.datetime,
-    paid_with: expense.paid_with,
-    shared: expense.shared,
-    pending: expense.pending,
-  };
-
-  if (!expense.originalAmount) {
-    return clean;
-  }
-
-  const inDifferentCurrency = {
-    ...clean,
-    originalAmount: expense.originalAmount,
-    originalCurrency: expense.originalCurrency,
-  };
-
-  return inDifferentCurrency;
-}

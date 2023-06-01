@@ -1,4 +1,4 @@
-import { Account, AccountAlias, CurrencyCode, Shortcut } from "./domain/model";
+import { Shortcut } from "./domain/model";
 import LoadEnvVar from "./environment";
 
 export const SHORTCUTS: Shortcut[] = [
@@ -41,78 +41,6 @@ export const SHORTCUTS: Shortcut[] = [
     people: [],
     seller: "TfL",
     tags: ["transport"],
-  },
-];
-
-export const DEFAULT_ACCOUNT_ALIAS: AccountAlias = "monzo";
-
-export const DEFAULT_CURRENCY: CurrencyCode = "GBP";
-
-export const PAYMENT_ACCOUNTS: Account[] = [
-  {
-    id: 1,
-    alias: "monzo",
-    pending: true,
-  },
-  {
-    id: 2,
-    alias: "revolut business",
-    pending: true,
-  },
-  {
-    id: 3,
-    alias: "amex",
-    pending: true,
-  },
-  {
-    id: 4,
-    alias: "evo",
-    pending: false,
-  },
-  {
-    id: 5,
-    alias: "evo bizum",
-    pending: false,
-  },
-  {
-    id: 6,
-    alias: "revolut personal GBP",
-    pending: false,
-  },
-  {
-    id: 7,
-    alias: "revolut personal EUR",
-    pending: false,
-  },
-  {
-    id: 8,
-    alias: "cash EUR",
-    pending: false,
-  },
-  {
-    id: 9,
-    alias: "cash GBP",
-    pending: false,
-  },
-  {
-    id: 10,
-    alias: "paid by Angela GBP",
-    pending: false,
-  },
-  {
-    id: 11,
-    alias: "paid by Angela EUR",
-    pending: false,
-  },
-  {
-    id: 12,
-    alias: "paid by somebody else",
-    pending: false,
-  },
-  {
-    id: 13,
-    alias: "chase",
-    pending: true,
   },
 ];
 

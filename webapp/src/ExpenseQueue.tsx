@@ -1,7 +1,7 @@
 import { dateToLocale } from "./datetimeUtils";
-import { getAccountById } from "./domain/accounts";
+import { App } from "./domain/app";
 import { AppExpense } from "./domain/expenses";
-import { AccountId, DraftExpense, ExpenseId } from "./domain/model";
+import { DraftExpense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { Button, Switch } from "@blueprintjs/core";
@@ -89,6 +89,7 @@ interface ListItemProps {
   edit: () => void;
   remove: () => void;
   deleteMode: boolean;
+  app: App;
 }
 function ListItem({
   appExpense,
@@ -97,6 +98,7 @@ function ListItem({
   edit,
   remove,
   deleteMode,
+  app,
 }: ListItemProps) {
   const { expense } = appExpense;
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -112,7 +114,7 @@ function ListItem({
     remove();
   }
 
-  const account = getAccountById(expense.paid_with as AccountId);
+  const account = app.paymentAccountsManager.get({ id: expense.paid_with });
 
   let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
@@ -136,7 +138,7 @@ function ListItem({
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
           <pre>datetime: {dateToLocale(expense.datetime)}</pre>
-          <pre>paid_with: {account.alias}</pre>
+          <pre>paid_with: {account && account.name}</pre>
           <pre>
             original_amount: {expense.originalAmount} {expense.originalCurrency}
           </pre>
@@ -167,8 +169,9 @@ interface Props {
   underEdition: ExpenseId | undefined;
   onEditExpense: (id: ExpenseId) => void;
   onDelete: (id: ExpenseId) => void;
+  app: App;
 }
-function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props) {
+function ExpenseList({ expenses, underEdition, onEditExpense, onDelete, app }: Props) {
   const [inDeletionMode, setInDeletionMode] = useState<boolean>(false);
 
   function toggleDeletionMode(): void {
@@ -192,6 +195,7 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete }: Props)
               edit={() => onEditExpense(id)}
               remove={() => onDelete(id)}
               deleteMode={inDeletionMode}
+              app={app}
             />
           );
         })
