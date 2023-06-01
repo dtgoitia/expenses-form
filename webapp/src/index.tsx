@@ -1,6 +1,6 @@
 import AppUI from "./AppUI";
 import "./blueprint.css";
-import { BASE_URL, DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
+import { DEVELOPMENT_MODE, MOCK_APIS } from "./constants";
 import { App } from "./domain/app";
 import { BrowserStorage } from "./domain/browserstorage";
 import { CurrencyManager } from "./domain/currencies";
@@ -13,7 +13,6 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { GlobalStyle } from "./style/globalStyle";
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter } from "react-router-dom";
 import "semantic-ui-css/semantic.min.css";
 
 if (DEVELOPMENT_MODE && MOCK_APIS) {
@@ -39,10 +38,8 @@ const app = new App({
 
 ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter basename={BASE_URL}>
-      <GlobalStyle />
-      <AppUI app={app} />
-    </BrowserRouter>
+    <GlobalStyle />
+    <AppUI app={app} />
   </React.StrictMode>,
   document.getElementById("root")
 );
