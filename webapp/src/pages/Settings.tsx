@@ -1,5 +1,4 @@
 import CenteredPage from "../components/CenteredPage";
-import { AccountAlias } from "../domain/model";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { Button, Label } from "@blueprintjs/core";
@@ -24,7 +23,6 @@ function SettingsPage() {
   const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [people, setPeople] = useState<string | undefined>(undefined);
-  const [paymentMethod, setPaymentMethod] = useState<AccountAlias | undefined>(undefined);
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
   const [currencies, setCurrencies] = useState<string | undefined>();
 
@@ -37,9 +35,6 @@ function SettingsPage() {
     }
     if (storage.people.exists()) {
       setPeople(listToInputField(storage.people.read() as string[]));
-    }
-    if (storage.defaultPaymentAccount.exists()) {
-      setPaymentMethod(storage.defaultPaymentAccount.read());
     }
     if (storage.firestoreConfig.exists()) {
       const config = storage.firestoreConfig.read();
@@ -88,18 +83,6 @@ function SettingsPage() {
 
     const peopleNames = inputFieldToList(value);
     storage.people.set(peopleNames);
-  }
-
-  function handlePaymentMethodChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
-      setPaymentMethod(undefined);
-      storage.defaultPaymentAccount.delete();
-      return;
-    }
-
-    setPaymentMethod(value);
-    storage.defaultPaymentAccount.set(value);
   }
 
   function handleFirestoreConfigChange(event: any): void {
@@ -164,18 +147,6 @@ function SettingsPage() {
           value={people}
           placeholder="JohnDoe,JaneDoe"
           onChange={handlePeopleChange}
-        />
-      </Label>
-
-      <Label htmlFor="payment-method">
-        Default payment method
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
-          id="payment-method"
-          value={paymentMethod}
-          placeholder="amex"
-          onChange={handlePaymentMethodChange}
         />
       </Label>
 
