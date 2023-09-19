@@ -9,7 +9,7 @@
 /coverage
 
 # production
-/webapp/build
+webapp/dist/
 
 # misc
 .DS_Store

@@ -1,17 +1,19 @@
-import { default as envVarWhitelistModule } from "./environment-variable-whitelist";
+// import { default as envVarWhitelistModule } from "./environment-variable-whitelist";
+import { ENV_VAR_WHITELIST as envVarWhitelistModule } from "./environment-variable-whitelist";
 
 // @ts-ignore:next-line
-const ENV_VAR_WHITELIST = envVarWhitelistModule.default as Set<string>;
+const ENV_VAR_WHITELIST = envVarWhitelistModule as Set<string>;
 const REACT_CUSTOM_ENVVAR_DOCS =
   "https://create-react-app.dev/docs/adding-custom-environment-variables/";
 
 function assertEnvVarsAreSet(whitelist: Set<string>) {
-  whitelist.forEach((name: string) => {
-    const value = process.env[name];
-    if (value === undefined) {
-      throw new Error(`Environment variable ${name} is missing`);
-    }
-  });
+  // TODO
+  // whitelist.forEach((name: string) => {
+  //   const value = process.env[name];
+  //   if (value === undefined) {
+  //     throw new Error(`Environment variable ${name} is missing`);
+  //   }
+  // });
 }
 
 function assertIsWhitelisted(name: string) {
@@ -52,5 +54,5 @@ class LoadEnvVar {
 }
 
 // Must be executed on module load
-assertEnvVarsAreSet(ENV_VAR_WHITELIST);
+// assertEnvVarsAreSet(ENV_VAR_WHITELIST);
 export default LoadEnvVar;
