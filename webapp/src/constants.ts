@@ -1,5 +1,4 @@
 import { Shortcut } from "./domain/model";
-import LoadEnvVar from "./environment";
 
 export const SHORTCUTS: Shortcut[] = [
   {
@@ -71,10 +70,12 @@ export const SELLERS = [
 ];
 
 export const BASE_URL = "expenses-form"; // must match "homepage" field in package.json
-export const SPLITWISE_API_BASE_URL = LoadEnvVar.asUrl(
-  "REACT_APP_SPLITWISE_API_BASE_URL"
-);
-export const MOCK_APIS = LoadEnvVar.asBoolean("REACT_APP_MOCK_APIS");
+export const SPLITWISE_API_BASE_URL = "foo";
+// export const SPLITWISE_API_BASE_URL = LoadEnvVar.asUrl(
+//   "REACT_APP_SPLITWISE_API_BASE_URL"
+// );
+export const MOCK_APIS = false;
+// export const MOCK_APIS = LoadEnvVar.asBoolean("REACT_APP_MOCK_APIS");
 export const DEVELOPMENT_MODE = process.env.NODE_ENV === "development";
 
 export enum ApiEndpoints {
