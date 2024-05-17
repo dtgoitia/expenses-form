@@ -1,6 +1,11 @@
-import { now } from "../datetimeUtils";
+import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
-import { CurrencyCode, DraftExpense, PaymentAccount } from "../domain/model";
+import {
+  CurrencyCode,
+  DatetimeISOString,
+  DraftExpense,
+  PaymentAccount,
+} from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { PaidWithDropdown } from "./PaidWith";
@@ -61,7 +66,8 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   }, [app, expense.paid_with]);
 
   function handleDateChange(date: Date): void {
-    update({ ...expense, datetime: date });
+    const local: DatetimeISOString = dateToISOLocale(date);
+    update({ ...expense, datetime: local });
   }
 
   function setDateToNow(e: SyntheticEvent) {
@@ -141,7 +147,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   return (
     <div>
       <DateTimePicker
-        date={expense.datetime}
+        date={new Date(Date.parse(expense.datetime))}
         defaultDate={now()}
         onChange={handleDateChange}
       />

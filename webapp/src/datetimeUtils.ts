@@ -1,3 +1,5 @@
+import { DatetimeCustomISOString, DatetimeISOString } from "./domain/model";
+
 export function now(): Date {
   return new Date(new Date().setMilliseconds(0));
 }
@@ -30,8 +32,19 @@ function getLocalTimezoneFormatted(): string {
 /**
  * Produces a date like `2023-05-22 16:08:27 +01:00`.
  */
-export function dateToLocale(date: Date): string {
+export function dateToLocale(date: Date): DatetimeCustomISOString {
   const naive: string = isoDateTimeFormatter(date);
   const tz = getLocalTimezoneFormatted();
   return `${naive} ${tz}`;
+}
+
+/**
+ * Produces a date like `2023-05-22T16:08:27+01:00`.
+ */
+export function dateToISOLocale(date: Date): DatetimeISOString {
+  return dateToLocale(date).replace(" ", "T").replace(" ", "");
+}
+
+export function customISOStringToDate(custom: DatetimeCustomISOString): Date {
+  return new Date(Date.parse(custom));
 }

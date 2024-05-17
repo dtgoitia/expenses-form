@@ -70,7 +70,7 @@ export class BrowserStorage {
           originalAmount: storedItem.expense.originalAmount,
           originalCurrency: storedItem.expense.originalCurrency,
           description: storedItem.expense.description,
-          datetime: new Date(storedItem.expense.datetime),
+          datetime: storedItem.expense.datetime,
           paid_with: storedItem.expense.paid_with,
           shared: storedItem.expense.shared,
           pending: storedItem.expense.pending,

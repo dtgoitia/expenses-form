@@ -1,5 +1,6 @@
 export type ExpenseId = string;
 export type DatetimeISOString = string; // "2022-01-17T08:19:26+00:00"
+export type DatetimeCustomISOString = string; // "2022-01-17 08:19:26 +00:00"
 
 export interface Expense {
   id: ExpenseId;
@@ -8,7 +9,7 @@ export interface Expense {
   originalAmount: number | undefined;
   originalCurrency: string | undefined;
   description: string;
-  datetime: Date;
+  datetime: DatetimeISOString;
   // The domain should not contain data about the persistence layer, instead, the
   // orchestration layer should enrich/wrap/attach the value with any extra data
   // required
