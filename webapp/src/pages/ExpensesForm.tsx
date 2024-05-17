@@ -2,7 +2,7 @@ import ExpenseQueue from "../ExpenseQueue";
 import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
 import ExpenseEditor from "../components/ExpenseEditor";
-import { now } from "../datetimeUtils";
+import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { AppExpense, AddExpenseArgs } from "../domain/expenses";
 import { DraftExpense, Expense, ExpenseId, PaymentAccount } from "../domain/model";
@@ -47,7 +47,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     }
 
     const newExpense: AddExpenseArgs = {
-      datetime: now(),
+      datetime: dateToISOLocale(now()),
       amount: undefined,
       originalAmount: undefined,
       currency: defaultAccount.currency,

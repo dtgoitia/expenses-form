@@ -1,4 +1,4 @@
-import { dateToLocale } from "./datetimeUtils";
+import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
 import { AppExpense } from "./domain/expenses";
 import { DraftExpense, ExpenseId } from "./domain/model";
@@ -132,12 +132,12 @@ function ListItem({
 
       <DescriptionSlot>
         <span onClick={() => setIsOpen(!isOpen)}>
-          {formatDate(expense.datetime)} <b>{formatAmount(expense)}</b>{" "}
-          {expense.description}
+          {formatDate(customISOStringToDate(expense.datetime))}{" "}
+          <b>{formatAmount(expense)}</b> {expense.description}
         </span>
         <Collapse isOpen={isOpen}>
           <pre>id: {expense.id}</pre>
-          <pre>datetime: {dateToLocale(expense.datetime)}</pre>
+          <pre>datetime: {dateToLocale(customISOStringToDate(expense.datetime))}</pre>
           <pre>paid_with: {account && account.name}</pre>
           <pre>
             original_amount: {expense.originalAmount} {expense.originalCurrency}
