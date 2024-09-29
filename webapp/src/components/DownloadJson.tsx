@@ -1,7 +1,7 @@
-import { unreachable } from "../devex";
 import { App } from "../domain/app";
 import { FirestoreClient } from "../domain/firebase";
 import { Expense } from "../domain/model";
+import { unreachable } from "../lib/devex";
 import storage from "../localStorage";
 import { errorsService } from "../services/errors";
 import { Button } from "@blueprintjs/core";
