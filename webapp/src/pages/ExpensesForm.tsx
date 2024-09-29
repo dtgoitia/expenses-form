@@ -1,4 +1,5 @@
 import ExpenseQueue from "../ExpenseQueue";
+import { Button } from "../components/Button";
 import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
 import ExpenseEditor from "../components/ExpenseEditor";
@@ -6,10 +7,7 @@ import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { AppExpense, AddExpenseArgs } from "../domain/expenses";
 import { DraftExpense, Expense, ExpenseId, PaymentAccount } from "../domain/model";
-import Paths from "../routes";
-import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { first } from "rxjs";
 
 interface ExpensesFormProps {
@@ -93,31 +91,27 @@ function ExpensesForm({ app }: ExpensesFormProps) {
 
   return (
     <CenteredPage>
-      <Button large icon="refresh" onClick={refreshPage}>
-        reload PWA
-      </Button>
-      <Link to={Paths.paymentAccounts}>
-        <Button large>Accounts</Button>
-      </Link>
-      <Link to={Paths.settings}>
-        <Button large icon="cog">
-          Settings
-        </Button>
-      </Link>
+      <Button text="reload PWA" icon="rotate" onClick={refreshPage} />
       {expenseUnderEdition ? (
-        <ExpenseEditor
-          expense={expenseUnderEdition.expense}
-          app={app}
-          update={handleExpenseEdition}
-        />
+        <>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button text="Close" onClick={handleStopEditingExpense} />
+          </div>
+          <ExpenseEditor
+            expense={expenseUnderEdition.expense}
+            app={app}
+            update={handleExpenseEdition}
+          />
+        </>
       ) : (
         <p>Add expense or select an existing one</p>
       )}
       {expenseIdUnderEdition ? (
-        <Button large text="Close" onClick={handleStopEditingExpense} />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button text="Close" onClick={handleStopEditingExpense} />
+        </div>
       ) : (
         <Button
-          large
           text={
             canAddExpense
               ? "Add expense"
