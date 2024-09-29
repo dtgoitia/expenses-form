@@ -88,6 +88,17 @@ make run_hasura_locally
 
 TODO: auto-apply migration on server start
 
+## Icons
+
+To add more SVG icons:
+
+1. find the desired icon among [**free** ones](https://fontawesome.com/v6/search?o=r&m=free)
+2. click on the icon
+3. click on the SVG tab
+4. copy the SVG code
+
+You can see how to use CSS to style the SVG [here](https://docs.fontawesome.com/web/add-icons/svg-bare)
+
 <!-- External references -->
 
 [1]: https://mswjs.io/docs/getting-started/integrate/browser#setup "Mock Service Worker - Setup"
