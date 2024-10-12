@@ -41,10 +41,9 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "npm run build:pre && npm run build:main && npm run build:post",
-    "build:pre": "node ./scripts/failIfEnvVarsMissing.js",
+    "build": "npm run build:main && npm run build:post",
     "build:main": "tsc && vite build",
-    "build:post": "rm ./build/mockServiceWorker.js",
+    "build:post": "rm ./dist/mockServiceWorker.js",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest",
     "test:ci": "vitest run",
