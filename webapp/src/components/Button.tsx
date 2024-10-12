@@ -19,7 +19,12 @@ interface Props {
 }
 
 export function Button({ text, disabled, icon, iconSize, onClick }: Props) {
-  const baseCss = "bg-gray-300 text-gray-800 py-2 px-3 rounded inline-flex items-center";
+  const baseCss =
+    "   dark:bg-gray-700   bg-gray-300" +
+    " dark:text-gray-300 text-gray-700" +
+    " py-2 px-3" +
+    " rounded" +
+    " inline-flex items-center";
   const hoverCss = " hover:bg-gray-400";
   const disabledCss = " opacity-50 cursor-not-allowed";
   let css = baseCss;
