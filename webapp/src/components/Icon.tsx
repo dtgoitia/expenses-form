@@ -1,7 +1,7 @@
 import { unreachable } from "../lib/devex";
 
 export type IconName = "gear" | "rotate";
-type IconSize = "small" | "large" | "extralarge";
+export type IconSize = "small" | "large" | "extralarge";
 
 interface Props {
   icon: IconName;
@@ -51,7 +51,7 @@ export function Icon({ icon, size }: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className="icon"
+      className="fill-current mr-2"
       aria-hidden="true"
       focusable="false"
       viewBox="0 0 512 512"
