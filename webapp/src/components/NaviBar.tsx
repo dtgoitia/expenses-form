@@ -1,35 +1,44 @@
 import Paths from "../routes";
-import { Alignment, Navbar, Tab, Tabs } from "@blueprintjs/core";
 import { useLocation, useNavigate } from "react-router-dom";
 
-function NavBar() {
+function Tab({ title, path }: { title: string; path: string }) {
   let navigate = useNavigate();
   const location = useLocation();
 
-  function handleTabClick(rawPath: string): void {
-    navigate(rawPath);
+  function handleClick(pathPrefix: string): void {
+    navigate(pathPrefix);
+  }
+
+  // assumption: `pathname` never contains query params
+  const isActive = location.pathname === path;
+
+  let css = `cursor-pointer hover:text-blue-300`;
+  if (isActive) {
+    // color
+    css += " text-blue-800 dark:text-blue-300";
+
+    // underline (decoration = line thickness)
+    css += " underline underline-offset-8 decoration-2";
   }
 
   return (
-    <Navbar>
-      <Navbar.Group>
-        <Navbar.Heading>expenses</Navbar.Heading>
-      </Navbar.Group>
+    <div className={css} onClick={() => handleClick(path)}>
+      {title}
+    </div>
+  );
+}
 
-      <Navbar.Group align={Alignment.RIGHT}>
-        {/*  */}
-        <Tabs
-          id="TabsExample"
-          onChange={handleTabClick}
-          selectedTabId={location.pathname}
-        >
-          <Tab id={`${Paths.root}`} title="Expenses" />
-          <Tab id={`${Paths.paymentAccounts}`} title="Accounts" />
-          <Tab id={`${Paths.settings}`} title="Settings" />
-          <Tabs.Expander />
-        </Tabs>
-      </Navbar.Group>
-    </Navbar>
+function NavBar() {
+  return (
+    <div className="flex flex-row justify-between m-4 mr-6">
+      <div className="mr-6">expenses</div>
+
+      <div id="nav-bar" className="flex flex-row gap-5">
+        <Tab title="Expenses" path={Paths.root} />
+        <Tab title="Accounts" path={Paths.paymentAccounts} />
+        <Tab title="Settings" path={Paths.settings} />
+      </div>
+    </div>
   );
 }
 
