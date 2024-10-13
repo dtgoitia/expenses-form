@@ -30,9 +30,8 @@ function Tab({ title, path }: { title: string; path: string }) {
 
 function NavBar() {
   return (
-    <div className="flex flex-row justify-between m-4 mr-6">
+    <div className="flex flex-row justify-between p-4 pr-6">
       <div className="mr-6">expenses</div>
-
       <div id="nav-bar" className="flex flex-row gap-5">
         <Tab title="Expenses" path={Paths.root} />
         <Tab title="Accounts" path={Paths.paymentAccounts} />
