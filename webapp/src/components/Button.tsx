@@ -5,6 +5,9 @@ interface Props {
   /** Text to show inside the button. */
   text: string;
 
+  /** If the button is active or not */
+  active?: boolean;
+
   /** If true, the icon cannot be clicked by the user. */
   disabled?: boolean;
 
@@ -18,7 +21,7 @@ interface Props {
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
-export function Button({ text, disabled, icon, iconSize, onClick }: Props) {
+export function Button({ text, active, disabled, icon, iconSize, onClick }: Props) {
   const baseCss =
     "   dark:bg-gray-700   bg-gray-300" +
     " dark:text-gray-300 text-gray-700" +
@@ -26,9 +29,13 @@ export function Button({ text, disabled, icon, iconSize, onClick }: Props) {
     " rounded" +
     " inline-flex items-center";
   const hoverCss = " hover:bg-gray-400";
+  const activeCss = " bg-gray-400 dark:bg-gray-500";
   const disabledCss = " opacity-50 cursor-not-allowed";
   let css = baseCss;
-  if (disabled) {
+
+  if (active) {
+    css += activeCss;
+  } else if (disabled) {
     css += disabledCss;
   } else {
     css += hoverCss;
