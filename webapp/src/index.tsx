@@ -12,16 +12,20 @@ import { GlobalStyle } from "./style/globalStyle";
 import React from "react";
 import ReactDOM from "react-dom";
 import "semantic-ui-css/semantic.min.css";
+import { registerSW } from "virtual:pwa-register";
 
-function toBoolean(raw: string) {
-  const value = raw.toLowerCase() === "true";
-  return value;
-}
+const isLocalhost = window.location.hostname === "localhost";
 
-if (import.meta.env.DEV && import.meta.env.VITE_ENV_MOCK_APIS) {
-  const { worker } = require("./mocks/browser");
-  worker.start();
-}
+const updateSW = registerSW({
+  onNeedRefresh: function () {
+    if (
+      isLocalhost ||
+      confirm("There is an newer version of this app. Do you want to update?")
+    ) {
+      updateSW(true);
+    }
+  },
+});
 
 const expenseManager = new ExpenseManager();
 const paymentAccountsManager = new PaymentAccountsManager();
