@@ -1,6 +1,6 @@
 import { unreachable } from "../lib/devex";
 
-export type IconName = "gear" | "rotate";
+export type IconName = "arrow-left" | "gear" | "rotate";
 export type IconSize = "small" | "large" | "extralarge";
 
 interface Props {
@@ -13,6 +13,13 @@ const INHERIT_COLOR_FROM_PARENT = { fill: "currentColor" };
 
 function IconContent({ icon }: { icon: IconName }): JSX.Element {
   switch (icon) {
+    case "arrow-left":
+      return (
+        <path
+          {...INHERIT_COLOR_FROM_PARENT}
+          d="M 475,219.46 H 125 L 245,99 A 36.7,36.7 0 0 0 193.33,47.33 L 10.6,230 a 37.1,37.1 0 0 0 0,52 L 193.3,464.7 a 36.7,36.7 0 0 0 51.9,-51.9 L 125,292 h 350.47 c 20.1,0 36.55,-16.45 36.55,-36.55 0,-20.1 -16.8,-36.55 -36.9,-36.55 z"
+        />
+      );
     case "gear":
       return (
         <path
