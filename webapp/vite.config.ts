@@ -1,5 +1,3 @@
-import { handlers } from "./src/mocks/handlers";
-import msw from "@iodigital/vite-plugin-msw";
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
@@ -15,7 +13,6 @@ export default defineConfig({
       // e.g. use TypeScript check
       typescript: true,
     }),
-    msw({ handlers }),
     VitePWA({
       devOptions: { enabled: true },
 
