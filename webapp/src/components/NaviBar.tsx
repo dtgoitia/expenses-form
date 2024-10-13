@@ -1,4 +1,5 @@
 import Paths from "../routes";
+import { ThemeToggle } from "./ThemeToggle";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function Tab({ title, path }: { title: string; path: string }) {
@@ -36,6 +37,7 @@ function NavBar() {
         <Tab title="Expenses" path={Paths.root} />
         <Tab title="Accounts" path={Paths.paymentAccounts} />
         <Tab title="Settings" path={Paths.settings} />
+        <ThemeToggle />
       </div>
     </div>
   );
