@@ -2,20 +2,15 @@ import Shortcuts from "../../PredefinedButtons";
 import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
 import { Person, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
+import { TextInput } from "../TextInput";
 import TagSelector from "./TagSelector";
 import { useState } from "react";
-import { DropdownProps, Form, InputOnChangeData } from "semantic-ui-react";
+import { DropdownProps, Form } from "semantic-ui-react";
 import styled from "styled-components";
 
 interface DescriptionProps {
   description: string;
   onChange: (description: string) => void;
-}
-
-enum DescriptionSubfield {
-  main = "main",
-  people = "people",
-  seller = "seller",
 }
 
 export function descriptionToString({ main, people, seller, tags }: Description): string {
@@ -104,15 +99,7 @@ const Grid = styled.div`
   column-gap: 0.3rem;
   row-gap: 0.3rem;
 `;
-const MainInput = styled(Form.Input)`
-  grid-column-start: 1;
-  grid-column-end: span 2;
-`;
 
-const SellerInput = styled(Form.Input)`
-  grid-column-start: 1;
-  grid-column-end: span 1;
-`;
 const PeopleInput = styled(Form.Dropdown)`
   grid-column-start: 2;
   grid-column-end: span 2;
@@ -155,21 +142,6 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
     ...peopleAddedByUser, // TODO: add these to Settings
     ...description.people,
   ];
-
-  function handleChange(_: any, { name, value }: InputOnChangeData): void {
-    if (value === undefined) {
-      return;
-    }
-
-    switch (name) {
-      case DescriptionSubfield.main:
-        handleMainChange(value);
-        break;
-      case DescriptionSubfield.seller:
-        handleSellerChange(value);
-        break;
-    }
-  }
 
   function handleMainChange(main: string): void {
     update(descriptionToString({ ...description, main }));
@@ -228,19 +200,17 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
       />
 
       <Grid>
-        <MainInput
-          name={DescriptionSubfield.main}
-          placeholder="Description"
+        <TextInput
           value={description.main}
-          fluid
-          onChange={handleChange}
+          placeholder="description"
+          className="col-start-1 col-span-2"
+          onChange={handleMainChange}
         />
-        <SellerInput
-          name={DescriptionSubfield.seller}
-          placeholder="seller"
+        <TextInput
           value={description.seller}
-          fluid
-          onChange={handleChange}
+          placeholder="seller"
+          className="col-start-1 col-span-1"
+          onChange={handleSellerChange}
         />
         <PeopleInput
           placeholder="people"
