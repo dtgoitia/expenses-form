@@ -1,7 +1,6 @@
+import { Button } from "./components/Button";
 import { ShortcutId } from "./domain/model";
-import { Button } from "@blueprintjs/core";
 import { SyntheticEvent } from "react";
-import styled from "styled-components";
 
 interface ButtonData {
   id: ShortcutId;
@@ -13,15 +12,6 @@ interface ShortcutsProps {
   select: (id: ShortcutId) => void;
 }
 
-const Container = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-  row-gap: 0.5rem;
-`;
-
 function Shortcuts({ data, select }: ShortcutsProps) {
   function handleClick(e: SyntheticEvent, id: ShortcutId) {
     e.preventDefault();
@@ -29,13 +19,15 @@ function Shortcuts({ data, select }: ShortcutsProps) {
   }
 
   return (
-    <Container>
+    <div className="flex flex-row flex-wrap mt-1 mb-2 gap-x-2">
       {data.map((shortcut, i) => (
-        <Button large key={`shortcut-${i}`} onClick={(e) => handleClick(e, shortcut.id)}>
-          {shortcut.buttonName}
-        </Button>
+        <Button
+          text={shortcut.buttonName}
+          key={`shortcut-${i}`}
+          onClick={(e) => handleClick(e, shortcut.id)}
+        />
       ))}
-    </Container>
+    </div>
   );
 }
 
