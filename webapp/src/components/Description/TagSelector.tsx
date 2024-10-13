@@ -1,5 +1,5 @@
 import { TagName } from "../../domain/model";
-import { Button } from "@blueprintjs/core";
+import { Button } from "../Button";
 import { SyntheticEvent } from "react";
 import styled from "styled-components";
 
@@ -15,11 +15,7 @@ function TagComponent({ name, selected, onClick }: TagProps) {
     onClick();
   };
 
-  return (
-    <Button large active={selected} onClick={customOnClick}>
-      {name}
-    </Button>
-  );
+  return <Button text={name} active={selected} onClick={customOnClick}></Button>;
 }
 
 const StyledTagContainer = styled.div`

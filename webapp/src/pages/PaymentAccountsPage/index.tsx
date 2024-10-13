@@ -1,3 +1,4 @@
+import { Button } from "../../components/Button";
 import CenteredPage from "../../components/CenteredPage";
 import { App } from "../../domain/app";
 import { CurrencyCode } from "../../domain/model";
@@ -9,7 +10,6 @@ import {
 import Paths from "../../routes";
 import { AddPaymentAccount } from "./AddPaymentAccount";
 import { ListedPaymentAccount } from "./ListedPaymentAccount";
-import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -62,9 +62,7 @@ export default function PaymentAccountsPage({ app }: Props) {
   return (
     <CenteredPage>
       <Link to={Paths.root}>
-        <Button large icon={"arrow-left"}>
-          Back
-        </Button>
+        <Button icon="arrow-left" text="Back" />
       </Link>
 
       <h3>Payment Accounts</h3>

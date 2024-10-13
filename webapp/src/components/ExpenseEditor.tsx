@@ -1,3 +1,4 @@
+import { Button } from "../components/Button";
 import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import {
@@ -9,7 +10,6 @@ import {
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { PaidWithDropdown } from "./PaidWith";
-import { Button } from "@blueprintjs/core";
 import { Checkbox, Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useEffect, useState } from "react";
 import {
@@ -154,9 +154,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
 
       <DateSlot>
         <ReloadDate onClick={setDateToNow}>
-          <Button large icon="refresh" onClick={setDateToNow}>
-            now
-          </Button>
+          <Button text="now" icon="rotate" onClick={setDateToNow} />
         </ReloadDate>
       </DateSlot>
 
@@ -243,7 +241,6 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
 
       <Button
         text={showDetails ? "Hide JSON" : "Show JSON"}
-        icon={showDetails ? "collapse-all" : "bring-data"}
         onClick={toggleShowDetails}
       />
       <Collapse isOpen={showDetails}>
