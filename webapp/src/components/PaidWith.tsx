@@ -1,9 +1,10 @@
 import { App } from "../domain/app";
-import { PaymentAccount, PaymentAccountId } from "../domain/model";
+import { PaymentAccount, PaymentAccountId, PaymentAccountName } from "../domain/model";
 import { PaymentAccountsManager } from "../domain/paymentAccounts";
 import { errorsService } from "../services/errors";
+import { Option, Select } from "./Select";
 import { HTMLSelect, Label } from "@blueprintjs/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   app: App;
@@ -17,9 +18,21 @@ export function PaidWithDropdown({
   onChange: changePaymentAccount,
 }: Props) {
   const [selected, select] = useState<PaymentAccountId>(paidWith);
+  const [accounts, updateAccounts] = useState<PaymentAccount[]>([]);
 
-  function handleAccountSelection(event: any): void {
-    const id: PaymentAccountId = event.target.value;
+  useEffect(() => {
+    const subscription = app.paymentAccountsManager.change$.subscribe((_) => {
+      updateAccounts(app.paymentAccountsManager.getAll());
+    });
+
+    updateAccounts(app.paymentAccountsManager.getAll());
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [app]);
+
+  function handleAccountSelection(id: PaymentAccountId): void {
     const account = app.paymentAccountsManager.get({ id });
     if (account === undefined) {
       errorsService.add({
@@ -35,17 +48,16 @@ export function PaidWithDropdown({
     changePaymentAccount(account);
   }
 
+  const options: Option[] = accounts.map((account) => ({
+    id: account.id,
+    label: account.name,
+  }));
+
   return (
     <div>
       <Label>
         Paid with:
-        <HTMLSelect value={selected} fill onChange={handleAccountSelection}>
-          {app.paymentAccountsManager.getAll().map(({ id, name }) => (
-            <option key={name} value={id}>
-              {name}
-            </option>
-          ))}
-        </HTMLSelect>
+        <Select selected={selected} options={options} onSelect={handleAccountSelection} />
       </Label>
     </div>
   );
