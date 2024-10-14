@@ -11,6 +11,9 @@
 # production
 webapp/dist/
 
+# development
+webapp/dev-dist/
+
 # misc
 .DS_Store
 .env.local
