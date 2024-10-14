@@ -11,14 +11,9 @@ import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { NumericInput } from "./NumericInput";
 import { PaidWithDropdown } from "./PaidWith";
+import { Select } from "./Select";
 import { Checkbox, Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useEffect, useState } from "react";
-import {
-  DropdownItemProps,
-  DropdownProps,
-  Form,
-  InputOnChangeData,
-} from "semantic-ui-react";
 import styled from "styled-components";
 
 const DateSlot = styled.div`
@@ -46,8 +41,6 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   );
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
   const [account, setAccount] = useState<PaymentAccount | undefined>();
-
-  const formCurrencies = getCurrencyDropdownItems({ currencies });
 
   useEffect(() => {
     const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
@@ -86,18 +79,13 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     update({ ...expense, amount });
   }
 
-  function handleCurrencyChange(_: any, data: DropdownProps): void {
-    const currency = data.value as CurrencyCode;
-    update({ ...expense, currency });
-  }
-
   function handleOriginalAmountChange(value: string): void {
     let originalAmount = value === "" ? undefined : Number(value);
     update({ ...expense, originalAmount });
   }
 
-  function handleOriginalCurrencyChange(_: any, data: DropdownProps): void {
-    const originalCurrency = data.value as CurrencyCode;
+  function handleOriginalCurrencyChange(selectedId: string): void {
+    const originalCurrency: CurrencyCode = selectedId;
     update({ ...expense, originalCurrency });
   }
 
@@ -137,6 +125,10 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     );
   }
 
+  const paymentCurrencies: CurrencyCode[] = [...currencies]
+    .filter((currency) => currency !== account.currency)
+    .sort();
+
   return (
     <div>
       <DateTimePicker
@@ -164,76 +156,86 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         onChange={handlePaidInOtherCurrencyCheckboxChange}
       />
 
-      <Form>
-        <div className="grid grid-col-2 gap-2">
-          {paidInOtherCurrency ? (
-            <>
-              <div className="col-span-1">
-                <NumericInput
-                  value={expense.originalAmount}
-                  placeholder="Merchant amount"
-                  onChange={handleOriginalAmountChange}
-                />
-              </div>
-              <div className="col-start-2 col-span-2">
-                <Form.Dropdown
-                  name="originalCurrencyField"
-                  value={expense.originalCurrency}
-                  options={formCurrencies}
-                  onChange={handleOriginalCurrencyChange}
-                />
-              </div>
-              <div className="col-span-1">
-                <NumericInput
-                  value={expense.amount}
-                  placeholder="Amount in account"
-                  onChange={handleAmountChange}
-                />
-              </div>
-              <div className="col-start-2 col-span-2">
-                <Form.Dropdown
-                  name="currencyField"
-                  value={account.currency}
-                  options={formCurrencies}
-                  disabled={true}
-                  onChange={handleCurrencyChange}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="col-span-1">
-                <NumericInput
-                  value={expense.amount}
-                  placeholder="Amount"
-                  onChange={handleAmountChange}
-                />
-              </div>
-              <div className="col-start-2 col-span-2">
-                <Form.Dropdown
-                  name="currencyField"
-                  value={account.currency}
-                  options={formCurrencies}
-                  disabled={true}
-                  onChange={handleCurrencyChange}
-                />
-              </div>
-            </>
-          )}
-        </div>
+      <div className="grid grid-col-2 gap-2">
+        {paidInOtherCurrency ? (
+          <>
+            <div className="col-span-1">
+              <NumericInput
+                value={expense.originalAmount}
+                placeholder="Amount in payment currency"
+                onChange={handleOriginalAmountChange}
+              />
+            </div>
+            <div className="col-start-2 col-span-2">
+              <Select
+                id="payment-currency"
+                selected={expense.originalCurrency}
+                options={paymentCurrencies.map((currency) => ({
+                  id: currency,
+                  label: currency,
+                }))}
+                onSelect={handleOriginalCurrencyChange}
+              />
+            </div>
+            <div className="col-span-1">
+              <NumericInput
+                value={expense.amount}
+                placeholder="Amount in account currency"
+                onChange={handleAmountChange}
+              />
+            </div>
+            <div className="col-start-2 col-span-2">
+              <Select
+                id="account-currency"
+                selected={account.currency}
+                options={[
+                  {
+                    id: account.currency,
+                    label: account.currency,
+                  },
+                ]}
+                onSelect={() => {}}
+                disabled
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="col-span-1">
+              <NumericInput
+                value={expense.amount}
+                placeholder="Amount"
+                onChange={handleAmountChange}
+              />
+            </div>
+            <div className="col-start-2 col-span-2">
+              <Select
+                selected={account.currency}
+                options={[
+                  {
+                    id: account.currency,
+                    label: account.currency,
+                  },
+                ]}
+                onSelect={() => {}}
+                disabled
+              />
+            </div>
+          </>
+        )}
+      </div>
 
-        <DescriptionForm
-          description={expense.description}
-          onChange={handleDescriptionChange}
-        />
+      <DescriptionForm
+        description={expense.description}
+        onChange={handleDescriptionChange}
+      />
 
-        <Checkbox
-          inline
-          checked={expense.shared}
-          label="Splitwise"
-          onChange={handleSplitwiseChange}
-        />
-      </Form>
+      <Checkbox
+        inline
+        checked={expense.shared}
+        label="Splitwise"
+        onChange={handleSplitwiseChange}
+      />
 
       <Button
         text={showDetails ? "Hide JSON" : "Show JSON"}
@@ -256,22 +258,3 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
 }
 
 export default ExpenseEditor;
-
-/**
- * The Expenses locally can have invalid data, that's fine - they might be drafts that need further edition
- * the Expenses must be validated when being pushed, shared or downloaded in CSV
- */
-
-function getCurrencyDropdownItems({
-  currencies,
-}: {
-  currencies: Set<CurrencyCode>;
-}): DropdownItemProps[] {
-  const dropdownItems = [...currencies.values()].map((currency) => ({
-    key: currency,
-    value: currency,
-    text: currency,
-  })) as unknown as DropdownItemProps[];
-
-  return dropdownItems;
-}
