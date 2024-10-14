@@ -9,6 +9,7 @@ import {
 } from "../domain/model";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
+import { NumericInput } from "./NumericInput";
 import { PaidWithDropdown } from "./PaidWith";
 import { Checkbox, Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useEffect, useState } from "react";
@@ -80,13 +81,9 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     update({ ...expense, paid_with: account.id, currency: account.currency });
   }
 
-  function handleAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
-    if (value === undefined || value === null || value === "") {
-      update({ ...expense, amount: undefined });
-      return;
-    }
-
-    update({ ...expense, amount: Number(value) });
+  function handleAmountChange(value: string) {
+    let amount = value === "" ? undefined : Number(value);
+    update({ ...expense, amount });
   }
 
   function handleCurrencyChange(_: any, data: DropdownProps): void {
@@ -94,13 +91,9 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     update({ ...expense, currency });
   }
 
-  function handleOriginalAmountChange(_: SyntheticEvent, { value }: InputOnChangeData) {
-    if (value === undefined || value === null || value === "") {
-      update({ ...expense, originalAmount: undefined });
-      return;
-    }
-
-    update({ ...expense, originalAmount: Number(value) });
+  function handleOriginalAmountChange(value: string): void {
+    let originalAmount = value === "" ? undefined : Number(value);
+    update({ ...expense, originalAmount });
   }
 
   function handleOriginalCurrencyChange(_: any, data: DropdownProps): void {
@@ -172,59 +165,62 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       />
 
       <Form>
-        {paidInOtherCurrency ? (
-          <>
-            <Form.Group inline>
-              <Form.Input
-                type="number"
-                placeholder="Original amount"
-                name="originalAmountField"
-                value={expense.originalAmount}
-                step="any"
-                onChange={handleOriginalAmountChange}
-              />
-              <Form.Dropdown
-                name="originalCurrencyField"
-                value={expense.originalCurrency}
-                options={formCurrencies}
-                onChange={handleOriginalCurrencyChange}
-              />
-              <Form.Input
-                type="number"
-                placeholder="Amount in account"
-                name="amountField"
-                value={expense.amount}
-                step="any"
-                onChange={handleAmountChange}
-              />
-              <Form.Dropdown
-                name="currencyField"
-                value={account.currency}
-                options={formCurrencies}
-                disabled={true}
-                onChange={handleCurrencyChange}
-              />
-            </Form.Group>
-          </>
-        ) : (
-          <Form.Group inline>
-            <Form.Input
-              type="number"
-              placeholder="Amount"
-              name="amountField"
-              value={expense.amount}
-              step="any"
-              onChange={handleAmountChange}
-            />
-            <Form.Dropdown
-              name="currencyField"
-              value={account.currency}
-              options={formCurrencies}
-              disabled={true}
-              onChange={handleCurrencyChange}
-            />
-          </Form.Group>
-        )}
+        <div className="grid grid-col-2 gap-2">
+          {paidInOtherCurrency ? (
+            <>
+              <div className="col-span-1">
+                <NumericInput
+                  value={expense.originalAmount}
+                  placeholder="Merchant amount"
+                  onChange={handleOriginalAmountChange}
+                />
+              </div>
+              <div className="col-start-2 col-span-2">
+                <Form.Dropdown
+                  name="originalCurrencyField"
+                  value={expense.originalCurrency}
+                  options={formCurrencies}
+                  onChange={handleOriginalCurrencyChange}
+                />
+              </div>
+              <div className="col-span-1">
+                <NumericInput
+                  value={expense.amount}
+                  placeholder="Amount in account"
+                  onChange={handleAmountChange}
+                />
+              </div>
+              <div className="col-start-2 col-span-2">
+                <Form.Dropdown
+                  name="currencyField"
+                  value={account.currency}
+                  options={formCurrencies}
+                  disabled={true}
+                  onChange={handleCurrencyChange}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="col-span-1">
+                <NumericInput
+                  value={expense.amount}
+                  placeholder="Amount"
+                  onChange={handleAmountChange}
+                />
+              </div>
+              <div className="col-start-2 col-span-2">
+                <Form.Dropdown
+                  name="currencyField"
+                  value={account.currency}
+                  options={formCurrencies}
+                  disabled={true}
+                  onChange={handleCurrencyChange}
+                />
+              </div>
+            </>
+          )}
+        </div>
 
         <DescriptionForm
           description={expense.description}
