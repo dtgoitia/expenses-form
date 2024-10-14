@@ -1,6 +1,7 @@
 import ExpenseQueue from "../ExpenseQueue";
 import { Button } from "../components/Button";
 import CenteredPage from "../components/CenteredPage";
+import DownloadJson from "../components/DownloadJson";
 import ExpenseEditor from "../components/ExpenseEditor";
 import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
@@ -84,6 +85,10 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     ? app.expenseManager.get(expenseIdUnderEdition)
     : undefined;
 
+  const publishableExpenses = appExpenses
+    .filter((appExpense) => appExpense.readyToPublish)
+    .map((appExpense) => appExpense.expense) as Expense[];
+
   return (
     <CenteredPage>
       <Button text="reload PWA" icon="rotate" onClick={refreshPage} />
@@ -116,6 +121,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
           disabled={canAddExpense === false}
         />
       )}
+      <DownloadJson expenses={publishableExpenses} app={app} />
 
       <ExpenseQueue
         expenses={appExpenses}
