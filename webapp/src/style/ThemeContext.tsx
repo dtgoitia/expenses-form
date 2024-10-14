@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 export type Theme = "light" | "dark";
 
-export const DEFAULT_THEME: Theme = "light";
+export const DEFAULT_THEME: Theme = "dark";
 
 interface Props {
   theme: Theme;
