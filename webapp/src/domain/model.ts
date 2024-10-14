@@ -6,8 +6,8 @@ export interface Expense {
   id: ExpenseId;
   amount: number;
   currency: string;
-  originalAmount: number | undefined;
-  originalCurrency: string | undefined;
+  originalAmount: number | undefined; // TODO: rename to 'paymentAmount'
+  originalCurrency: string | undefined; // TODO: rename to 'paymentCurrency'
   description: string;
   datetime: DatetimeISOString;
   // The domain should not contain data about the persistence layer, instead, the
