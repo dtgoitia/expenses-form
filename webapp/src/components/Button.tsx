@@ -22,23 +22,25 @@ interface Props {
 }
 
 export function Button({ text, active, disabled, icon, iconSize, onClick }: Props) {
-  const baseCss =
-    "   dark:bg-gray-700   bg-gray-300" +
-    " dark:text-gray-300 text-gray-700" +
-    " py-2 px-3" +
-    " rounded" +
-    " inline-flex items-center";
-  const hoverCss = " hover:bg-gray-400";
-  const activeCss = " bg-gray-400 dark:bg-gray-500";
+  const baseCss = "text-sm" + " py-2 px-3" + " rounded" + " inline-flex items-center";
+  const normalCss = " bg-gray-300  dark:bg-gray-600  text-gray-700  dark:text-gray-300"; // not active, not disabled
+  const hoverCss =
+    " hover:text-gray-100  hover:dark:text-gray-800" +
+    "   hover:bg-gray-400    hover:dark:bg-gray-400";
+  const activeCss = " bg-gray-400  dark:bg-gray-400  text-gray-100  dark:text-gray-800";
   const disabledCss = " opacity-50 cursor-not-allowed";
   let css = baseCss;
 
-  if (active) {
-    css += activeCss;
-  } else if (disabled) {
+  if (disabled) {
     css += disabledCss;
   } else {
     css += hoverCss;
+
+    if (active) {
+      css += activeCss;
+    } else {
+      css += normalCss;
+    }
   }
 
   let props = {};
