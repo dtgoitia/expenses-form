@@ -1,8 +1,9 @@
 import CenteredPage from "../components/CenteredPage";
+import { Label } from "../components/Label";
 import { TextInput } from "../components/TextInput";
 import storage from "../localStorage";
 import Paths from "../routes";
-import { Button, Label } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -110,8 +111,7 @@ function SettingsPage() {
     <CenteredPage>
       <h1>Settings</h1>
 
-      <Label htmlFor="splitwise-api-token">
-        Splitwise API token
+      <Label htmlFor="splitwise-api-token" text="Splitwise API token">
         <TextInput
           id="splitwise-api-token"
           value={splitwiseToken}
@@ -120,8 +120,7 @@ function SettingsPage() {
         />
       </Label>
 
-      <Label htmlFor="trip-tags">
-        Trip tags
+      <Label htmlFor="trip-tags" text="Trip tags">
         <TextInput
           id="trip-tags"
           value={tripTags}
@@ -130,8 +129,7 @@ function SettingsPage() {
         />
       </Label>
 
-      <Label htmlFor="people">
-        People
+      <Label htmlFor="people" text="People">
         <TextInput
           id="people"
           value={people}
@@ -140,8 +138,7 @@ function SettingsPage() {
         />
       </Label>
 
-      <Label htmlFor="firestore-config">
-        Firestore config
+      <Label htmlFor="firestore-config" text="Firestore config">
         <TextInput
           id="firestore-config"
           value={firestoreConfig}
@@ -151,8 +148,7 @@ function SettingsPage() {
         />
       </Label>
 
-      <Label htmlFor="currencies">
-        Currencies
+      <Label htmlFor="currencies" text="Currencies">
         <TextInput
           id="currencies"
           value={currencies}
