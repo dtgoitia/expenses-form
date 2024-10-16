@@ -7,7 +7,10 @@ import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { AppExpense, AddExpenseArgs } from "../domain/expenses";
 import { DraftExpense, Expense, ExpenseId, PaymentAccount } from "../domain/model";
+import { unreachable } from "../lib/devex";
+import Paths from "../routes";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { first } from "rxjs";
 
 interface ExpensesFormProps {
@@ -40,8 +43,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
 
     const defaultAccount = app.paymentAccountsManager.getDefault();
     if (defaultAccount === undefined) {
-      // TODO: push to error service
-      throw new Error("No default account found");
+      throw unreachable("No default account found");
     }
 
     const newExpense: AddExpenseArgs = {
@@ -104,32 +106,45 @@ function ExpensesForm({ app }: ExpensesFormProps) {
           />
         </>
       ) : (
-        <p>Add expense or select an existing one</p>
+        canAddExpense && (
+          <div className="flex justify-center items-center p-4" role="warning">
+            <div>Add expense or select an existing one</div>
+          </div>
+        )
       )}
-      {expenseIdUnderEdition ? (
+      {expenseUnderEdition ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button text="Close" onClick={handleStopEditingExpense} />
         </div>
+      ) : canAddExpense ? (
+        <Button text="Add expense" onClick={handleAddExpense} />
       ) : (
-        <Button
-          text={
-            canAddExpense
-              ? "Add expense"
-              : "Must select a default account to add an expense"
-          }
-          onClick={handleAddExpense}
-          disabled={canAddExpense === false}
-        />
+        <div className="flex justify-center p-4" role="warning">
+          <div className="flex flex-col gap-4 items-center">
+            <div>
+              Must &nbsp;<b>select a default account</b>&nbsp; in "Accounts" page to add
+              an expense.
+            </div>
+            <Link to={Paths.paymentAccounts}>
+              <Button text="Go to Accounts" />
+            </Link>
+          </div>
+        </div>
       )}
-      <DownloadJson expenses={publishableExpenses} app={app} />
 
-      <ExpenseQueue
-        expenses={appExpenses}
-        underEdition={expenseIdUnderEdition}
-        onEditExpense={handleOnEditExpense}
-        onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
-        app={app}
-      />
+      {publishableExpenses.length > 0 && (
+        <DownloadJson expenses={publishableExpenses} app={app} />
+      )}
+
+      <div className="mt-4">
+        <ExpenseQueue
+          expenses={appExpenses}
+          underEdition={expenseIdUnderEdition}
+          onEditExpense={handleOnEditExpense}
+          onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
+          app={app}
+        />
+      </div>
     </CenteredPage>
   );
 }
