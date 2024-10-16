@@ -11,7 +11,7 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { GlobalStyle } from "./style/globalStyle";
 import React from "react";
 import ReactDOM from "react-dom";
-import "semantic-ui-css/semantic.min.css";
+// import "semantic-ui-css/semantic.min.css";
 import { registerSW } from "virtual:pwa-register";
 
 const isLocalhost = window.location.hostname === "localhost";
