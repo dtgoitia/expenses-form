@@ -1,12 +1,11 @@
 import Shortcuts from "../../PredefinedButtons";
-import { DEFAULT_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
+import { DEFAULT_PEOPLE as HARDCODED_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
 import { Person, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
+import { Choice, MultipleChoice } from "../MultipleChoice";
 import { TextInput } from "../TextInput";
 import TagSelector from "./TagSelector";
 import { useState } from "react";
-import { DropdownProps, Form } from "semantic-ui-react";
-import styled from "styled-components";
 
 interface DescriptionProps {
   description: string;
@@ -87,61 +86,38 @@ export function stringToDescription({ raw }: { raw: string }): Description {
   return { main, people, seller, tags };
 }
 
-const tagsInConfig = storage.tripTags.read() || [];
-const availableTags: TagName[] = mergeStringLists([TAGS, tagsInConfig]);
+const tagsInSettings = storage.tripTags.read() || [];
+const availableTags: TagName[] = mergeStringLists([TAGS, tagsInSettings]);
 
-const peopleInConfig = storage.people.read() || [];
-const defaultPeople: Person[] = mergeStringLists([DEFAULT_PEOPLE, peopleInConfig]);
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 0.3rem;
-  row-gap: 0.3rem;
-`;
-
-const PeopleInput = styled(Form.Dropdown)`
-  grid-column-start: 2;
-  grid-column-end: span 2;
-
-  &.div {
-    margin-bottom: 0;
-  }
-`;
-
-const Container = styled.div`
-  margin-bottom: 1rem;
-`;
+const peopleInSettings = storage.people.read() || [];
+const defaultPeople: Person[] = mergeStringLists([HARDCODED_PEOPLE, peopleInSettings]);
 
 function mergeStringLists(listOfStringLists: string[][]): string[] {
   /**
    * Return a list of unique strings. The order is preserved - items of the first list
    * are added first, then items in the second list, etc.
    */
-  const flatList = listOfStringLists.flatMap((s) => s);
+  const seen = new Set<string>([]);
+  const result: string[] = [];
+  for (const s of listOfStringLists.flatMap((s) => s)) {
+    if (seen.has(s)) continue;
 
-  const added = new Set<string>([]);
-
-  const unique: string[] = [];
-  for (const s of flatList) {
-    if (added.has(s)) continue;
-
-    added.add(s);
-    unique.push(s);
+    seen.add(s);
+    result.push(s);
   }
 
-  return unique;
+  return result;
 }
 
 function DescriptionForm({ description: raw, onChange: update }: DescriptionProps) {
   const description = stringToDescription({ raw });
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);
-  const selectablePeople = [
-    ...defaultPeople,
-    ...peopleAddedByUser, // TODO: add these to Settings
-    ...description.people,
-  ];
+  const selectablePeople: Person[] = getSelectablePeople({
+    inSettings: defaultPeople,
+    addedByUser: peopleAddedByUser, // TODO: add these to Settings
+    inExpense: description.people,
+  });
 
   function handleMainChange(main: string): void {
     update(descriptionToString({ ...description, main }));
@@ -151,19 +127,15 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
     update(descriptionToString({ ...description, seller }));
   }
 
-  function handlePeopleChange(_: any, { value }: DropdownProps): void {
-    const selectedPeople: Person[] = value as string[];
+  function handlePeopleChange(value: Choice[]): void {
+    const selectedPeople: Person[] = value;
     if (!selectedPeople) {
       return;
     }
 
     // Ensure people added by the user are shown amongst the dropdown options
     const previous = new Set(selectablePeople);
-    const addedByUser: Person[] = [];
-    selectedPeople.forEach((person) => {
-      if (previous.has(person)) return;
-      addedByUser.push(person);
-    });
+    const addedByUser = selectedPeople.filter((person) => !previous.has(person));
 
     if (addedByUser.length > 0) {
       setPeopleAddedByUser([...peopleAddedByUser, ...addedByUser]);
@@ -171,7 +143,7 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
 
     const people = selectedPeople.sort();
 
-    update(descriptionToString({ ...description, people: people }));
+    update(descriptionToString({ ...description, people }));
   }
 
   function handleTagChange(selectedTags: Set<TagName>): void {
@@ -193,13 +165,13 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
   }
 
   return (
-    <Container>
+    <div role="description-form" className="mb-4">
       <Shortcuts
         data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
         select={handleShortcutSelection}
       />
 
-      <Grid>
+      <div className="grid grid-cols-2 gap-2 mb-4">
         <TextInput
           value={description.main}
           placeholder="description"
@@ -212,30 +184,38 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
           className="col-start-1 col-span-1"
           onChange={handleSellerChange}
         />
-        <PeopleInput
+        <MultipleChoice
           placeholder="people"
-          multiple
-          search
-          fluid
-          selection
-          options={selectablePeople.map((person) => ({
-            key: person,
-            text: person,
-            value: person,
-          }))}
           value={description.people}
+          choices={selectablePeople}
           onChange={handlePeopleChange}
-          allowAdditions
         />
-      </Grid>
+      </div>
 
       <TagSelector
         tags={availableTags}
         selected={new Set(description.tags)}
         onChange={handleTagChange}
       />
-    </Container>
+    </div>
   );
 }
 
 export default DescriptionForm;
+
+/**
+ * Ensure there are no duplicates
+ */
+function getSelectablePeople({
+  inSettings,
+  addedByUser,
+  inExpense,
+}: {
+  inSettings: Person[];
+  addedByUser: Person[];
+  inExpense: Person[];
+}) {
+  const seen = new Set<Person>([...inSettings, ...addedByUser, ...inExpense]);
+  const result: Person[] = [...seen.values()].sort();
+  return result;
+}
