@@ -107,8 +107,7 @@ function SettingsPage() {
   return (
     <CenteredPage>
       <div className="px-3 flex flex-col gap-4">
-        <Label htmlFor="splitwise-api-token">
-          Splitwise API token
+        <Label htmlFor="splitwise-api-token" text="Splitwise API token">
           <TextInput
             id="splitwise-api-token"
             value={splitwiseToken}
@@ -118,8 +117,7 @@ function SettingsPage() {
           />
         </Label>
 
-        <Label htmlFor="trip-tags">
-          Trip tags
+        <Label htmlFor="trip-tags" text="Trip tags">
           <TextInput
             id="trip-tags"
             value={tripTags}
@@ -129,8 +127,7 @@ function SettingsPage() {
           />
         </Label>
 
-        <Label htmlFor="people">
-          People
+        <Label htmlFor="people" text="People">
           <TextInput
             id="people"
             value={people}
@@ -140,8 +137,7 @@ function SettingsPage() {
           />
         </Label>
 
-        <Label htmlFor="firestore-config">
-          Firestore config
+        <Label htmlFor="firestore-config" text="Firestore config">
           <TextInput
             id="firestore-config"
             value={firestoreConfig}
@@ -152,8 +148,7 @@ function SettingsPage() {
           />
         </Label>
 
-        <Label htmlFor="currencies">
-          Currencies
+        <Label htmlFor="currencies" text="Currencies">
           <TextInput
             id="currencies"
             value={currencies}
