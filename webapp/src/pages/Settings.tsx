@@ -1,8 +1,9 @@
 import CenteredPage from "../components/CenteredPage";
+import { Label } from "../components/Label";
 import { TextInput } from "../components/TextInput";
 import storage from "../localStorage";
 import Paths from "../routes";
-import { Button, Label } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
