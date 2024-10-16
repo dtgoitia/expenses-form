@@ -1,4 +1,3 @@
-import { Button } from "../../components/Button";
 import CenteredPage from "../../components/CenteredPage";
 import { App } from "../../domain/app";
 import { CurrencyCode } from "../../domain/model";
@@ -7,11 +6,9 @@ import {
   PaymentAccount,
   PaymentAccountId,
 } from "../../domain/model";
-import Paths from "../../routes";
 import { AddPaymentAccount } from "./AddPaymentAccount";
 import { ListedPaymentAccount } from "./ListedPaymentAccount";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 interface Props {
   app: App;
@@ -61,12 +58,6 @@ export default function PaymentAccountsPage({ app }: Props) {
 
   return (
     <CenteredPage>
-      <Link to={Paths.root}>
-        <Button icon="arrow-left" text="Back" />
-      </Link>
-
-      <h3>Payment Accounts</h3>
-
       {canAddAccount ? (
         <>
           <AddPaymentAccount
