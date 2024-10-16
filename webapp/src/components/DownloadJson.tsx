@@ -4,7 +4,7 @@ import { Expense } from "../domain/model";
 import { unreachable } from "../lib/devex";
 import storage from "../localStorage";
 import { errorsService } from "../services/errors";
-import { Button } from "@blueprintjs/core";
+import { Button } from "./Button";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -163,19 +163,17 @@ function DownloadJson({ expenses, app }: DownloadJsonProps) {
 
   return (
     <Container>
-      <Button intent="success" text="Download CSV" onClick={() => download()} />
+      <Button text="Download CSV" onClick={() => download()} />
       <Button
-        intent="success"
         text="Share CSV"
         onClick={() => share()}
         disabled={shareApiAvailable === false}
       />
       <Button
-        intent="success"
         text="Push to Firestore"
         onClick={() => pushToFirestore()}
         disabled={pushing}
-        icon={pushing ? "refresh" : "airplane"}
+        icon={pushing ? "rotate" : undefined}
       />
     </Container>
   );
