@@ -2,10 +2,7 @@ import CenteredPage from "../components/CenteredPage";
 import { Label } from "../components/Label";
 import { TextInput } from "../components/TextInput";
 import storage from "../localStorage";
-import Paths from "../routes";
-import { Button } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 function listToInputField(items: string[]): string {
   return items.join(",");
@@ -109,57 +106,58 @@ function SettingsPage() {
 
   return (
     <CenteredPage>
-      <h1>Settings</h1>
+      <div className="px-3 flex flex-col gap-4">
+        <Label htmlFor="splitwise-api-token" text="Splitwise API token">
+          <TextInput
+            id="splitwise-api-token"
+            value={splitwiseToken}
+            placeholder="Splitwise API token"
+            onChange={handleSplitwiseApiTokenChange}
+            className="mt-1"
+          />
+        </Label>
 
-      <Label htmlFor="splitwise-api-token" text="Splitwise API token">
-        <TextInput
-          id="splitwise-api-token"
-          value={splitwiseToken}
-          placeholder="Splitwise API token"
-          onChange={handleSplitwiseApiTokenChange}
-        />
-      </Label>
+        <Label htmlFor="trip-tags" text="Trip tags">
+          <TextInput
+            id="trip-tags"
+            value={tripTags}
+            placeholder="trip tags"
+            onChange={handleTripTagsChange}
+            className="mt-1"
+          />
+        </Label>
 
-      <Label htmlFor="trip-tags" text="Trip tags">
-        <TextInput
-          id="trip-tags"
-          value={tripTags}
-          placeholder="trip tags"
-          onChange={handleTripTagsChange}
-        />
-      </Label>
+        <Label htmlFor="people" text="People">
+          <TextInput
+            id="people"
+            value={people}
+            placeholder="JohnDoe,JaneDoe"
+            onChange={handlePeopleChange}
+            className="mt-1"
+          />
+        </Label>
 
-      <Label htmlFor="people" text="People">
-        <TextInput
-          id="people"
-          value={people}
-          placeholder="JohnDoe,JaneDoe"
-          onChange={handlePeopleChange}
-        />
-      </Label>
+        <Label htmlFor="firestore-config" text="Firestore config">
+          <TextInput
+            id="firestore-config"
+            value={firestoreConfig}
+            placeholder={`{"a":1,"b":2}`}
+            onChange={handleFirestoreConfigChange}
+            isCode
+            className="mt-1"
+          />
+        </Label>
 
-      <Label htmlFor="firestore-config" text="Firestore config">
-        <TextInput
-          id="firestore-config"
-          value={firestoreConfig}
-          placeholder={`{"a":1,"b":2}`}
-          onChange={handleFirestoreConfigChange}
-          isCode
-        />
-      </Label>
-
-      <Label htmlFor="currencies" text="Currencies">
-        <TextInput
-          id="currencies"
-          value={currencies}
-          placeholder={`GBP,EUR,USD`}
-          onChange={handleCurrenciesChange}
-        />
-      </Label>
-
-      <Link to={Paths.root}>
-        <Button icon="cross">Close</Button>
-      </Link>
+        <Label htmlFor="currencies" text="Currencies">
+          <TextInput
+            id="currencies"
+            value={currencies}
+            placeholder={`GBP,EUR,USD`}
+            onChange={handleCurrenciesChange}
+            className="mt-1"
+          />
+        </Label>
+      </div>
     </CenteredPage>
   );
 }
