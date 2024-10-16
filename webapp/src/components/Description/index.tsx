@@ -119,11 +119,11 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
     inExpense: description.people,
   });
 
-  function handleMainChange(main: string): void {
+  function handleMainChange(main: string | undefined): void {
     update(descriptionToString({ ...description, main }));
   }
 
-  function handleSellerChange(seller: string): void {
+  function handleSellerChange(seller: string | undefined): void {
     update(descriptionToString({ ...description, seller }));
   }
 
