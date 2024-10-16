@@ -1,4 +1,3 @@
-import { Button } from "../../components/Button";
 import CenteredPage from "../../components/CenteredPage";
 import { App } from "../../domain/app";
 import { CurrencyCode } from "../../domain/model";
@@ -7,11 +6,9 @@ import {
   PaymentAccount,
   PaymentAccountId,
 } from "../../domain/model";
-import Paths from "../../routes";
 import { AddPaymentAccount } from "./AddPaymentAccount";
 import { ListedPaymentAccount } from "./ListedPaymentAccount";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 interface Props {
   app: App;
@@ -61,12 +58,6 @@ export default function PaymentAccountsPage({ app }: Props) {
 
   return (
     <CenteredPage>
-      <Link to={Paths.root}>
-        <Button icon="arrow-left" text="Back" />
-      </Link>
-
-      <h3>Payment Accounts</h3>
-
       {canAddAccount ? (
         <>
           <AddPaymentAccount
@@ -74,25 +65,31 @@ export default function PaymentAccountsPage({ app }: Props) {
             onAddPaymentAccount={handleAddPaymentAccount}
           />
 
-          {defaultAccount === undefined && (
-            <h4>please, select your default payment account</h4>
+          {defaultAccount === undefined && accounts.length > 0 && (
+            <div role="warning" className="p-4 flex justify-center">
+              <p>
+                <b>please, select your default payment account</b>
+              </p>
+            </div>
           )}
 
-          {accounts.length > 0 ? (
-            accounts.map((account, i) => (
-              <ListedPaymentAccount
-                key={`${i}-${account.id}`}
-                account={account}
-                isDefault={defaultAccount !== undefined && account.id === defaultAccount}
-                currencies={currencies}
-                onUpdate={handleUpdatePaymentAccount}
-                onDelete={handleDeletePaymentAccount}
-                onMarkAsDefault={() => handleMarkPaymentAccountAsDefault(account.id)}
-              />
-            ))
-          ) : (
-            <p>No payment accounts :)</p>
-          )}
+          <div className="flex flex-col gap-3" role="payment-accounts">
+            {accounts.length > 0 ? (
+              accounts.map((account, i) => (
+                <ListedPaymentAccount
+                  key={`${i}-${account.id}`}
+                  account={account}
+                  isDefault={account.id === defaultAccount}
+                  currencies={currencies}
+                  onUpdate={handleUpdatePaymentAccount}
+                  onDelete={handleDeletePaymentAccount}
+                  onMarkAsDefault={() => handleMarkPaymentAccountAsDefault(account.id)}
+                />
+              ))
+            ) : (
+              <p>No payment accounts :)</p>
+            )}
+          </div>
         </>
       ) : (
         <div>

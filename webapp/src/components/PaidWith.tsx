@@ -1,9 +1,9 @@
 import { App } from "../domain/app";
-import { PaymentAccount, PaymentAccountId, PaymentAccountName } from "../domain/model";
+import { PaymentAccount, PaymentAccountId } from "../domain/model";
 import { PaymentAccountsManager } from "../domain/paymentAccounts";
 import { errorsService } from "../services/errors";
 import { Option, Select } from "./Select";
-import { HTMLSelect, Label } from "@blueprintjs/core";
+import { Label } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 
 interface Props {

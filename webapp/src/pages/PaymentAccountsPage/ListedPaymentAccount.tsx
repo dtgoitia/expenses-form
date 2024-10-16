@@ -1,16 +1,8 @@
+import { Button } from "../../components/Button";
 import { CurrencyCode, PaymentAccount, PaymentAccountId } from "../../domain/model";
+import { unreachable } from "../../lib/devex";
 import { PaymentAccountEditor } from "./PaymentAccountEditor";
-import { Button, Intent } from "@blueprintjs/core";
 import { useState } from "react";
-import styled from "styled-components";
-
-const NonDefaultPaymentAccount = styled.div`
-  padding: 1rem;
-`;
-
-const DefaultPaymentAccount = styled(NonDefaultPaymentAccount)`
-  background-color: #ddd;
-`;
 
 interface Props {
   account: PaymentAccount;
@@ -30,17 +22,42 @@ export function ListedPaymentAccount({
 }: Props) {
   const [editing, setEditing] = useState<boolean>(false);
 
-  const Container = isDefault ? DefaultPaymentAccount : NonDefaultPaymentAccount;
+  let css = "px-4 py-3 rounded relative";
+  if (isDefault && editing) {
+    css += " bg-blue-200  dark:bg-blue-900 dark:bg-opacity-50";
+  } else if (isDefault && !editing) {
+    css += " bg-blue-200  dark:bg-blue-900";
+  } else if (!isDefault && !editing) {
+    css += " bg-gray-100  dark:bg-gray-700";
+  } else if (!isDefault && editing) {
+    css += " bg-gray-300  dark:bg-gray-900";
+  } else {
+    throw unreachable();
+  }
 
   if (editing === false) {
     const { name, ledgerName } = account;
     return (
-      <Container onClick={() => setEditing(true)}>
+      <div role="payment-account" className={css} onClick={() => setEditing(true)}>
+        {isDefault && (
+          <div
+            className={
+              "absolute top-2 right-3" +
+              "  text-xs" +
+              " flex justify-end" +
+              " z-10" +
+              " opacity-50"
+            }
+            role="default-payment-account-indicator"
+          >
+            default
+          </div>
+        )}
         <div>
           <b>{name}</b>
         </div>
         <div>{ledgerName}</div>
-      </Container>
+      </div>
     );
   }
 
@@ -50,15 +67,18 @@ export function ListedPaymentAccount({
   }
 
   return (
-    <Container>
+    <div role="payment-account" className={css}>
       <PaymentAccountEditor account={account} currencies={currencies} onUpdate={update} />
-      <Button onClick={handleDeletionIntent} intent={Intent.DANGER}>
-        Delete {account.name}
-      </Button>
-      <Button onClick={() => setEditing(false)}>Close</Button>
-      <Button onClick={markAsDefault} disabled={isDefault}>
-        {isDefault ? "is default payment method" : "Mark as default"}
-      </Button>
-    </Container>
+
+      <Button text="Delete" onClick={handleDeletionIntent} />
+
+      <Button text="Close" onClick={() => setEditing(false)} />
+
+      <Button
+        text={isDefault ? "is default payment method" : "Mark as default"}
+        onClick={markAsDefault}
+        disabled={isDefault}
+      />
+    </div>
   );
 }

@@ -1,13 +1,14 @@
+import { Button } from "../../components/Button";
+import { Label } from "../../components/Label";
+import { Select } from "../../components/Select";
+import { TextInput } from "../../components/TextInput";
 import {
   CurrencyCode,
   DraftPaymentAccount,
   LedgerAccountName,
   PaymentAccountName,
 } from "../../domain/model";
-import { Button, Intent, MenuItem } from "@blueprintjs/core";
-import { Select2 } from "@blueprintjs/select";
 import { useState } from "react";
-import styled from "styled-components";
 
 interface Props {
   currencies: CurrencyCode[];
@@ -29,55 +30,48 @@ export function AddPaymentAccount({
     addPaymentAccount({ name, ledgerName, currency });
   }
 
+  const canCreateAccount = name !== undefined && ledgerName !== undefined;
+
   return (
-    <Container>
-      <input
-        type="text"
-        className="bp4-input bp4-large bp4-fill"
-        value={name}
-        placeholder="Name"
-        onChange={(event) => setName(event.target.value)}
-      />
-      <input
-        type="text"
-        className="bp4-input bp4-large bp4-fill"
-        value={ledgerName}
-        placeholder="Ledger name"
-        onChange={(event) => setLedgerName(event.target.value)}
-      />
-      <Select2<CurrencyCode>
-        items={currencies}
-        itemRenderer={(currency, { handleClick, modifiers }) => (
-          <MenuItem
-            active={modifiers.active}
-            key={currency}
-            label={currency}
-            onClick={handleClick}
-          />
-        )}
-        filterable={false}
-        onItemSelect={setCurrency}
-      >
-        <Button
-          text={currency}
-          rightIcon="double-caret-vertical"
-          placeholder="Select a currency"
+    <div className="flex flex-col gap-3 ">
+      <Label htmlFor="new-account-name" text="Account name: *">
+        <TextInput
+          id="new-account-name"
+          value={name}
+          placeholder="Name"
+          onChange={setName}
+          className="mt-1"
         />
-      </Select2>
-      <Button
-        intent={Intent.PRIMARY}
-        icon="floppy-disk"
-        onClick={handleAddPaymentAccount}
-        disabled={
-          name === undefined || ledgerName === undefined || currency === undefined
-        }
-      >
-        Add
-      </Button>
-    </Container>
+      </Label>
+
+      <Label htmlFor="new-account-ledger-name" text="Account name in ledger: *">
+        <TextInput
+          id="new-account-ledger-name"
+          value={ledgerName}
+          placeholder="Ledger name"
+          onChange={setLedgerName}
+          className="mt-1"
+        />
+      </Label>
+
+      <Label htmlFor="new-account-currency" text="Account currency:">
+        <Select
+          id="new-account-currency"
+          selected={currency}
+          options={currencies.map((currency) => ({ id: currency, label: currency }))}
+          onSelect={setCurrency}
+          className="mt-1"
+        />
+      </Label>
+
+      <div className="flex justify-end p-4">
+        <Button
+          text={canCreateAccount ? "Create" : "fill details above"}
+          // icon="floppy-disk"
+          onClick={handleAddPaymentAccount}
+          disabled={!canCreateAccount}
+        />
+      </div>
+    </div>
   );
 }
-
-const Container = styled.div`
-  margin: 1rem 0;
-`;
