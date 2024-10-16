@@ -1,4 +1,5 @@
 import CenteredPage from "../components/CenteredPage";
+import { TextInput } from "../components/TextInput";
 import storage from "../localStorage";
 import Paths from "../routes";
 import { Button, Label } from "@blueprintjs/core";
@@ -45,9 +46,8 @@ function SettingsPage() {
     }
   }, []);
 
-  function handleSplitwiseApiTokenChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
+  function handleSplitwiseApiTokenChange(value: string | undefined): void {
+    if (value === undefined || value === "") {
       setSplitwiseToken(undefined);
       storage.splitwiseApiToken.delete();
       return;
@@ -57,9 +57,8 @@ function SettingsPage() {
     storage.splitwiseApiToken.set(value);
   }
 
-  function handleTripTagsChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
+  function handleTripTagsChange(value: string | undefined): void {
+    if (value === undefined || value === "") {
       setTripTags(undefined);
       storage.tripTags.delete();
       return;
@@ -71,9 +70,8 @@ function SettingsPage() {
     storage.tripTags.set(tags);
   }
 
-  function handlePeopleChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
+  function handlePeopleChange(value: string | undefined): void {
+    if (value === undefined || value === "") {
       setPeople(undefined);
       storage.people.delete();
       return;
@@ -85,9 +83,8 @@ function SettingsPage() {
     storage.people.set(peopleNames);
   }
 
-  function handleFirestoreConfigChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
+  function handleFirestoreConfigChange(value: string | undefined): void {
+    if (value === undefined || value === "") {
       setFirestoreConfig(undefined);
       storage.firestoreConfig.delete();
       return;
@@ -98,9 +95,8 @@ function SettingsPage() {
     storage.firestoreConfig.set(config);
   }
 
-  function handleCurrenciesChange(event: any): void {
-    const value = event.target.value;
-    if (value === undefined || value === null || value === "") {
+  function handleCurrenciesChange(value: string | undefined): void {
+    if (value === undefined || value === "") {
       setCurrencies(undefined);
       storage.currencies.delete();
       return;
@@ -116,9 +112,7 @@ function SettingsPage() {
 
       <Label htmlFor="splitwise-api-token">
         Splitwise API token
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
+        <TextInput
           id="splitwise-api-token"
           value={splitwiseToken}
           placeholder="Splitwise API token"
@@ -128,9 +122,7 @@ function SettingsPage() {
 
       <Label htmlFor="trip-tags">
         Trip tags
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
+        <TextInput
           id="trip-tags"
           value={tripTags}
           placeholder="trip tags"
@@ -140,9 +132,7 @@ function SettingsPage() {
 
       <Label htmlFor="people">
         People
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
+        <TextInput
           id="people"
           value={people}
           placeholder="JohnDoe,JaneDoe"
@@ -152,21 +142,18 @@ function SettingsPage() {
 
       <Label htmlFor="firestore-config">
         Firestore config
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
+        <TextInput
           id="firestore-config"
           value={firestoreConfig}
           placeholder={`{"a":1,"b":2}`}
           onChange={handleFirestoreConfigChange}
+          isCode
         />
       </Label>
 
       <Label htmlFor="currencies">
         Currencies
-        <input
-          className="bp4-input bp4-fill"
-          type="text"
+        <TextInput
           id="currencies"
           value={currencies}
           placeholder={`GBP,EUR,USD`}
