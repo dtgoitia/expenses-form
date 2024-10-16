@@ -48,6 +48,12 @@ export function PaidWithDropdown({
     changePaymentAccount(account);
   }
 
+  // accounts are populated after the component is mounted and we suscribe to
+  // the App.paymentAccountManager
+  if (accounts.length === 0) {
+    return <div>loading accounts...</div>;
+  }
+
   const options: Option[] = accounts.map((account) => ({
     id: account.id,
     label: account.name,
