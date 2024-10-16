@@ -26,8 +26,6 @@
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.3.0",
     "rxjs": "^7.5.5",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.1.3",
     "styled-components": "^5.3.5",
     "typescript": "^4.7.3",
     "web-vitals": "^0.2.4",
@@ -49,8 +47,7 @@
     "build_serve": "npm run clear_build && npm run build && serve -s build/",
     "deploy": "gh-pages --dist=./dist --branch=gh-pages --repo=git@github.com:dtgoitia/expenses-form.git",
     "clean_gh_pages_cache": "rm -rf ./node_modules/.cache/gh-pages",
-    "deploy_from_local": "npm run clear_build && npm run build && npm run clean_gh_pages_cache && npm run deploy",
-    "postinstall": "semantic-ui-css-patch"
+    "deploy_from_local": "npm run clear_build && npm run build && npm run clean_gh_pages_cache && npm run deploy"
   },
   "eslintConfig": {
     "extends": [
@@ -74,7 +71,6 @@
     "fsevents": "2.1.2"
   },
   "devDependencies": {
-    "@semantic-ui-react/css-patch": "^1.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.2.5",
