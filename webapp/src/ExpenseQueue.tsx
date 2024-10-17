@@ -19,15 +19,6 @@ const DescriptionSlot = styled.div`
   flex-grow: 1;
   flex-shrink: 1;
 `;
-const StyledListItem = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  column-gap: 0.5rem;
-  padding: 0.3rem;
-`;
-const RedListItem = styled(StyledListItem)`
-  background-color: rgba(255, 0, 0, 0.2);
-`;
 
 const MONTH_INDEX_TO_NAME: { [x: number]: string } = {
   1: "Jan",
@@ -118,10 +109,13 @@ function ListItem({
 
   let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
-  const ListItem = appExpense.readyToPublish ? StyledListItem : RedListItem;
+  let css = "flex flex-row flex-nowrap gap-x-2" + " p-2 dark:p-2";
+  if (!appExpense.readyToPublish) {
+    css += " bg-red-200 dark:bg-red-900";
+  }
 
   return (
-    <ListItem>
+    <div className={css}>
       <ActionSlot>
         {deleteMode ? (
           <Button onClick={handleOnDeleteClick} loading={deleting} icon="delete" />
@@ -150,19 +144,9 @@ function ListItem({
           </pre>
         </Collapse>
       </DescriptionSlot>
-    </ListItem>
+    </div>
   );
 }
-
-// const Container = styled.div`
-//   display: flex;
-//   flex: row nowrap;
-//   justify-content: center;
-//   gap: 0.8rem;
-// `;
-// const LoaderText = styled.span`
-//   font-size: 0.8rem;
-// `;
 
 interface Props {
   expenses: AppExpense[];
