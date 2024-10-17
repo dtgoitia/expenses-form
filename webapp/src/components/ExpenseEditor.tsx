@@ -7,12 +7,13 @@ import {
   DraftExpense,
   PaymentAccount,
 } from "../domain/model";
+import { Checkbox } from "./Checkbox";
 import DateTimePicker from "./DateTimePicker";
 import DescriptionForm from "./Description";
 import { NumericInput } from "./NumericInput";
 import { PaidWithDropdown } from "./PaidWith";
 import { Select } from "./Select";
-import { Checkbox, Collapse } from "@blueprintjs/core";
+import { Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -99,22 +100,16 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     update({ ...expense, description });
   }
 
-  function handleSplitwiseChange(event: SyntheticEvent): void {
-    const shared = (event.target as HTMLInputElement).checked;
-    update({ ...expense, shared });
+  function handleSplitwiseChange(checked: boolean): void {
+    update({ ...expense, shared: checked });
   }
 
-  function toggleShowDetails(): void {
-    setShowDetails(!showDetails);
-  }
-
-  function handlePaidInOtherCurrencyCheckboxChange(): void {
+  function handlePaidInOtherCurrencyCheckboxChange(checked: boolean): void {
+    const paidInOtherCurrency = checked;
     if (paidInOtherCurrency) {
-      setPaidInOtherCurrency(false);
       update({ ...expense, originalAmount: undefined, originalCurrency: undefined });
-    } else {
-      setPaidInOtherCurrency(true);
     }
+    setPaidInOtherCurrency(checked);
   }
 
   if (account === undefined) {
@@ -149,12 +144,13 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         onChange={handleAccountChange}
       />
 
-      <Checkbox
-        inline
-        checked={paidInOtherCurrency}
-        label="paid with different currency"
-        onChange={handlePaidInOtherCurrencyCheckboxChange}
-      />
+      <div className="pb-3 flex flex-row flex-no-wrap justify-end">
+        <Checkbox
+          label="paid with different currency"
+          checked={paidInOtherCurrency}
+          onChange={handlePaidInOtherCurrencyCheckboxChange}
+        />
+      </div>
 
       <div className="grid grid-col-2 gap-2">
         {paidInOtherCurrency ? (
@@ -230,13 +226,13 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         onChange={handleDescriptionChange}
       />
 
-      <Checkbox
-        inline
-        checked={expense.shared}
-        label="Splitwise"
-        onChange={handleSplitwiseChange}
-      />
-
+      <div className="py-4 flex flex-row justify-end">
+        <Checkbox
+          checked={expense.shared}
+          label="Splitwise"
+          onChange={handleSplitwiseChange}
+        />
+      </div>
       <Button
         text={showDetails ? "Hide JSON" : "Show JSON"}
         onClick={toggleShowDetails}
