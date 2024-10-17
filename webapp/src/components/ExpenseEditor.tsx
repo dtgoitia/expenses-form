@@ -13,7 +13,6 @@ import DescriptionForm from "./Description";
 import { NumericInput } from "./NumericInput";
 import { PaidWithDropdown } from "./PaidWith";
 import { Select } from "./Select";
-import { Collapse } from "@blueprintjs/core";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -33,8 +32,6 @@ interface ExpenseEditorProps {
 }
 
 function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
-  const [showDetails, setShowDetails] = useState<boolean>(false);
-
   // If true, the user has paid with a different currency to the default
   // currency of the account used to pay
   const [paidInOtherCurrency, setPaidInOtherCurrency] = useState<boolean>(
@@ -233,22 +230,6 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
           onChange={handleSplitwiseChange}
         />
       </div>
-      <Button
-        text={showDetails ? "Hide JSON" : "Show JSON"}
-        onClick={toggleShowDetails}
-      />
-      <Collapse isOpen={showDetails}>
-        <pre className="bp4-code-block">
-          {JSON.stringify(
-            {
-              ...expense,
-              paid_with: `${expense.paid_with} -- ${account && account.name}`,
-            },
-            null,
-            2
-          )}
-        </pre>
-      </Collapse>
     </div>
   );
 }
