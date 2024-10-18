@@ -39,6 +39,7 @@ export function MultipleChoice({
     " text-sm" +
     " text-gray-700  dark:text-gray-200" +
     "   bg-gray-100    dark:bg-gray-700" +
+    " p-3" +
     " has-[input:focus]:border-t  border-t-blue-300  dark:has-[input:focus]:border-t-blue-300" +
     " has-[input:focus]:border-l  border-l-blue-300  dark:has-[input:focus]:border-l-blue-300" +
     " has-[input:focus]:border-r  border-r-blue-300  dark:has-[input:focus]:border-r-blue-300" +
@@ -138,7 +139,10 @@ export function MultipleChoice({
       role="multi-choice-dropdown"
       onFocus={unfoldDropdown}
     >
-      <div className={"flex flex-row flex-wrap gap-2" + " p-3"} role="listbox-selected">
+      <div
+        className={"flex flex-row flex-wrap gap-2" + " overflow-x-hidden"}
+        role="listbox-selected"
+      >
         {value.map((choice, i) => (
           <div
             role="choice"
