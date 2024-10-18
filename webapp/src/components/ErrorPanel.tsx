@@ -1,5 +1,6 @@
 import { ErrorMessage, errorsService } from "../services/errors";
-import { Button, Callout } from "@blueprintjs/core";
+import { Button } from "./Button";
+import { Callout } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 
@@ -26,9 +27,7 @@ export default function Errors() {
 
   return (
     <ErrorsContainer>
-      <Button large onClick={() => errorsService.deleteAll()}>
-        Clear all error messages
-      </Button>
+      <Button text="Clear all error messages" onClick={() => errorsService.deleteAll()} />
 
       {errors.map((error, i) => (
         <Error key={`error-${i}`} error={error} />

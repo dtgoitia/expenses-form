@@ -1,5 +1,6 @@
+import { Button } from "../Button";
 import FormattedDate from "./FormattedDate";
-import { Button, Dialog } from "@blueprintjs/core";
+import { Dialog } from "@blueprintjs/core";
 import { DatePicker, TimePrecision } from "@blueprintjs/datetime";
 import { useState } from "react";
 import styled from "styled-components";
