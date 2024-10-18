@@ -41,6 +41,14 @@ export const SHORTCUTS: Shortcut[] = [
     seller: "TfL",
     tags: ["transport"],
   },
+  {
+    id: 6,
+    buttonName: "Move",
+    main: "Move money between accounts",
+    people: [],
+    seller: "",
+    tags: [],
+  },
 ];
 
 export const TAGS = [
