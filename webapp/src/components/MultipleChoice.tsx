@@ -185,6 +185,7 @@ export function MultipleChoice({
               className={
                 "px-3 py-3" +
                 " hover:bg-gray-100 dark:hover:bg-gray-800" +
+                " truncate" + // snips long texts and shows an ellipsis
                 " cursor-pointer"
               }
             >
@@ -202,6 +203,7 @@ export function MultipleChoice({
                 className={
                   "py-3 px-5" +
                   " hover:bg-gray-100 dark:hover:bg-gray-800" +
+                  " truncate" + // snips long texts and shows an ellipsis
                   " cursor-pointer"
                 }
               >
