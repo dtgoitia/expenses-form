@@ -19,7 +19,7 @@ function Shortcuts({ data, select }: ShortcutsProps) {
   }
 
   return (
-    <div className="flex flex-row flex-wrap mt-1 mb-2 gap-x-2">
+    <div className="flex flex-row flex-wrap my-2 mb-2 gap-2">
       {data.map((shortcut, i) => (
         <Button
           text={shortcut.buttonName}
