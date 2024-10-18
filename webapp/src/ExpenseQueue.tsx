@@ -1,10 +1,11 @@
+import { Toggle } from "./components/Toggle";
 import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
 import { AppExpense } from "./domain/expenses";
 import { DraftExpense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
-import { Button, Switch } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { Collapse } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";
@@ -164,7 +165,12 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete, app }: P
 
   return (
     <div>
-      <Switch label="deletion mode" onClick={() => toggleDeletionMode()} />
+      <Toggle
+        isOn={inDeletionMode}
+        labelOn="enable deletion mode"
+        labelOff="exit deletion mode"
+        onToggle={() => toggleDeletionMode()}
+      />
 
       {expenses.length > 0 ? (
         expenses.map((appExpense) => {
