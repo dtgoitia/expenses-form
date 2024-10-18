@@ -3,7 +3,7 @@ import { MouseEventHandler } from "react";
 
 interface Props {
   /** Text to show inside the button. */
-  text: string;
+  text?: string;
 
   /** If the button is active or not */
   active?: boolean;
@@ -22,7 +22,8 @@ interface Props {
 }
 
 export function Button({ text, active, disabled, icon, iconSize, onClick }: Props) {
-  const baseCss = "text-sm" + " py-2 px-3" + " rounded" + " inline-flex items-center";
+  const baseCss =
+    "text-sm" + " py-2 px-3" + " rounded" + " inline-flex items-center gap-2";
   const normalCss = " bg-gray-300  dark:bg-gray-600  text-gray-700  dark:text-gray-300"; // not active, not disabled
   const hoverCss =
     " hover:text-gray-100  hover:dark:text-gray-800" +
@@ -51,7 +52,7 @@ export function Button({ text, active, disabled, icon, iconSize, onClick }: Prop
   return (
     <button className={css} disabled={disabled} onClick={onClick}>
       {icon && <Icon icon={icon} {...props} />}
-      <span>{text}</span>
+      {text !== undefined && <span>{text}</span>}
     </button>
   );
 }
