@@ -23,25 +23,29 @@ interface Props {
 
 export function Button({ text, active, disabled, icon, iconSize, onClick }: Props) {
   const baseCss =
-    "text-sm" + " py-2 px-3" + " rounded" + " inline-flex items-center gap-2";
+    "text-sm" +
+    " py-2 px-3" +
+    " rounded" +
+    " inline-flex items-center gap-2" +
+    " focus:outline-none"; // hide "focus" border
   const normalCss = " bg-gray-300  dark:bg-gray-600  text-gray-700  dark:text-gray-300"; // not active, not disabled
-  const hoverCss =
-    " hover:text-gray-100  hover:dark:text-gray-800" +
-    "   hover:bg-gray-400    hover:dark:bg-gray-400";
   const activeCss = " bg-gray-400  dark:bg-gray-400  text-gray-100  dark:text-gray-800";
   const disabledCss = " opacity-50 cursor-not-allowed";
+
+  /**
+   * DO NOT ADD `hover`. On mobile, when you tap and release a button, the focus
+   * of the "mouse" is your last tap. This means that the `hover` styles will be
+   * enabled until the user tap elsewhere, which is not a desired behaviour.
+   */
+
   let css = baseCss;
 
   if (disabled) {
     css += disabledCss;
+  } else if (active) {
+    css += activeCss;
   } else {
-    css += hoverCss;
-
-    if (active) {
-      css += activeCss;
-    } else {
-      css += normalCss;
-    }
+    css += normalCss;
   }
 
   let props = {};
