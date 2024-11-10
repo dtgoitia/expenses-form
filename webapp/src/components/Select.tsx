@@ -50,6 +50,7 @@ export function Select({
     "        dark:border-gray-700 dark:focus:border-blue-300" +
     " rounded" +
     " appearance-none" + // removes chevron
+    " cursor-pointer" +
     " leading-tight focus:outline-none focus:shadow-outline";
 
   if (disabled) {
