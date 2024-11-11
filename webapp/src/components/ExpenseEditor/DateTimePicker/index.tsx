@@ -1,7 +1,8 @@
 import { Button } from "../../Button";
+import { DatePicker } from "../../DateTimePicker/DatePicker";
+import { TimePicker } from "../../DateTimePicker/TimePicker";
 import FormattedDate from "./FormattedDate";
 import { Dialog } from "@blueprintjs/core";
-import { DatePicker, TimePrecision } from "@blueprintjs/datetime";
 import { useState } from "react";
 import styled from "styled-components";
 
@@ -26,7 +27,7 @@ interface Props {
   onChange: (date: Date) => void;
 }
 
-function DateTimePicker({ defaultDate, date, onChange }: Props) {
+function DateTimePicker({ defaultDate, date, onChange: setDate }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
@@ -43,15 +44,10 @@ function DateTimePicker({ defaultDate, date, onChange }: Props) {
           onClose={() => setIsOpen(false)}
         >
           <div className="bp4-dialog-body">
-            <DatePicker
-              value={date}
-              defaultValue={defaultDate}
-              timePrecision={TimePrecision.SECOND}
-              shortcuts={true}
-              highlightCurrentDay={true}
-              timePickerProps={{ showArrowButtons: true }}
-              onChange={onChange}
-            />
+            <div className="flex flex-col gap-8 justify-center align-center pb-4">
+              <DatePicker value={date} defaultValue={defaultDate} onChange={setDate} />
+              <TimePicker value={date} onChange={setDate} />
+            </div>
             <FormattedDateContainer>
               <FormattedDate date={date} />
             </FormattedDateContainer>
