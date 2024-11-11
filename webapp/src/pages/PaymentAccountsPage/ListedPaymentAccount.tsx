@@ -43,7 +43,7 @@ export function ListedPaymentAccount({
           <div
             className={
               "absolute top-2 right-3" +
-              "  text-xs" +
+              " text-xs" +
               " flex justify-end" +
               " z-10" +
               " opacity-50"
