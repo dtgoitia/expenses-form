@@ -16,8 +16,8 @@ export const isoDateTimeFormatter = new Intl.DateTimeFormat(LANGUAGE_SIMILAR_TO_
   second: "2-digit",
 }).format;
 
-function getLocalTimezoneFormatted(): string {
-  const offset = new Date().getTimezoneOffset(); // in minutes
+function getLocalTimezoneFormatted(date: Date): string {
+  const offset = date.getTimezoneOffset(); // in minutes
 
   const sign = offset <= 0 ? "+" : "-";
 
@@ -34,7 +34,7 @@ function getLocalTimezoneFormatted(): string {
  */
 export function dateToLocale(date: Date): DatetimeCustomISOString {
   const naive: string = isoDateTimeFormatter(date);
-  const tz = getLocalTimezoneFormatted();
+  const tz = getLocalTimezoneFormatted(date);
   return `${naive} ${tz}`;
 }
 
