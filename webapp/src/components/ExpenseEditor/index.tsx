@@ -1,18 +1,18 @@
-import { Button } from "../components/Button";
-import { dateToISOLocale, now } from "../datetimeUtils";
-import { App } from "../domain/app";
+import { dateToISOLocale, now } from "../../datetimeUtils";
+import { App } from "../../domain/app";
 import {
   CurrencyCode,
   DatetimeISOString,
   DraftExpense,
   PaymentAccount,
-} from "../domain/model";
-import { Checkbox } from "./Checkbox";
+} from "../../domain/model";
+import { Button } from "../Button";
+import { Checkbox } from "../Checkbox";
+import DescriptionForm from "../Description";
+import { NumericInput } from "../NumericInput";
+import { PaidWithDropdown } from "../PaidWith";
+import { Select } from "../Select";
 import DateTimePicker from "./DateTimePicker";
-import DescriptionForm from "./Description";
-import { NumericInput } from "./NumericInput";
-import { PaidWithDropdown } from "./PaidWith";
-import { Select } from "./Select";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 

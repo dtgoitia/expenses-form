@@ -1,4 +1,4 @@
-import { Button } from "../Button";
+import { Button } from "../../Button";
 import FormattedDate from "./FormattedDate";
 import { Dialog } from "@blueprintjs/core";
 import { DatePicker, TimePrecision } from "@blueprintjs/datetime";
