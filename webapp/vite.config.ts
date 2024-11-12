@@ -41,4 +41,8 @@ export default defineConfig({
     host: true, // expose in LAN
   },
   base: "/expenses-form",
+  test: {
+    environment: "jsdom",
+    globals: true,
+  },
 } as FullConfig);
