@@ -1,4 +1,5 @@
 import { Button } from "./components/Button";
+import { Collapse } from "./components/Collapse";
 import { Toggle } from "./components/Toggle";
 import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
@@ -6,7 +7,6 @@ import { AppExpense } from "./domain/expenses";
 import { DraftExpense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
-import { Collapse } from "@blueprintjs/core";
 import { useState } from "react";
 import styled from "styled-components";
 
