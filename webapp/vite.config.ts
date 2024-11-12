@@ -1,9 +1,16 @@
 import react from "@vitejs/plugin-react-swc";
+import type { UserConfig as ViteConfig } from "vite";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
 import { VitePWA } from "vite-plugin-pwa";
+import type { InlineConfig as VitestConfig } from "vitest";
 
 const port = 3000;
+
+// rationale: https://stackoverflow.com/a/74453402/8038693
+interface FullConfig extends ViteConfig {
+  test: VitestConfig;
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -34,4 +41,4 @@ export default defineConfig({
     host: true, // expose in LAN
   },
   base: "/expenses-form",
-});
+} as FullConfig);
