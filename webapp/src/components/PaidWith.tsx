@@ -2,8 +2,8 @@ import { App } from "../domain/app";
 import { PaymentAccount, PaymentAccountId } from "../domain/model";
 import { PaymentAccountsManager } from "../domain/paymentAccounts";
 import { errorsService } from "../services/errors";
+import { Label } from "./Label";
 import { Option, Select } from "./Select";
-import { Label } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -61,9 +61,13 @@ export function PaidWithDropdown({
 
   return (
     <div>
-      <Label>
-        Paid with:
-        <Select selected={selected} options={options} onSelect={handleAccountSelection} />
+      <Label htmlFor="paid-with" text="Paid with:">
+        <Select
+          id="paid-with"
+          selected={selected}
+          options={options}
+          onSelect={handleAccountSelection}
+        />
       </Label>
     </div>
   );
