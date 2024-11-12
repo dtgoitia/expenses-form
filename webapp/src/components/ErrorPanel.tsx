@@ -1,23 +1,10 @@
 import { ErrorMessage, errorsService } from "../services/errors";
 import { Button } from "./Button";
-import { Callout } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
-import styled from "styled-components";
 
-interface ErrorsProps {
-  error: ErrorMessage;
-}
-
-function Error({ error: { header, description } }: ErrorsProps) {
-  return <Callout title={header}>{description}</Callout>;
-}
-
-const ErrorsContainer = styled.div`
-  margin: 0.2rem;
-`;
-
-export default function Errors() {
+export function ErrorPanel() {
   const [errors, setErrors] = useState<ErrorMessage[]>([]);
+
   useEffect(() => {
     const subscription = errorsService.errorsFeed$.subscribe(setErrors);
     return subscription.unsubscribe;
@@ -26,12 +13,36 @@ export default function Errors() {
   if (!errors || errors.length === 0) return null;
 
   return (
-    <ErrorsContainer>
-      <Button text="Clear all error messages" onClick={() => errorsService.deleteAll()} />
+    <div className="p-3">
+      <div className="flex flex-row justify-end pb-3">
+        <Button
+          text="Clear all error messages"
+          onClick={() => errorsService.deleteAll()}
+        />
+      </div>
 
-      {errors.map((error, i) => (
-        <Error key={`error-${i}`} error={error} />
-      ))}
-    </ErrorsContainer>
+      <div className="flex flex-col gap-2" role="error-list">
+        {errors.map((error, i) => (
+          <Error key={`error-${i}`} error={error} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface ErrorsProps {
+  error: ErrorMessage;
+}
+
+function Error({ error: { header, description } }: ErrorsProps) {
+  return (
+    <div className={"p-3 bg-gray-100 dark:bg-red-800"} role="error">
+      <div className={"font-bold"} role="error-header">
+        {header}
+      </div>
+      <div className={""} role="error-description">
+        {description}
+      </div>
+    </div>
   );
 }

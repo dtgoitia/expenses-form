@@ -1,5 +1,5 @@
 import CenteredPage from "./components/CenteredPage";
-import ErrorPanel from "./components/ErrorPanel";
+import { ErrorPanel } from "./components/ErrorPanel";
 import { FullPage } from "./components/FullPage";
 import NavBar from "./components/NaviBar";
 import { BASE_URL } from "./constants";
