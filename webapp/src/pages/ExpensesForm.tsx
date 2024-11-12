@@ -2,15 +2,14 @@ import ExpenseQueue from "../ExpenseQueue";
 import { Button } from "../components/Button";
 import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
-import ExpenseEditor from "../components/ExpenseEditor";
 import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { AppExpense, AddExpenseArgs } from "../domain/expenses";
-import { DraftExpense, Expense, ExpenseId, PaymentAccount } from "../domain/model";
+import { Expense, ExpenseId, PaymentAccount } from "../domain/model";
 import { unreachable } from "../lib/devex";
 import Paths from "../routes";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { first } from "rxjs";
 
 interface ExpensesFormProps {
@@ -18,10 +17,9 @@ interface ExpensesFormProps {
 }
 
 function ExpensesForm({ app }: ExpensesFormProps) {
+  const navigate = useNavigate();
+
   const [appExpenses, setAppExpenses] = useState<AppExpense[]>([]);
-  const [expenseIdUnderEdition, setExpenseUnderEdition] = useState<ExpenseId | undefined>(
-    undefined
-  );
   const [defaultAccount, setDefaultAccount] = useState<PaymentAccount | undefined>();
 
   useEffect(() => {
@@ -33,12 +31,18 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     setDefaultAccount(app.paymentAccountsManager.getDefault());
     setAppExpenses(app.expenseManager.getAll());
 
-    return subscription.unsubscribe;
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [app]);
+
+  function navigateToExpense(id: ExpenseId): void {
+    navigate(Paths.expenseEditor.replace(":expenseId", id));
+  }
 
   function handleAddExpense(): void {
     app.expenseManager.change$.pipe(first()).subscribe((change) => {
-      setExpenseUnderEdition(change.expenseId);
+      navigateToExpense(change.expenseId);
     });
 
     const defaultAccount = app.paymentAccountsManager.getDefault();
@@ -61,10 +65,6 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     app.expenseManager.add(newExpense);
   }
 
-  function handleStopEditingExpense(): void {
-    setExpenseUnderEdition(undefined);
-  }
-
   function refreshPage() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Location/reload
     // `.reload(true)` is supported in Firefox and Chrome, but it's not standard
@@ -72,20 +72,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     window.location.reload(true);
   }
 
-  function handleOnEditExpense(id: ExpenseId): void {
-    setExpenseUnderEdition(id);
-  }
-
-  function handleExpenseEdition(expense: DraftExpense): void {
-    console.debug(`ExpensesForm::handleExpenseEdition::expense`, expense);
-    app.expenseManager.update(expense);
-  }
-
   const canAddExpense = defaultAccount !== undefined;
-
-  const expenseUnderEdition = expenseIdUnderEdition
-    ? app.expenseManager.get(expenseIdUnderEdition)
-    : undefined;
 
   const publishableExpenses = appExpenses
     .filter((appExpense) => appExpense.readyToPublish)
@@ -94,30 +81,13 @@ function ExpensesForm({ app }: ExpensesFormProps) {
   return (
     <CenteredPage>
       <Button text="reload PWA" icon="rotate" onClick={refreshPage} />
-      {expenseUnderEdition ? (
+      {canAddExpense ? (
         <>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <Button text="Close" onClick={handleStopEditingExpense} />
-          </div>
-          <ExpenseEditor
-            expense={expenseUnderEdition.expense}
-            app={app}
-            update={handleExpenseEdition}
-          />
-        </>
-      ) : (
-        canAddExpense && (
           <div className="flex justify-center items-center p-4" role="warning">
             <div>Add expense or select an existing one</div>
           </div>
-        )
-      )}
-      {expenseUnderEdition ? (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <Button text="Close" onClick={handleStopEditingExpense} />
-        </div>
-      ) : canAddExpense ? (
-        <Button text="Add expense" onClick={handleAddExpense} />
+          <Button text="Add expense" onClick={handleAddExpense} />
+        </>
       ) : (
         <div className="flex justify-center p-4" role="warning">
           <div className="flex flex-col gap-4 items-center">
@@ -139,8 +109,8 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       <div className="mt-4">
         <ExpenseQueue
           expenses={appExpenses}
-          underEdition={expenseIdUnderEdition}
-          onEditExpense={handleOnEditExpense}
+          underEdition={undefined}
+          onEditExpense={navigateToExpense}
           onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
           app={app}
         />
