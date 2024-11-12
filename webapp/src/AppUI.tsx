@@ -10,7 +10,6 @@ import PaymentAccountsPage from "./pages/PaymentAccountsPage";
 import SettingsPage from "./pages/Settings";
 import Paths from "./routes";
 import { DEFAULT_THEME, Theme, ThemeContext } from "./style/ThemeContext";
-import { Spinner } from "@blueprintjs/core";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import styled from "styled-components";
@@ -19,11 +18,6 @@ const navBarHeight = "50px";
 const ScrollableSectionBellowNavBar = styled.div`
   height: calc(100vh - ${navBarHeight});
   overflow-y: scroll;
-`;
-
-const SpinnerText = styled.p`
-  margin: 1rem;
-  font-size: large;
 `;
 
 interface Props {
@@ -46,8 +40,7 @@ function AppUI({ app }: Props) {
       <FullPage.Parent className={DEFAULT_THEME}>
         <FullPage.ContentFullyCentered className={baseCss}>
           <CenteredPage>
-            <Spinner />
-            <SpinnerText>Loading data...</SpinnerText>
+            <div className="flex flex-row justify-center">Loading data...</div>
           </CenteredPage>
         </FullPage.ContentFullyCentered>
       </FullPage.Parent>
