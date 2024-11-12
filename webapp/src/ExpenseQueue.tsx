@@ -165,12 +165,14 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete, app }: P
 
   return (
     <div>
-      <Toggle
-        isOn={inDeletionMode}
-        labelOn="enable deletion mode"
-        labelOff="exit deletion mode"
-        onToggle={() => toggleDeletionMode()}
-      />
+      <div className="flex flex-row justify-end">
+        <Toggle
+          isOn={inDeletionMode}
+          labelOn="enable deletion mode"
+          labelOff="exit deletion mode"
+          onToggle={() => toggleDeletionMode()}
+        />
+      </div>
 
       {expenses.length > 0 ? (
         expenses.map((appExpense) => {
