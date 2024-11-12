@@ -21,4 +21,11 @@ export const GlobalStyle = createGlobalStyle`
   html {
     font-size: 1.2rem;
   }
+
+  body {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
 `;

@@ -1,5 +1,4 @@
 import AppUI from "./AppUI";
-import "./blueprint.css";
 import { App } from "./domain/app";
 import { BrowserStorage } from "./domain/browserstorage";
 import { CurrencyManager } from "./domain/currencies";
