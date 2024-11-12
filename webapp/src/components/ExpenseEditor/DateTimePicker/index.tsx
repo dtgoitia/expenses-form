@@ -1,24 +1,9 @@
 import { Button } from "../../Button";
+import { DatePicker } from "../../DateTimePicker/DatePicker";
+import { TimePicker } from "../../DateTimePicker/TimePicker";
+import { Dialog } from "../../Dialog";
 import FormattedDate from "./FormattedDate";
-import { Dialog } from "@blueprintjs/core";
-import { DatePicker, TimePrecision } from "@blueprintjs/datetime";
 import { useState } from "react";
-import styled from "styled-components";
-
-const Container = styled.div`
-  margin: 1rem;
-`;
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-`;
-
-const FormattedDateContainer = styled.div`
-  background-color: white;
-  padding: 1rem;
-`;
 
 interface Props {
   date: Date;
@@ -26,48 +11,36 @@ interface Props {
   onChange: (date: Date) => void;
 }
 
-function DateTimePicker({ defaultDate, date, onChange }: Props) {
+function DateTimePicker({ defaultDate, date, onChange: setDate }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
+  const rowCss = "flex flex-row flex-nowrap justify-between";
+
   return (
-    <Container className="bp4-text-large">
-      <Row>
+    <div className="m-1">
+      <div className={rowCss}>
         <Dialog
-          title="Select a date"
+          className="p-4 rounded-lg"
           isOpen={isOpen}
-          autoFocus={true}
-          canOutsideClickClose={true}
-          isCloseButtonShown={true}
-          canEscapeKeyClose={true}
-          transitionDuration={0}
-          onClose={() => setIsOpen(false)}
+          onClickOutside={() => setIsOpen(false)}
         >
-          <div className="bp4-dialog-body">
-            <DatePicker
-              value={date}
-              defaultValue={defaultDate}
-              timePrecision={TimePrecision.SECOND}
-              shortcuts={true}
-              highlightCurrentDay={true}
-              timePickerProps={{ showArrowButtons: true }}
-              onChange={onChange}
-            />
-            <FormattedDateContainer>
-              <FormattedDate date={date} />
-            </FormattedDateContainer>
+          <div className="flex flex-col gap-8 justify-center align-center">
+            <DatePicker value={date} defaultValue={defaultDate} onChange={setDate} />
+            <TimePicker value={date} onChange={setDate} />
+            <FormattedDate date={date} />
           </div>
-          <div className="bp4-dialog-footer">Changes are saved automatically</div>
         </Dialog>
-      </Row>
-      <Row>
+      </div>
+
+      <div className={rowCss}>
         <FormattedDate date={date} />
         <Button
           text={isOpen ? "Close" : "Edit time"}
           disabled={isOpen}
           onClick={() => setIsOpen(!isOpen)}
         />
-      </Row>
-    </Container>
+      </div>
+    </div>
   );
 }
 
