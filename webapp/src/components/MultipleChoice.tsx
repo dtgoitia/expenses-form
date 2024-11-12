@@ -105,6 +105,7 @@ export function MultipleChoice({
     const newState = addAndSelectNonexistentChoice({ choice: searchValue, state });
     setState(validateState(newState));
     handleChange([...newState.chosen]);
+    setSearchValue(EMPTY_STRING);
   }
 
   function handleSelectChoice(choice: Choice): void {
@@ -112,12 +113,14 @@ export function MultipleChoice({
     const newState = selectExistingChoice({ choice, state });
     setState(validateState(newState));
     handleChange([...newState.chosen]);
+    setSearchValue(EMPTY_STRING);
   }
 
   function handleUnselectChoice(choice: Choice): void {
     const newState = unselectChoice({ choice, state });
     setState(validateState(newState));
     handleChange([...newState.chosen]);
+    setSearchValue(EMPTY_STRING);
   }
 
   // does user search match any existing option? (case insensitive)
