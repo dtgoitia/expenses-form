@@ -19,6 +19,7 @@ export class App {
   public expenseManager: ExpenseManager;
   public paymentAccountsManager: PaymentAccountsManager;
   public currencyManager: CurrencyManager;
+  public initialized: boolean = false;
 
   private browserStorage: BrowserStorage;
 
@@ -40,26 +41,31 @@ export class App {
 
   public initialize(): void {
     console.debug(`App.initialize::started`);
+    if (this.initialized) {
+      console.debug(`App.initialize::already initialized`);
+    } else {
+      const appExpenses = this.browserStorage.readExpenses();
+      this.expenseManager.initialize({ appExpenses });
 
-    const appExpenses = this.browserStorage.readExpenses();
-    this.expenseManager.initialize({ appExpenses });
+      const currencies = this.browserStorage.readCurrencies();
+      const accounts = this.browserStorage.readPaymentAccounts();
 
-    const currencies = this.browserStorage.readCurrencies();
-    const accounts = this.browserStorage.readPaymentAccounts();
+      this.currencyManager.initialize({
+        currencies: [
+          ...currencies,
+          //
+          // Use currencies in Account too
+          ...accounts.map((account) => account.currency),
+        ],
+      });
 
-    this.currencyManager.initialize({
-      currencies: [
-        ...currencies,
-        //
-        // Use currencies in Account too
-        ...accounts.map((account) => account.currency),
-      ],
-    });
+      this.paymentAccountsManager.initialize({
+        accounts,
+        defaultAccountId: this.browserStorage.readDefaultAccountId(),
+      });
 
-    this.paymentAccountsManager.initialize({
-      accounts,
-      defaultAccountId: this.browserStorage.readDefaultAccountId(),
-    });
+      this.initialized = true;
+    }
     console.debug(`App.initialize::completed`);
   }
 
