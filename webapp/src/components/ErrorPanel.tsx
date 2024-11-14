@@ -7,7 +7,9 @@ export function ErrorPanel() {
 
   useEffect(() => {
     const subscription = errorsService.errorsFeed$.subscribe(setErrors);
-    return subscription.unsubscribe;
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (!errors || errors.length === 0) return null;
