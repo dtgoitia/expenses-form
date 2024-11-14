@@ -1,5 +1,6 @@
 import AppUI from "./AppUI";
 import { App } from "./domain/app";
+import { createRoot } from "react-dom/client";
 import { BrowserStorage } from "./domain/browserstorage";
 import { CurrencyManager } from "./domain/currencies";
 import { ExpenseManager } from "./domain/expenses";
@@ -41,12 +42,20 @@ const app = new App({
   currencyManager,
 });
 
-ReactDOM.render(
+const container = document.getElementById("root");
+if (container === null) {
+  throw new Error(
+    'expected to find an element with `id="root"` to render' +
+      " the React app, but found none"
+  );
+}
+
+const root = createRoot(container);
+root.render(
   <React.StrictMode>
     <GlobalStyle />
     <AppUI app={app} />
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change
