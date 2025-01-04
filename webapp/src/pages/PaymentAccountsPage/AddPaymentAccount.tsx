@@ -28,6 +28,9 @@ export function AddPaymentAccount({
     }
 
     addPaymentAccount({ name, ledgerName, currency });
+    setName(undefined);
+    setLedgerName(undefined);
+    setCurrency(undefined);
   }
 
   const canCreateAccount = name !== undefined && ledgerName !== undefined;
