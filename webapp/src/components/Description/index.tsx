@@ -1,6 +1,6 @@
 import Shortcuts from "../../PredefinedButtons";
 import { DEFAULT_PEOPLE as HARDCODED_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
-import { Person, Seller, ShortcutId, TagName } from "../../domain/model";
+import { PersonName, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
 import { Choice, MultipleChoice } from "../MultipleChoice";
 import { TextInput } from "../TextInput";
@@ -38,7 +38,7 @@ export function descriptionToString({ main, people, seller, tags }: Description)
 
 export interface Description {
   main: string | undefined;
-  people: Person[]; // TODO: make a Set
+  people: PersonName[]; // TODO: make a Set
   seller: Seller | undefined;
   tags: TagName[]; // TODO: make a Set
 }
@@ -48,7 +48,7 @@ export function stringToDescription({ raw }: { raw: string }): Description {
   let main: string | undefined = undefined;
   let tags: TagName[] = [];
   let rawPeople: string | undefined = undefined;
-  let people: Person[] = [];
+  let people: PersonName[] = [];
 
   if (reminder.startsWith("#")) {
     // user added tags first, without adding anything else to the description
@@ -90,7 +90,10 @@ const tagsInSettings = storage.tripTags.read() || [];
 const availableTags: TagName[] = mergeStringLists([TAGS, tagsInSettings]);
 
 const peopleInSettings = storage.people.read() || [];
-const defaultPeople: Person[] = mergeStringLists([HARDCODED_PEOPLE, peopleInSettings]);
+const defaultPeople: PersonName[] = mergeStringLists([
+  HARDCODED_PEOPLE,
+  peopleInSettings,
+]);
 
 function mergeStringLists(listOfStringLists: string[][]): string[] {
   /**
@@ -112,8 +115,8 @@ function mergeStringLists(listOfStringLists: string[][]): string[] {
 function DescriptionForm({ description: raw, onChange: update }: DescriptionProps) {
   const description = stringToDescription({ raw });
 
-  const [peopleAddedByUser, setPeopleAddedByUser] = useState<Person[]>([]);
-  const selectablePeople: Person[] = getSelectablePeople({
+  const [peopleAddedByUser, setPeopleAddedByUser] = useState<PersonName[]>([]);
+  const selectablePeople: PersonName[] = getSelectablePeople({
     inSettings: defaultPeople,
     addedByUser: peopleAddedByUser, // TODO: add these to Settings
     inExpense: description.people,
@@ -128,7 +131,7 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
   }
 
   function handlePeopleChange(value: Choice[]): void {
-    const selectedPeople: Person[] = value;
+    const selectedPeople: PersonName[] = value;
     if (!selectedPeople) {
       return;
     }
@@ -211,11 +214,11 @@ function getSelectablePeople({
   addedByUser,
   inExpense,
 }: {
-  inSettings: Person[];
-  addedByUser: Person[];
-  inExpense: Person[];
+  inSettings: PersonName[];
+  addedByUser: PersonName[];
+  inExpense: PersonName[];
 }) {
-  const seen = new Set<Person>([...inSettings, ...addedByUser, ...inExpense]);
-  const result: Person[] = [...seen.values()].sort();
+  const seen = new Set<PersonName>([...inSettings, ...addedByUser, ...inExpense]);
+  const result: PersonName[] = [...seen.values()].sort();
   return result;
 }

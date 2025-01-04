@@ -1,3 +1,4 @@
+import { assertNever } from "../exhaustive-match";
 import { Storage } from "../localStorage";
 import {
   AppExpense,
@@ -7,8 +8,15 @@ import {
   ExpenseStatus,
   ExpenseUpdated,
 } from "./expenses";
-import { CurrencyCode, ExpenseId, PaymentAccount, PaymentAccountId } from "./model";
+import {
+  CurrencyCode,
+  ExpenseId,
+  PaymentAccount,
+  PaymentAccountId,
+  PersonName,
+} from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
+import { PeopleManager } from "./people";
 
 type GenericObject = { [key: string]: any };
 
@@ -16,17 +24,25 @@ interface BrowserStorageParams {
   client: Storage;
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
+  peopleManager: PeopleManager;
 }
 
 export class BrowserStorage {
   private client: Storage;
   private expenseManager: ExpenseManager;
   private paymentAccountsManager: PaymentAccountsManager;
+  private peopleManager: PeopleManager;
 
-  constructor({ expenseManager, paymentAccountsManager, client }: BrowserStorageParams) {
+  constructor({
+    client,
+    expenseManager,
+    paymentAccountsManager,
+    peopleManager,
+  }: BrowserStorageParams) {
     this.client = client;
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
+    this.peopleManager = peopleManager;
 
     this.expenseManager.change$.subscribe((change) => {
       console.debug(`BrowserStorage.expenseManager.changes: ${change}`);
@@ -53,6 +69,20 @@ export class BrowserStorage {
           return this.persistAllPaymentAccounts();
         case "PaymentAccountDeleted":
           return this.persistAllPaymentAccounts();
+      }
+    });
+
+    this.peopleManager.change$.subscribe((change) => {
+      console.debug(`BrowserStorage.peopleManager.change$:`, change);
+      switch (change.kind) {
+        case "PeopleManagerInitialized":
+          return;
+        case "PersonAdded":
+          return this.persistAllPeople();
+        case "PersonDeleted":
+          return this.persistAllPeople();
+        default:
+          assertNever(change, `unsupported PeopleChange: ${change}`);
       }
     });
   }
@@ -115,6 +145,13 @@ export class BrowserStorage {
     return id;
   }
 
+  public readPeople(): PersonName[] {
+    console.debug(`BrowserStorage.readPeople()`);
+    const raw: any[] = this.client.people.read() || [];
+    const names: PersonName[] = raw;
+    return names;
+  }
+
   public setDefaultAccountId({ id }: { id: PaymentAccountId }): void {
     console.debug(`${BrowserStorage.name}.${this.setDefaultAccountId.name}()`);
     this.client.defaultPaymentAccountId.set(id);
@@ -152,5 +189,10 @@ export class BrowserStorage {
   private persistAllPaymentAccounts(): void {
     const accounts = this.paymentAccountsManager.getAll();
     this.client.paymentAccounts.set(accounts);
+  }
+
+  private persistAllPeople(): void {
+    const personNames = this.peopleManager.getAll().map((person) => person.name);
+    this.client.people.set(personNames);
   }
 }

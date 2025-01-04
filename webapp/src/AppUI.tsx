@@ -8,7 +8,7 @@ import { ExpenseEditorPage } from "./pages/ExpenseEditorPage";
 import ExpensesForm from "./pages/ExpensesForm";
 import PageNotFound from "./pages/PageNotFound";
 import PaymentAccountsPage from "./pages/PaymentAccountsPage";
-import SettingsPage from "./pages/Settings";
+import { SettingsPage } from "./pages/SettingsPage";
 import Paths from "./routes";
 import { DEFAULT_THEME, Theme, ThemeContext } from "./style/ThemeContext";
 import { useEffect, useState } from "react";
@@ -66,7 +66,7 @@ function AppUI({ app }: Props) {
                   path={Paths.paymentAccounts}
                   element={<PaymentAccountsPage app={app} />}
                 />
-                <Route path={Paths.settings} element={<SettingsPage />} />
+                <Route path={Paths.settings} element={<SettingsPage app={app} />} />
                 <Route path={Paths.notFound} element={<PageNotFound />} />
               </Routes>
             </ScrollableSectionBellowNavBar>

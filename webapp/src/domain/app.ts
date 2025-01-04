@@ -7,18 +7,21 @@ import {
   PaymentAccountChanges as PaymentAccountChange,
   PaymentAccountsManager,
 } from "./paymentAccounts";
+import { PeopleManager } from "./people";
 
 interface Props {
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
   browserStorage: BrowserStorage;
   currencyManager: CurrencyManager;
+  peopleManager: PeopleManager;
 }
 
 export class App {
   public expenseManager: ExpenseManager;
   public paymentAccountsManager: PaymentAccountsManager;
   public currencyManager: CurrencyManager;
+  public peopleManager: PeopleManager;
   public initialized: boolean = false;
 
   private browserStorage: BrowserStorage;
@@ -28,11 +31,13 @@ export class App {
     paymentAccountsManager,
     browserStorage,
     currencyManager,
+    peopleManager,
   }: Props) {
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
     this.browserStorage = browserStorage;
     this.currencyManager = currencyManager;
+    this.peopleManager = peopleManager;
 
     this.paymentAccountsManager.change$.subscribe((change) =>
       this.handlePaymentAccountChange(change)
@@ -63,6 +68,8 @@ export class App {
         accounts,
         defaultAccountId: this.browserStorage.readDefaultAccountId(),
       });
+
+      this.peopleManager.initialize({ people: this.browserStorage.readPeople() });
 
       this.initialized = true;
     }

@@ -55,7 +55,11 @@ export type ShortcutId = number;
 
 export type Seller = string;
 
-export type Person = string;
+export type PersonName = string;
+
+export interface Person {
+  name: PersonName;
+}
 
 export type TagName = string; // TODO: make every piece of code point here
 
@@ -63,7 +67,7 @@ export interface Shortcut {
   id: ShortcutId;
   buttonName: string;
   main: string;
-  people: Person[];
+  people: PersonName[];
   seller: Seller;
   tags: TagName[];
 }

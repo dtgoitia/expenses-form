@@ -1,8 +1,10 @@
-import CenteredPage from "../components/CenteredPage";
-import { Label } from "../components/Label";
-import { TextInput } from "../components/TextInput";
-import storage from "../localStorage";
+import CenteredPage from "../../components/CenteredPage";
+import { Label } from "../../components/Label";
+import { TextInput } from "../../components/TextInput";
+import { App } from "../../domain/app";
+import storage from "../../localStorage";
 import { useEffect, useState } from "react";
+import { PeopleForm } from "./PeopleForm";
 
 function listToInputField(items: string[]): string {
   return items.join(",");
@@ -18,10 +20,13 @@ function inputFieldToList(inputValue: string): string[] {
   return items;
 }
 
-function SettingsPage() {
+interface Props {
+  app: App;
+}
+
+export function SettingsPage({ app }: Props) {
   const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
-  const [people, setPeople] = useState<string | undefined>(undefined);
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
   const [currencies, setCurrencies] = useState<string | undefined>();
 
@@ -31,9 +36,6 @@ function SettingsPage() {
     }
     if (storage.tripTags.exists()) {
       setTripTags(listToInputField(storage.tripTags.read() as string[]));
-    }
-    if (storage.people.exists()) {
-      setPeople(listToInputField(storage.people.read() as string[]));
     }
     if (storage.firestoreConfig.exists()) {
       const config = storage.firestoreConfig.read();
@@ -66,19 +68,6 @@ function SettingsPage() {
 
     const tags = inputFieldToList(value);
     storage.tripTags.set(tags);
-  }
-
-  function handlePeopleChange(value: string | undefined): void {
-    if (value === undefined || value === "") {
-      setPeople(undefined);
-      storage.people.delete();
-      return;
-    }
-
-    setPeople(value.replaceAll(",,", ",").trim());
-
-    const peopleNames = inputFieldToList(value);
-    storage.people.set(peopleNames);
   }
 
   function handleFirestoreConfigChange(value: string | undefined): void {
@@ -127,16 +116,6 @@ function SettingsPage() {
           />
         </Label>
 
-        <Label htmlFor="people" text="People">
-          <TextInput
-            id="people"
-            value={people}
-            placeholder="JohnDoe,JaneDoe"
-            onChange={handlePeopleChange}
-            className="mt-1"
-          />
-        </Label>
-
         <Label htmlFor="firestore-config" text="Firestore config">
           <TextInput
             id="firestore-config"
@@ -157,9 +136,9 @@ function SettingsPage() {
             className="mt-1"
           />
         </Label>
+
+        <PeopleForm app={app} />
       </div>
     </CenteredPage>
   );
 }
-
-export default SettingsPage;

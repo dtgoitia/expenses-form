@@ -1,6 +1,7 @@
 import AppUI from "./AppUI";
 import { App } from "./domain/app";
 import { createRoot } from "react-dom/client";
+import { PeopleManager } from "./domain/people";
 import { BrowserStorage } from "./domain/browserstorage";
 import { CurrencyManager } from "./domain/currencies";
 import { ExpenseManager } from "./domain/expenses";
@@ -28,10 +29,12 @@ const updateSW = registerSW({
 
 const expenseManager = new ExpenseManager();
 const paymentAccountsManager = new PaymentAccountsManager();
+const peopleManager = new PeopleManager();
 const browserStorage = new BrowserStorage({
   expenseManager,
   paymentAccountsManager,
   client: new Storage(),
+  peopleManager,
 });
 const currencyManager = new CurrencyManager();
 
@@ -40,6 +43,7 @@ const app = new App({
   expenseManager,
   paymentAccountsManager,
   currencyManager,
+  peopleManager,
 });
 
 const container = document.getElementById("root");
