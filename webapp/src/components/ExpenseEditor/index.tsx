@@ -5,10 +5,11 @@ import {
   DatetimeISOString,
   DraftExpense,
   PaymentAccount,
+  PersonName,
 } from "../../domain/model";
 import { Button } from "../Button";
 import { Checkbox } from "../Checkbox";
-import DescriptionForm from "../Description";
+import { DescriptionForm } from "../Description";
 import { NumericInput } from "../NumericInput";
 import { PaidWithDropdown } from "../PaidWith";
 import { Select } from "../Select";
@@ -39,6 +40,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   );
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
   const [account, setAccount] = useState<PaymentAccount | undefined>();
+  const [people, setPeople] = useState<PersonName[]>([]);
 
   useEffect(() => {
     const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
@@ -47,13 +49,18 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     const currenciesSubscription = app.currencyManager.change$.subscribe((_) => {
       setCurrencies(app.currencyManager.getAll());
     });
+    const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
+      setPeople(app.peopleManager.getAll().map((person) => person.name));
+    });
 
     setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
     setCurrencies(app.currencyManager.getAll());
+    setPeople(app.peopleManager.getAll().map((person) => person.name));
 
     return () => {
       accountsSubscription.unsubscribe();
       currenciesSubscription.unsubscribe();
+      peopleSubscription.unsubscribe();
     };
   }, [app, expense.paid_with]);
 
@@ -220,6 +227,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
 
       <DescriptionForm
         description={expense.description}
+        peopleInSettings={people}
         onChange={handleDescriptionChange}
       />
 

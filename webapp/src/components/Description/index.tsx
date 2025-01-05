@@ -1,5 +1,5 @@
 import Shortcuts from "../../PredefinedButtons";
-import { DEFAULT_PEOPLE as HARDCODED_PEOPLE, SHORTCUTS, TAGS } from "../../constants";
+import { SHORTCUTS, TAGS } from "../../constants";
 import { PersonName, Seller, ShortcutId, TagName } from "../../domain/model";
 import storage from "../../localStorage";
 import { Choice, MultipleChoice } from "../MultipleChoice";
@@ -9,6 +9,7 @@ import { useState } from "react";
 
 interface DescriptionProps {
   description: string;
+  peopleInSettings: PersonName[];
   onChange: (description: string) => void;
 }
 
@@ -89,12 +90,6 @@ export function stringToDescription({ raw }: { raw: string }): Description {
 const tagsInSettings = storage.tripTags.read() || [];
 const availableTags: TagName[] = mergeStringLists([TAGS, tagsInSettings]);
 
-const peopleInSettings = storage.people.read() || [];
-const defaultPeople: PersonName[] = mergeStringLists([
-  HARDCODED_PEOPLE,
-  peopleInSettings,
-]);
-
 function mergeStringLists(listOfStringLists: string[][]): string[] {
   /**
    * Return a list of unique strings. The order is preserved - items of the first list
@@ -112,12 +107,16 @@ function mergeStringLists(listOfStringLists: string[][]): string[] {
   return result;
 }
 
-function DescriptionForm({ description: raw, onChange: update }: DescriptionProps) {
+export function DescriptionForm({
+  description: raw,
+  peopleInSettings,
+  onChange: update,
+}: DescriptionProps) {
   const description = stringToDescription({ raw });
 
   const [peopleAddedByUser, setPeopleAddedByUser] = useState<PersonName[]>([]);
   const selectablePeople: PersonName[] = getSelectablePeople({
-    inSettings: defaultPeople,
+    inSettings: peopleInSettings,
     addedByUser: peopleAddedByUser, // TODO: add these to Settings
     inExpense: description.people,
   });
@@ -203,8 +202,6 @@ function DescriptionForm({ description: raw, onChange: update }: DescriptionProp
     </div>
   );
 }
-
-export default DescriptionForm;
 
 /**
  * Ensure there are no duplicates

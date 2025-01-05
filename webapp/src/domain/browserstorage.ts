@@ -13,7 +13,7 @@ import {
   ExpenseId,
   PaymentAccount,
   PaymentAccountId,
-  PersonName,
+  Person,
 } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 import { PeopleManager } from "./people";
@@ -145,11 +145,19 @@ export class BrowserStorage {
     return id;
   }
 
-  public readPeople(): PersonName[] {
+  public readPeople(): Person[] {
     console.debug(`BrowserStorage.readPeople()`);
     const raw: any[] = this.client.people.read() || [];
-    const names: PersonName[] = raw;
-    return names;
+    const people: Person[] = [];
+    for (const storedItem of raw) {
+      const person: Person = {
+        name: storedItem.name,
+        splitwiseId: storedItem.splitwiseId,
+      };
+      people.push(person);
+    }
+
+    return people;
   }
 
   public setDefaultAccountId({ id }: { id: PaymentAccountId }): void {
@@ -192,7 +200,7 @@ export class BrowserStorage {
   }
 
   private persistAllPeople(): void {
-    const personNames = this.peopleManager.getAll().map((person) => person.name);
-    this.client.people.set(personNames);
+    const people = this.peopleManager.getAll();
+    this.client.people.set(people);
   }
 }

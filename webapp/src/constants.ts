@@ -65,5 +65,4 @@ export const TAGS = [
   "home",
 ];
 
-export const DEFAULT_PEOPLE = ["AngelaPerez"];
 export const BASE_URL = "expenses-form"; // must match "homepage" field in package.json

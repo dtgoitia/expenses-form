@@ -14,19 +14,16 @@ export class PeopleManager {
     this.change$ = this.changesSubject.asObservable();
   }
 
-  public initialize({ people }: { people: PersonName[] }): void {
+  public initialize({ people }: { people: Person[] }): void {
     console.debug(`PeopleManager.initialize:: initializing people:`, people);
     const TO_DISCARD = [undefined, null, "", " "];
 
-    for (const item of people) {
-      if (TO_DISCARD.includes(item)) {
+    for (const person of people) {
+      if (TO_DISCARD.includes(person.name)) {
         continue;
       }
 
-      const name: PersonName = item;
-      const person: Person = { name: item };
-
-      this.people.set(name, person);
+      this.people.set(person.name, person);
     }
 
     this.changesSubject.next({ kind: "PeopleManagerInitialized" });

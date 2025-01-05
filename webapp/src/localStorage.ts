@@ -81,7 +81,7 @@ class StoredItem<T> {
 export class Storage {
   splitwiseApiToken: StoredItem<string | undefined>;
   tripTags: StoredItem<string[] | undefined>;
-  people: StoredItem<string[] | undefined>;
+  people: StoredItem<object[] | undefined>;
   expenses: StoredItem<object | undefined>;
   paymentAccounts: StoredItem<object[] | undefined>;
   defaultPaymentAccountId: StoredItem<string | undefined>;
