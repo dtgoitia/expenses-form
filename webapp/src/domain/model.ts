@@ -59,6 +59,7 @@ export type PersonName = string;
 
 export interface Person {
   name: PersonName;
+  splitwiseId?: SplitwiseId;
 }
 
 export type TagName = string; // TODO: make every piece of code point here
@@ -71,3 +72,5 @@ export interface Shortcut {
   seller: Seller;
   tags: TagName[];
 }
+
+export type SplitwiseId = string;
