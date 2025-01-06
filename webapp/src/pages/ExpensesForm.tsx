@@ -60,6 +60,7 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       shared: false,
       pending: true,
       paid_with: defaultAccount.id,
+      splits: [],
     };
 
     app.expenseManager.add(newExpense);

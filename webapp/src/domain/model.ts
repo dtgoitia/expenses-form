@@ -17,10 +17,17 @@ export interface Expense {
   paid_with: PaymentAccountId;
   shared: boolean;
   pending: boolean;
+  splits: Split[];
 }
 
 export interface DraftExpense extends Omit<Expense, "amount"> {
   amount: number | undefined;
+}
+
+export interface Split {
+  person: PersonName;
+  owed: number;
+  paid: number;
 }
 
 export type AccountId = number;

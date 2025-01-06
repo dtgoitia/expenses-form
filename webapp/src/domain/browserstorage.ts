@@ -106,6 +106,7 @@ export class BrowserStorage {
           paid_with: storedItem.expense.paid_with,
           shared: storedItem.expense.shared,
           pending: storedItem.expense.pending,
+          splits: storedItem.expense.splits,
         },
         status: ExpenseStatus[storedItem.status as keyof typeof ExpenseStatus],
         readyToPublish: storedItem.readyToPublish,
