@@ -79,6 +79,8 @@ export class BrowserStorage {
           return;
         case "PersonAdded":
           return this.persistAllPeople();
+        case "PersonUpdated":
+          return this.persistAllPeople();
         case "PersonDeleted":
           return this.persistAllPeople();
         default:

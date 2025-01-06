@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { App } from "../../domain/app";
-import { Person, PersonName } from "../../domain/model";
+import { Person, PersonName, SplitwiseId } from "../../domain/model";
 import { Button } from "../../components/Button";
 import { Label } from "../../components/Label";
 import { TextInput } from "../../components/TextInput";
+import { Collapse } from "../../components/Collapse";
 
 interface Props {
   app: App;
@@ -41,12 +42,15 @@ export function PeopleForm({ app }: Props) {
     setDraft(undefined);
   }
 
+  function handlePersonUpdate(person: Person): void {
+    app.peopleManager.update({ person });
+  }
   function handlePersonDeletion(name: PersonName): void {
     app.peopleManager.delete(name);
   }
 
   return (
-    <Label htmlFor="add-person" text="People">
+    <Label htmlFor="people" text="People">
       <div role="people-form" className="pt-2 px-2">
         {people.length === 0 ? (
           <div>No people found</div>
@@ -56,6 +60,7 @@ export function PeopleForm({ app }: Props) {
               <ListedPerson
                 key={`person-${person.name}`}
                 person={person}
+                onUpdate={handlePersonUpdate}
                 onDelete={handlePersonDeletion}
               />
             ))}
@@ -84,22 +89,57 @@ export function PeopleForm({ app }: Props) {
 
 interface ListedPersonProps {
   person: Person;
+  onUpdate: (person: Person) => void;
   onDelete: (name: PersonName) => void;
 }
-function ListedPerson({ person, onDelete }: ListedPersonProps) {
+function ListedPerson({ person, onUpdate, onDelete }: ListedPersonProps) {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [splitwiseId, setSplitwiseId] = useState<SplitwiseId | undefined>(
+    person.splitwiseId
+  );
+
+  const dirty = splitwiseId !== person.splitwiseId;
+
+  function toggleOpen(): void {
+    setIsOpen(!isOpen);
+  }
+
+  function saveSplitwiseId(): void {
+    if (dirty === false) {
+      return;
+    }
+
+    onUpdate({ ...person, splitwiseId });
+  }
+
   return (
-    <div
-      role="person"
-      className={
-        "flex flex-row justify-between items-center gap-2" +
-        " px-4 py-3" +
-        " text-gray-700  dark:text-gray-200" +
-        "   bg-gray-100    dark:bg-gray-700" +
-        " rounded"
-      }
-    >
-      <div role="person-name">{person.name}</div>
-      <Button icon="bin" onClick={() => onDelete(person.name)} />
+    <div role="person">
+      <div
+        className={
+          "flex flex-row items-center gap-2" +
+          " px-4 py-3" +
+          " text-gray-700  dark:text-gray-200" +
+          "   bg-gray-100    dark:bg-gray-700" +
+          " rounded"
+        }
+      >
+        <Button icon="pencil" onClick={toggleOpen} />
+        <div role="person-name" className="w-full">
+          {person.name}
+        </div>
+        <Button icon="bin" onClick={() => onDelete(person.name)} />
+      </div>
+      <Collapse isOpen={isOpen}>
+        <div className="flex flex-row items-center gap-2 pl-6 pt-1 pr-2 pb-4">
+          <Button icon="rotate" disabled={dirty === false} onClick={saveSplitwiseId} />
+          <TextInput
+            id="splitwise-id"
+            value={splitwiseId}
+            placeholder="Splitwise ID"
+            onChange={setSplitwiseId}
+          />
+        </div>
+      </Collapse>
     </div>
   );
 }

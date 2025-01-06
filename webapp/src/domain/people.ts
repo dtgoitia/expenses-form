@@ -44,6 +44,27 @@ export class PeopleManager {
     this.changesSubject.next({ kind: "PersonAdded", name });
   }
 
+  public update({
+    person,
+  }: {
+    person: Person;
+  }): { success: true } | { success: false; reason: string } {
+    const name = person.name;
+    const previous = this.people.get(name);
+    if (previous === undefined) {
+      return { success: false, reason: `person '${name}' not found` };
+    }
+
+    if (previous.splitwiseId === person.splitwiseId) {
+      return { success: false, reason: `person '${name}' is already up to date` };
+    }
+
+    this.people.set(name, person);
+    this.changesSubject.next({ kind: "PersonUpdated", name });
+
+    return { success: true };
+  }
+
   public delete(name: PersonName): void {
     const removed = this.people.delete(name);
 
@@ -61,6 +82,7 @@ export class PeopleManager {
 export type PeopleChanges =
   | { kind: "PeopleManagerInitialized" }
   | { kind: "PersonAdded"; name: PersonName }
+  | { kind: "PersonUpdated"; name: PersonName }
   | { kind: "PersonDeleted"; name: PersonName };
 
 function sortPerson(a: Person, b: Person): SortAction {
