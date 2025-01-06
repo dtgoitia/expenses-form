@@ -6,29 +6,41 @@ const EMPTY_STRING = "";
 export type Choice = string;
 
 interface Props {
+  id?: string;
   /** Currently selected choices. */
   value: Choice[];
   placeholder?: string;
   /** All possible choices. */
   choices: Choice[];
   onChange: (selected: Choice[]) => void;
+  /** If `true`, allow user to create a new choice when no choices match the query. */
+  allowChoiceCreation?: boolean;
   className?: string;
 }
 
 export function MultipleChoice({
+  id,
   value,
   placeholder,
   choices,
   onChange: handleChange,
+  allowChoiceCreation: maybeAllowChoiceCreation,
   className,
 }: Props) {
-  const toChoose: Choice[] = choices.filter((choice) => !value.includes(choice));
+  const allowChoiceCreation =
+    maybeAllowChoiceCreation === undefined ? true : maybeAllowChoiceCreation;
 
-  const [state, setState] = useState<State>(
-    validateState({ chosen: value, toChoose, all: choices })
-  );
   const [searchValue, setSearchValue] = useState<string>(EMPTY_STRING);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const notChosen: Choice[] = choices.filter((choice) => !value.includes(choice));
+  const toChoose: Choice[] = notChosen.filter((choice) =>
+    choice.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
+  const [state, setState] = useState<State>(
+    validateState({ chosen: value, notChosen, toChoose, all: choices })
+  );
 
   // the outermost DOM element of the component - used to determine if the user
   // has clicked outside of the component
@@ -124,13 +136,9 @@ export function MultipleChoice({
   }
 
   // does user search match any existing option? (case insensitive)
-  const matched = choices
-    .map((choice) => choice.toLowerCase())
-    .includes(searchValue.toLowerCase());
 
   const isSearching = ![EMPTY_STRING, undefined].includes(searchValue);
-
-  const offerChoiceCreation = isSearching && !matched;
+  const noChoicesMatched = isSearching && toChoose.length === 0;
 
   // hide input placeholder if any items are selected
   const smartPlaceholder = value.length > 0 ? undefined : placeholder;
@@ -162,6 +170,7 @@ export function MultipleChoice({
           </div>
         ))}
         <input
+          id={id}
           type="search"
           className={searchBoxCss}
           value={searchValue === undefined ? EMPTY_STRING : searchValue}
@@ -185,22 +194,35 @@ export function MultipleChoice({
             " z-10 dark:z-10"
           }
         >
-          {offerChoiceCreation && (
-            <div
-              role="create-choice"
-              onClick={handleCreateAndSelectChoice}
-              className={
-                "px-3 py-3" +
-                " hover:bg-gray-100 dark:hover:bg-gray-800" +
-                " truncate" + // snips long texts and shows an ellipsis
-                " cursor-pointer"
-              }
-            >
-              Add &nbsp; <b>{searchValue}</b>
-            </div>
-          )}
+          {noChoicesMatched ? (
+            allowChoiceCreation ? (
+              <div
+                role="create-choice"
+                onClick={handleCreateAndSelectChoice}
+                className={
+                  "px-3 py-3" +
+                  " hover:bg-gray-100 dark:hover:bg-gray-800" +
+                  " truncate" + // snips long texts and shows an ellipsis
+                  " cursor-pointer"
+                }
+              >
+                Add &nbsp; <b>{searchValue}</b>
+              </div>
+            ) : (
+              <div
+                role="choices-not-found"
+                className={
+                  "px-3 py-3" +
+                  " text-gray-800  dark:text-gray-200" +
+                  "    bg-red-200     dark:bg-red-500"
+                }
+              >
+                Not found
+              </div>
+            )
+          ) : null}
 
-          {toChoose
+          {notChosen
             .filter((choice) => choice.toLowerCase().includes(searchValue.toLowerCase()))
             .map((choice, i) => (
               <div
@@ -224,8 +246,9 @@ export function MultipleChoice({
 }
 
 interface State {
-  chosen: Choice[];
-  toChoose: Choice[];
+  chosen: Choice[]; // items selected by user
+  notChosen: Choice[]; // all - chosen
+  toChoose: Choice[]; // notChosen items that match user's query
   all: Choice[];
 }
 
@@ -235,15 +258,15 @@ interface State {
  */
 function validateState(state: State): State {
   const chosen = new Set<Choice>(state.chosen);
-  const toChoose = new Set<Choice>(state.toChoose);
+  const notChosen = new Set<Choice>(state.notChosen);
   const all = new Set<Choice>(state.all);
 
-  // `chosen` and `toChoose` must not overlap
-  const intersection = intersect(chosen, toChoose);
+  // `chosen` and `notChosen` must not overlap
+  const intersection = intersect(chosen, notChosen);
   if (intersection.size > 0) {
     throw unreachable(
       `invalid state: a choice must only appear in either 'chosen' or` +
-        ` 'toChoose' collections, but the following choices appear in both: ` +
+        ` 'notChosen' collections, but the following choices appear in both: ` +
         [...intersection]
           .map((choice) => `'${choice}'`)
           .sort()
@@ -251,16 +274,16 @@ function validateState(state: State): State {
     );
   }
 
-  // `all` = `chosen` + `toChoose`
+  // `all` = `chosen` + `notChosen`
   const errors: string[] = [];
   const { inAButNotInB: extraInAll, inBButNotInA: missingInAll } = assessSetOverlap({
     a: all,
-    b: union(chosen, toChoose),
+    b: union(chosen, notChosen),
   });
   if (extraInAll.size > 0) {
     errors.push(
       `every choice in the 'all' collection must appear in either 'chosen' or,` +
-        ` 'toChoose' collections but these do not: ` +
+        ` 'notChosen' collections but these do not: ` +
         [...extraInAll]
           .map((choice) => `'${choice}'`)
           .sort()
@@ -269,7 +292,7 @@ function validateState(state: State): State {
   }
   if (missingInAll.size > 0) {
     errors.push(
-      `every choice in the 'chosen' and 'toChoose' collections must appear in` +
+      `every choice in the 'chosen' and 'notChosen' collections must appear in` +
         ` the 'all' collection, but these do not: ` +
         [...missingInAll]
           .map((choice) => `'${choice}'`)
@@ -296,8 +319,9 @@ function addAndSelectNonexistentChoice({
   state: State;
 }): State {
   return {
+    toChoose: [...state.toChoose],
     chosen: [...state.chosen, choice],
-    toChoose: state.toChoose.filter((c) => c !== choice),
+    notChosen: state.notChosen.filter((c) => c !== choice),
     all: [...state.all, choice],
   };
 }
@@ -309,16 +333,18 @@ function selectExistingChoice({
   state: State;
 }): State {
   return {
+    toChoose: [...state.toChoose],
     chosen: [...state.chosen, choice],
-    toChoose: state.toChoose.filter((c) => c !== choice),
+    notChosen: state.notChosen.filter((c) => c !== choice),
     all: state.all,
   };
 }
 
 function unselectChoice({ choice, state }: { choice: Choice; state: State }): State {
   return {
+    toChoose: [...state.toChoose],
     chosen: state.chosen.filter((c) => c !== choice),
-    toChoose: [...state.toChoose, choice],
+    notChosen: [...state.notChosen, choice],
     all: state.all,
   };
 }

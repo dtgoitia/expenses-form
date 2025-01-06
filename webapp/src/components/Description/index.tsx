@@ -191,6 +191,7 @@ export function DescriptionForm({
           value={description.people}
           choices={selectablePeople}
           onChange={handlePeopleChange}
+          allowChoiceCreation={true}
         />
       </div>
 
