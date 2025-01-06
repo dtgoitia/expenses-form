@@ -31,7 +31,7 @@ export function MultipleChoice({
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // the outermost DOM element of the component - used to determine if the user
-  // has clicked outside of the compoment
+  // has clicked outside of the component
   const ref = useRef(null);
 
   let containerCss =
