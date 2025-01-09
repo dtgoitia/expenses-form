@@ -1,7 +1,9 @@
+import { parseAsNumber } from "../lib/number";
+
 interface Props {
   value?: number;
   placeholder?: string;
-  onChange: (value: string | undefined) => void;
+  onChange: (value: number | undefined) => void;
   className?: string;
 }
 
@@ -21,24 +23,28 @@ export function NumericInput({ value, placeholder, onChange: change, className }
     css += ` ${className}`;
   }
 
+  function handleChange(raw: string | undefined): void {
+    if (raw === "" || raw === undefined || raw === null) {
+      change(undefined);
+      return;
+    }
+
+    const parsed = parseAsNumber(raw);
+    if (!parsed.isNumber) {
+      return;
+    }
+
+    change(parsed.value);
+  }
+
   return (
     <input
       type="number"
+      pattern="[0-9]*"
       className={css}
       value={value === undefined ? "" : value}
       placeholder={placeholder === undefined ? "" : placeholder}
-      onChange={(event) => {
-        const raw = event.target.value;
-        if (raw === "") {
-          change(undefined);
-        } else {
-          change(raw);
-        }
-      }}
+      onChange={(event) => handleChange(event.target.value)}
     />
   );
-}
-
-function isNumeric(x: unknown): boolean {
-  return isNaN(Number(x));
 }
