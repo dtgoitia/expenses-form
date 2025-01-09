@@ -45,7 +45,7 @@ export class BrowserStorage {
     this.peopleManager = peopleManager;
 
     this.expenseManager.change$.subscribe((change) => {
-      console.debug(`BrowserStorage.expenseManager.changes: ${change}`);
+      console.debug(`BrowserStorage.expenseManager.changes:`, change);
       switch (true) {
         case change instanceof ExpenseAdded:
           return this.handleExpenseAdded(change);
