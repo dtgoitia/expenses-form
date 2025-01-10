@@ -2,18 +2,16 @@ export type ExpenseId = string;
 export type DatetimeISOString = string; // "2022-01-17T08:19:26+00:00"
 export type DatetimeCustomISOString = string; // "2022-01-17 08:19:26 +00:00"
 
+export type CurrencyAmount = number;
+
 export interface Expense {
   id: ExpenseId;
-  amount: number;
+  amount: CurrencyAmount;
   currency: string;
-  originalAmount: number | undefined;
+  originalAmount: CurrencyAmount | undefined;
   originalCurrency: string | undefined;
   description: string;
   datetime: DatetimeISOString;
-  // The domain should not contain data about the persistence layer, instead, the
-  // orchestration layer should enrich/wrap/attach the value with any extra data
-  // required
-  // submitted: boolean;
   paid_with: PaymentAccountId;
   shared: boolean;
   pending: boolean;
