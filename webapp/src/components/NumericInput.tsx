@@ -1,11 +1,11 @@
 interface Props {
   value?: number;
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string | undefined) => void;
   className?: string;
 }
 
-export function NumericInput({ value, placeholder, onChange, className }: Props) {
+export function NumericInput({ value, placeholder, onChange: change, className }: Props) {
   let css =
     "w-full py-3 px-4" +
     " text-sm" +
@@ -27,7 +27,14 @@ export function NumericInput({ value, placeholder, onChange, className }: Props)
       className={css}
       value={value === undefined ? "" : value}
       placeholder={placeholder === undefined ? "" : placeholder}
-      onChange={(event) => onChange(event.target.value)}
+      onChange={(event) => {
+        const raw = event.target.value;
+        if (raw === "") {
+          change(undefined);
+        } else {
+          change(raw);
+        }
+      }}
     />
   );
 }
