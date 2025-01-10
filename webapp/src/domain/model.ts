@@ -19,13 +19,13 @@ export interface Expense {
 }
 
 export interface DraftExpense extends Omit<Expense, "amount"> {
-  amount: number | undefined;
+  amount: CurrencyAmount | undefined;
 }
 
 export interface Split {
   person: PersonName;
-  owed: number;
-  paid: number;
+  owed: CurrencyAmount;
+  paid: CurrencyAmount;
 }
 
 export type AccountId = number;
