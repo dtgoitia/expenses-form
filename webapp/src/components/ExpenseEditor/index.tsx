@@ -6,6 +6,7 @@ import {
   DraftExpense,
   PaymentAccount,
   PersonName,
+  Split,
 } from "../../domain/model";
 import { Button } from "../Button";
 import { Checkbox } from "../Checkbox";
@@ -16,6 +17,7 @@ import { Select } from "../Select";
 import DateTimePicker from "./DateTimePicker";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
+import { SplitsForm } from "./Splits/SplitsForm";
 
 const DateSlot = styled.div`
   display: flex;
@@ -41,6 +43,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
   const [account, setAccount] = useState<PaymentAccount | undefined>();
   const [people, setPeople] = useState<PersonName[]>([]);
+  const [splits, setSplits] = useState<Split[]>(expense.splits);
 
   useEffect(() => {
     const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
@@ -79,14 +82,12 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     update({ ...expense, paid_with: account.id, currency: account.currency });
   }
 
-  function handleAmountChange(value: string) {
-    let amount = value === "" ? undefined : Number(value);
-    update({ ...expense, amount });
+  function handleAmountChange(value: number | undefined) {
+    update({ ...expense, amount: value });
   }
 
-  function handleOriginalAmountChange(value: string): void {
-    let originalAmount = value === "" ? undefined : Number(value);
-    update({ ...expense, originalAmount });
+  function handleOriginalAmountChange(value: number | undefined): void {
+    update({ ...expense, originalAmount: value });
   }
 
   function handleOriginalCurrencyChange(selectedId: string): void {
@@ -114,6 +115,11 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       update({ ...expense, originalAmount: undefined, originalCurrency: undefined });
     }
     setPaidInOtherCurrency(checked);
+  }
+
+  function handleSplitsChange(splits: Split[]): void {
+    setSplits(splits);
+    update({ ...expense, splits });
   }
 
   if (account === undefined) {
@@ -234,10 +240,25 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       <div className="py-4 flex flex-row justify-end">
         <Checkbox
           checked={expense.shared}
-          label="Splitwise"
+          label="is shared"
           onChange={handleSplitwiseChange}
         />
       </div>
+
+      {expense.shared && (
+        <div
+          style={{
+            height: `${8 * Math.max(people.length, expense.splits.length)}rem`,
+          }}
+        >
+          <SplitsForm
+            splits={splits}
+            amount={expense.originalAmount || expense.amount || 0}
+            selectablePeople={people}
+            onChange={handleSplitsChange}
+          />
+        </div>
+      )}
     </div>
   );
 }
