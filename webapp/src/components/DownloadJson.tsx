@@ -1,3 +1,4 @@
+import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
 import { FirestoreClient } from "../domain/firebase";
 import { Expense } from "../domain/model";
@@ -122,6 +123,7 @@ function DownloadJson({ expenses, app }: DownloadJsonProps) {
       paid_with: account.ledgerName,
       shared: expense.shared,
       pending: expense.pending,
+      published_at: dateToISOLocale(now()),
     };
 
     if (expense.originalAmount === undefined) {
