@@ -123,6 +123,7 @@ function DownloadJson({ expenses, app }: DownloadJsonProps) {
       paid_with: account.ledgerName,
       shared: expense.shared,
       pending: expense.pending,
+      splits: expense.splits,
       published_at: dateToISOLocale(now()),
     };
 
