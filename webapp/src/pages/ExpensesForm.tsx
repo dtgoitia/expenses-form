@@ -110,7 +110,6 @@ function ExpensesForm({ app }: ExpensesFormProps) {
       <div className="mt-4">
         <ExpenseQueue
           expenses={appExpenses}
-          underEdition={undefined}
           onEditExpense={navigateToExpense}
           onDelete={(id: ExpenseId) => app.expenseManager.delete(id)}
           app={app}

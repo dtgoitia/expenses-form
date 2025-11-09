@@ -76,7 +76,6 @@ function formatAmount(expense: DraftExpense): string {
 
 interface ListItemProps {
   appExpense: AppExpense;
-  editing: boolean;
   deleting: boolean;
   edit: () => void;
   remove: () => void;
@@ -85,7 +84,6 @@ interface ListItemProps {
 }
 function ListItem({
   appExpense,
-  editing,
   deleting,
   edit,
   remove,
@@ -151,12 +149,11 @@ function ListItem({
 
 interface Props {
   expenses: AppExpense[];
-  underEdition: ExpenseId | undefined;
   onEditExpense: (id: ExpenseId) => void;
   onDelete: (id: ExpenseId) => void;
   app: App;
 }
-function ExpenseList({ expenses, underEdition, onEditExpense, onDelete, app }: Props) {
+function ExpenseList({ expenses, onEditExpense, onDelete, app }: Props) {
   const [inDeletionMode, setInDeletionMode] = useState<boolean>(false);
 
   function toggleDeletionMode(): void {
@@ -181,7 +178,6 @@ function ExpenseList({ expenses, underEdition, onEditExpense, onDelete, app }: P
           return (
             <ListItem
               key={`queued-expense-${id}`}
-              editing={underEdition === id}
               deleting={false} // TODO: integrate this in the new domain
               appExpense={appExpense}
               edit={() => onEditExpense(id)}
