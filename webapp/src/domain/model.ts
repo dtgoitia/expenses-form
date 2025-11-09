@@ -1,4 +1,5 @@
 export type ExpenseId = string;
+export type DateISOString = string; // "2022-01-17"
 export type DatetimeISOString = string; // "2022-01-17T08:19:26+00:00"
 export type DatetimeCustomISOString = string; // "2022-01-17 08:19:26 +00:00"
 
