@@ -1,7 +1,7 @@
+import { Observable, Subject } from "rxjs";
 import { SortAction } from "../sort";
 import { generatePrefixedId } from "./idGeneration";
-import { DraftExpense, ExpenseId } from "./model";
-import { Observable, Subject } from "rxjs";
+import { DateISOString, DraftExpense, ExpenseId } from "./model";
 
 export type AddExpenseArgs = Omit<DraftExpense, "id">;
 
@@ -144,4 +144,24 @@ function isReadyToPublish(draft: DraftExpense): boolean {
   }
 
   return true;
+}
+
+type ExpensesPerDay = [DateISOString, AppExpense[]];
+
+export function groupExpensesByLocalDate(expenses: AppExpense[]): ExpensesPerDay[] {
+  function getLocalDate(expense: AppExpense): DateISOString {
+    return expense.expense.datetime.slice(0, 10);
+  }
+
+  const map = new Map<DateISOString, AppExpense[]>();
+
+  for (const expense of expenses) {
+    const date = getLocalDate(expense);
+    const previous = map.get(date) || [];
+    map.set(date, [...previous, expense]);
+  }
+
+  const dates = [...map.keys()].sort().reverse();
+
+  return dates.map((date) => [date, map.get(date) as AppExpense[]]);
 }
