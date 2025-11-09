@@ -135,12 +135,16 @@ function ListItem({
           <pre>
             original_amount: {expense.originalAmount} {expense.originalCurrency}
           </pre>
-          <p onClick={() => copyToClipboard(expense.description)}>
-            Click to copy description
-          </p>
-          <pre onClick={() => copyToClipboard(splitwiseDescription)}>
-            Splitwise: {splitwiseDescription}
-          </pre>
+          <div className="flex flex-row gap-3 pt-1">
+            <Button
+              text="Copy full description"
+              onClick={() => copyToClipboard(expense.description)}
+            />
+            <Button
+              text="Copy Splitwise description"
+              onClick={() => copyToClipboard(splitwiseDescription)}
+            />
+          </div>
         </Collapse>
       </DescriptionSlot>
     </div>
