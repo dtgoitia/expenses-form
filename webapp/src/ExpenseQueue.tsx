@@ -3,7 +3,7 @@ import { Collapse } from "./components/Collapse";
 import { Toggle } from "./components/Toggle";
 import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
-import { AppExpense } from "./domain/expenses";
+import { AppExpense, groupExpensesByLocalDate } from "./domain/expenses";
 import { DraftExpense, ExpenseId } from "./domain/model";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
@@ -125,7 +125,6 @@ function ListItem({
 
       <DescriptionSlot>
         <span onClick={() => setIsOpen(!isOpen)}>
-          {formatDate(customISOStringToDate(expense.datetime))}{" "}
           <b>{formatAmount(expense)}</b> {expense.description}
         </span>
         <Collapse isOpen={isOpen}>
@@ -164,6 +163,8 @@ function ExpenseList({ expenses, onEditExpense, onDelete, app }: Props) {
     setInDeletionMode(!inDeletionMode);
   }
 
+  const expensesByDate = groupExpensesByLocalDate(expenses);
+
   return (
     <div>
       <div className="flex flex-row justify-end">
@@ -175,20 +176,31 @@ function ExpenseList({ expenses, onEditExpense, onDelete, app }: Props) {
         />
       </div>
 
-      {expenses.length > 0 ? (
-        expenses.map((appExpense) => {
-          const id = appExpense.expense.id;
-
+      {expensesByDate.length > 0 ? (
+        expensesByDate.map(([isoDate, expensesInDay]) => {
+          const date = formatDate(new Date(Date.parse(isoDate)));
           return (
-            <ListItem
-              key={`queued-expense-${id}`}
-              deleting={false} // TODO: integrate this in the new domain
-              appExpense={appExpense}
-              edit={() => onEditExpense(id)}
-              remove={() => onDelete(id)}
-              deleteMode={inDeletionMode}
-              app={app}
-            />
+            <div key={`${isoDate}-expenses`}>
+              <div className="pt-4 p-2">
+                <b>{date}</b>
+              </div>
+              <div>
+                {expensesInDay.map((appExpense) => {
+                  const id = appExpense.expense.id;
+                  return (
+                    <ListItem
+                      key={`queued-expense-${id}`}
+                      deleting={false} // TODO: integrate this in the new domain
+                      appExpense={appExpense}
+                      edit={() => onEditExpense(id)}
+                      remove={() => onDelete(id)}
+                      deleteMode={inDeletionMode}
+                      app={app}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           );
         })
       ) : (
