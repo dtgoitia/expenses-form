@@ -5,6 +5,7 @@ import { App } from "../../domain/app";
 import storage from "../../localStorage";
 import { useEffect, useState } from "react";
 import { PeopleForm } from "./PeopleForm";
+import { ShortcutsForm } from "./ShortcutsForm";
 
 function listToInputField(items: string[]): string {
   return items.join(",");
@@ -138,6 +139,8 @@ export function SettingsPage({ app }: Props) {
         </Label>
 
         <PeopleForm app={app} />
+
+        <ShortcutsForm app={app} />
       </div>
     </CenteredPage>
   );
