@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
 import { Button } from "./components/Button";
 import { ShortcutId } from "./domain/model";
 import { SyntheticEvent } from "react";
+import Paths from "./routes";
 
 interface ButtonData {
   id: ShortcutId;
@@ -20,13 +22,20 @@ function Shortcuts({ data, select }: ShortcutsProps) {
 
   return (
     <div className="flex flex-row flex-wrap my-2 mb-2 gap-2">
-      {data.map((shortcut, i) => (
-        <Button
-          text={shortcut.buttonName}
-          key={`shortcut-${i}`}
-          onClick={(e) => handleClick(e, shortcut.id)}
-        />
-      ))}
+      {data.length === 0 ? (
+        <div>
+          No shortcuts found. You can add them in the{" "}
+          <Link to={Paths.settings}>Settings</Link> page
+        </div>
+      ) : (
+        data.map((shortcut, i) => (
+          <Button
+            text={shortcut.buttonName}
+            key={`shortcut-${i}`}
+            onClick={(e) => handleClick(e, shortcut.id)}
+          />
+        ))
+      )}
     </div>
   );
 }
