@@ -70,13 +70,21 @@ export interface Person {
 
 export type TagName = string; // TODO: make every piece of code point here
 
+export type ShortcutButtonName = string;
+export type ShortcutMainDescription = string;
+
 export interface Shortcut {
   id: ShortcutId;
-  buttonName: string;
-  main: string;
+  buttonName: ShortcutButtonName;
+  main: ShortcutMainDescription;
   people: PersonName[];
-  seller: Seller;
+  seller: Seller | undefined;
   tags: TagName[];
 }
+
+export type ValidDraftShortcut = Omit<Shortcut, "id">;
+export type DraftShortcut = Omit<ValidDraftShortcut, "main"> & {
+  main: ShortcutMainDescription | undefined;
+};
 
 export type SplitwiseId = string;
