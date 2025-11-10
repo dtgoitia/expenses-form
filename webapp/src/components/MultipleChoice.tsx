@@ -38,9 +38,7 @@ export function MultipleChoice({
     choice.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const [state, setState] = useState<State>(
-    validateState({ chosen: value, notChosen, toChoose, all: choices })
-  );
+  const state = validateState({ chosen: value, notChosen, toChoose, all: choices });
 
   // the outermost DOM element of the component - used to determine if the user
   // has clicked outside of the component
@@ -115,7 +113,7 @@ export function MultipleChoice({
   function handleCreateAndSelectChoice(): void {
     // Scenario: user typed a new value which is not amongst listed choices
     const newState = addAndSelectNonexistentChoice({ choice: searchValue, state });
-    setState(validateState(newState));
+    validateState(newState);
     handleChange([...newState.chosen]);
     setSearchValue(EMPTY_STRING);
   }
@@ -123,14 +121,14 @@ export function MultipleChoice({
   function handleSelectChoice(choice: Choice): void {
     // Scenario: user chose a value which is amongst listed choices
     const newState = selectExistingChoice({ choice, state });
-    setState(validateState(newState));
+    validateState(newState);
     handleChange([...newState.chosen]);
     setSearchValue(EMPTY_STRING);
   }
 
   function handleUnselectChoice(choice: Choice): void {
     const newState = unselectChoice({ choice, state });
-    setState(validateState(newState));
+    validateState(newState);
     handleChange([...newState.chosen]);
     setSearchValue(EMPTY_STRING);
   }
@@ -336,7 +334,7 @@ function selectExistingChoice({
     toChoose: [...state.toChoose],
     chosen: [...state.chosen, choice],
     notChosen: state.notChosen.filter((c) => c !== choice),
-    all: state.all,
+    all: [...state.all],
   };
 }
 
@@ -345,6 +343,6 @@ function unselectChoice({ choice, state }: { choice: Choice; state: State }): St
     toChoose: [...state.toChoose],
     chosen: state.chosen.filter((c) => c !== choice),
     notChosen: [...state.notChosen, choice],
-    all: state.all,
+    all: [...state.all],
   };
 }
