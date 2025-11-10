@@ -8,6 +8,7 @@ import {
   PaymentAccountsManager,
 } from "./paymentAccounts";
 import { PeopleManager } from "./people";
+import { ShortcutsManager } from "./shortcuts";
 
 interface Props {
   expenseManager: ExpenseManager;
@@ -15,6 +16,7 @@ interface Props {
   browserStorage: BrowserStorage;
   currencyManager: CurrencyManager;
   peopleManager: PeopleManager;
+  shortcutsManager: ShortcutsManager;
 }
 
 export class App {
@@ -22,6 +24,7 @@ export class App {
   public paymentAccountsManager: PaymentAccountsManager;
   public currencyManager: CurrencyManager;
   public peopleManager: PeopleManager;
+  public shortcutsManager: ShortcutsManager;
   public initialized: boolean = false;
 
   private browserStorage: BrowserStorage;
@@ -32,12 +35,14 @@ export class App {
     browserStorage,
     currencyManager,
     peopleManager,
+    shortcutsManager,
   }: Props) {
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
     this.browserStorage = browserStorage;
     this.currencyManager = currencyManager;
     this.peopleManager = peopleManager;
+    this.shortcutsManager = shortcutsManager;
 
     this.paymentAccountsManager.change$.subscribe((change) =>
       this.handlePaymentAccountChange(change)
@@ -70,6 +75,10 @@ export class App {
       });
 
       this.peopleManager.initialize({ people: this.browserStorage.readPeople() });
+
+      this.shortcutsManager.initialize({
+        shortcuts: this.browserStorage.readShortcuts(),
+      });
 
       this.initialized = true;
     }

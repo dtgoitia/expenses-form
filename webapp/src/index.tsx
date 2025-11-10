@@ -13,6 +13,7 @@ import { GlobalStyle } from "./style/globalStyle";
 import React from "react";
 import ReactDOM from "react-dom";
 import { registerSW } from "virtual:pwa-register";
+import { ShortcutsManager } from "./domain/shortcuts";
 
 const isLocalhost = window.location.hostname === "localhost";
 
@@ -30,11 +31,13 @@ const updateSW = registerSW({
 const expenseManager = new ExpenseManager();
 const paymentAccountsManager = new PaymentAccountsManager();
 const peopleManager = new PeopleManager();
+const shortcutsManager = new ShortcutsManager();
 const browserStorage = new BrowserStorage({
   expenseManager,
   paymentAccountsManager,
   client: new Storage(),
   peopleManager,
+  shortcutsManager,
 });
 const currencyManager = new CurrencyManager();
 
@@ -44,6 +47,7 @@ const app = new App({
   paymentAccountsManager,
   currencyManager,
   peopleManager,
+  shortcutsManager,
 });
 
 const container = document.getElementById("root");
