@@ -6,6 +6,7 @@ import {
   DraftExpense,
   PaymentAccount,
   PersonName,
+  Shortcut,
   ShortcutId,
   Split,
 } from "../../domain/model";
@@ -19,7 +20,6 @@ import DateTimePicker from "./DateTimePicker";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SplitsForm } from "./Splits/SplitsForm";
-import { SHORTCUTS } from "../../constants";
 import Shortcuts from "../../PredefinedButtons";
 
 const DateSlot = styled.div`
@@ -48,6 +48,8 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   const [people, setPeople] = useState<PersonName[]>([]);
   const [splits, setSplits] = useState<Split[]>(expense.splits);
 
+  const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
+
   useEffect(() => {
     const accountsSubscription = app.paymentAccountsManager.change$.subscribe((_) => {
       setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
@@ -58,15 +60,20 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
       setPeople(app.peopleManager.getAll().map((person) => person.name));
     });
+    const shortcutsSubscription = app.shortcutsManager.change$.subscribe((_) => {
+      setShortcuts(app.shortcutsManager.getAll());
+    });
 
     setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
     setCurrencies(app.currencyManager.getAll());
     setPeople(app.peopleManager.getAll().map((person) => person.name));
+    setShortcuts(app.shortcutsManager.getAll());
 
     return () => {
       accountsSubscription.unsubscribe();
       currenciesSubscription.unsubscribe();
       peopleSubscription.unsubscribe();
+      shortcutsSubscription.unsubscribe();
     };
   }, [app, expense.paid_with]);
 
@@ -109,7 +116,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   }
 
   function handleShortcutSelection(id: ShortcutId) {
-    const shortcut = SHORTCUTS.filter((shortcut) => shortcut.id === id)[0];
+    const shortcut = shortcuts.filter((shortcut) => shortcut.id === id)[0];
 
     handleDescriptionChange(
       descriptionToString({
@@ -248,7 +255,7 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       </div>
 
       <Shortcuts
-        data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
+        data={shortcuts.map(({ id, buttonName }) => ({ id, buttonName }))}
         select={handleShortcutSelection}
       />
 
