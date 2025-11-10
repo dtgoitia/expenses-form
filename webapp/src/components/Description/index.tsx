@@ -1,6 +1,5 @@
-import Shortcuts from "../../PredefinedButtons";
-import { SHORTCUTS, TAGS } from "../../constants";
-import { PersonName, Seller, ShortcutId, TagName } from "../../domain/model";
+import { TAGS } from "../../constants";
+import { PersonName, Seller, TagName } from "../../domain/model";
 import storage from "../../localStorage";
 import { Choice, MultipleChoice } from "../MultipleChoice";
 import { TextInput } from "../TextInput";
@@ -153,26 +152,8 @@ export function DescriptionForm({
     update(descriptionToString({ ...description, tags }));
   }
 
-  function handleShortcutSelection(id: ShortcutId) {
-    const shortcut = SHORTCUTS.filter((shortcut) => shortcut.id === id)[0];
-
-    update(
-      descriptionToString({
-        main: shortcut.main,
-        people: shortcut.people,
-        seller: shortcut.seller,
-        tags: shortcut.tags,
-      })
-    );
-  }
-
   return (
     <div role="description-form" className="mb-4">
-      <Shortcuts
-        data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
-        select={handleShortcutSelection}
-      />
-
       <div className="grid grid-cols-2 gap-2 mb-4">
         <TextInput
           value={description.main}

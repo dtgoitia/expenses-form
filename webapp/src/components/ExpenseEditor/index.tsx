@@ -6,11 +6,12 @@ import {
   DraftExpense,
   PaymentAccount,
   PersonName,
+  ShortcutId,
   Split,
 } from "../../domain/model";
 import { Button } from "../Button";
 import { Checkbox } from "../Checkbox";
-import { DescriptionForm } from "../Description";
+import { DescriptionForm, descriptionToString } from "../Description";
 import { NumericInput } from "../NumericInput";
 import { PaidWithDropdown } from "../PaidWith";
 import { Select } from "../Select";
@@ -18,6 +19,8 @@ import DateTimePicker from "./DateTimePicker";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import { SplitsForm } from "./Splits/SplitsForm";
+import { SHORTCUTS } from "../../constants";
+import Shortcuts from "../../PredefinedButtons";
 
 const DateSlot = styled.div`
   display: flex;
@@ -103,6 +106,19 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
     }
 
     update({ ...expense, description });
+  }
+
+  function handleShortcutSelection(id: ShortcutId) {
+    const shortcut = SHORTCUTS.filter((shortcut) => shortcut.id === id)[0];
+
+    handleDescriptionChange(
+      descriptionToString({
+        main: shortcut.main,
+        people: shortcut.people,
+        seller: shortcut.seller,
+        tags: shortcut.tags,
+      })
+    );
   }
 
   function handleSplitwiseChange(checked: boolean): void {
@@ -230,6 +246,11 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
           </>
         )}
       </div>
+
+      <Shortcuts
+        data={SHORTCUTS.map(({ id, buttonName }) => ({ id, buttonName }))}
+        select={handleShortcutSelection}
+      />
 
       <DescriptionForm
         description={expense.description}
