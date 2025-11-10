@@ -87,6 +87,7 @@ export class Storage {
   defaultPaymentAccountId: StoredItem<string | undefined>;
   firestoreConfig: StoredItem<object | undefined>;
   currencies: StoredItem<string | undefined>;
+  shortcuts: StoredItem<object[] | undefined>;
 
   constructor() {
     this.splitwiseApiToken = new StoredItem("exp_splitwise_api_token", ValueType.string);
@@ -100,6 +101,7 @@ export class Storage {
     );
     this.firestoreConfig = new StoredItem("exp__firestore_config", ValueType.object);
     this.currencies = new StoredItem("exp__currencies", ValueType.string);
+    this.shortcuts = new StoredItem("exp__shortcuts", ValueType.object);
   }
 }
 

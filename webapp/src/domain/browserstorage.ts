@@ -14,9 +14,11 @@ import {
   PaymentAccount,
   PaymentAccountId,
   Person,
+  Shortcut,
 } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 import { PeopleManager } from "./people";
+import { ShortcutsManager } from "./shortcuts";
 
 type GenericObject = { [key: string]: any };
 
@@ -25,6 +27,7 @@ interface BrowserStorageParams {
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
   peopleManager: PeopleManager;
+  shortcutsManager: ShortcutsManager;
 }
 
 export class BrowserStorage {
@@ -32,17 +35,20 @@ export class BrowserStorage {
   private expenseManager: ExpenseManager;
   private paymentAccountsManager: PaymentAccountsManager;
   private peopleManager: PeopleManager;
+  private shortcutsManager: ShortcutsManager;
 
   constructor({
     client,
     expenseManager,
     paymentAccountsManager,
     peopleManager,
+    shortcutsManager,
   }: BrowserStorageParams) {
     this.client = client;
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
     this.peopleManager = peopleManager;
+    this.shortcutsManager = shortcutsManager;
 
     this.expenseManager.change$.subscribe((change) => {
       console.debug(`BrowserStorage.expenseManager.changes:`, change);
@@ -85,6 +91,20 @@ export class BrowserStorage {
           return this.persistAllPeople();
         default:
           assertNever(change, `unsupported PeopleChange: ${change}`);
+      }
+    });
+
+    this.shortcutsManager.change$.subscribe((change) => {
+      console.debug(`BrowserStorage.shortcutsManager.change$:`, change);
+      switch (change.kind) {
+        case "ShortcutsManagerInitialized":
+          return;
+        case "ShortcutAdded":
+          return this.persistAllShortcuts();
+        case "ShortcutUpdated":
+          return this.persistAllShortcuts();
+        case "ShortcutDeleted":
+          return this.persistAllShortcuts();
       }
     });
   }
@@ -163,6 +183,25 @@ export class BrowserStorage {
     return people;
   }
 
+  public readShortcuts(): Shortcut[] {
+    console.debug(`BrowserStorage.readShortcuts()`);
+    const raw: any[] = this.client.shortcuts.read() || [];
+    const shortcuts: Shortcut[] = [];
+    for (const storedItem of raw) {
+      const shortcut: Shortcut = {
+        id: storedItem.id,
+        buttonName: storedItem.buttonName,
+        main: storedItem.main,
+        people: storedItem.people,
+        seller: storedItem.seller,
+        tags: storedItem.tags,
+      };
+      shortcuts.push(shortcut);
+    }
+
+    return shortcuts;
+  }
+
   public setDefaultAccountId({ id }: { id: PaymentAccountId }): void {
     console.debug(`${BrowserStorage.name}.${this.setDefaultAccountId.name}()`);
     this.client.defaultPaymentAccountId.set(id);
@@ -205,5 +244,10 @@ export class BrowserStorage {
   private persistAllPeople(): void {
     const people = this.peopleManager.getAll();
     this.client.people.set(people);
+  }
+
+  private persistAllShortcuts(): void {
+    const shortcuts = this.shortcutsManager.getAll();
+    this.client.shortcuts.set(shortcuts);
   }
 }
