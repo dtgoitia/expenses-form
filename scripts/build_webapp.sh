@@ -5,7 +5,7 @@ echo "Changing directory to '${webapp_dir}' directory..."
 cd $webapp_dir || exit 1
 
 echo "Kicking off CI-like webapp build..."
-NODE_OPTIONS='--no-experimental-fetch' CI="true" npm run build
+CI="true" npm run build
 
 last_exit_code=$?
 
