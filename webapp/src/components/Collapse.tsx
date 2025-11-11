@@ -18,7 +18,7 @@ export function Collapse({ children, isOpen }: Props) {
     transition-all
     duration-300
     ease-in-out
-    ${isOpen ? "max-h-96" : "max-h-0"}
+    ${isOpen ? "" : "max-h-0"}
   `;
   return (
     <div className={css} role="collapse">
