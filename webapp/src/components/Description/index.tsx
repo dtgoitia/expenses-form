@@ -3,6 +3,7 @@ import { PersonName, Seller, TagName } from "../../domain/model";
 import storage from "../../localStorage";
 import { Choice, MultipleChoice } from "../MultipleChoice";
 import { TextInput } from "../TextInput";
+import { SellerSuggestion } from "./SellerSuggestion";
 import TagSelector from "./TagSelector";
 import { useState } from "react";
 
@@ -152,6 +153,10 @@ export function DescriptionForm({
     update(descriptionToString({ ...description, tags }));
   }
 
+  function handleSellerSuggestionAcceptance(updatedSeller: Seller): void {
+    update(descriptionToString({ ...description, seller: updatedSeller }));
+  }
+
   return (
     <div role="description-form" className="mb-4">
       <div className="grid grid-cols-2 gap-2 mb-4">
@@ -175,6 +180,13 @@ export function DescriptionForm({
           allowChoiceCreation={true}
         />
       </div>
+
+      {description.seller && (
+        <SellerSuggestion
+          descriptionSeller={description.seller}
+          onAcceptance={handleSellerSuggestionAcceptance}
+        />
+      )}
 
       <TagSelector
         tags={availableTags}

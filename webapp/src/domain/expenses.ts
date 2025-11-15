@@ -1,7 +1,8 @@
 import { Observable, Subject } from "rxjs";
+import { unreachable } from "../lib/devex";
 import { SortAction } from "../sort";
 import { generatePrefixedId } from "./idGeneration";
-import { DateISOString, DraftExpense, ExpenseId } from "./model";
+import { DateISOString, DraftExpense, ExpenseId, Seller } from "./model";
 
 export type AddExpenseArgs = Omit<DraftExpense, "id">;
 
@@ -164,4 +165,62 @@ export function groupExpensesByLocalDate(expenses: AppExpense[]): ExpensesPerDay
   const dates = [...map.keys()].sort().reverse();
 
   return dates.map((date) => [date, map.get(date) as AppExpense[]]);
+}
+
+const VALID_CHARACTERS = new Set<string>(
+  "abcçdefghijklmnñopqrstuvwxyz0123456789".split("")
+);
+
+export function formatSeller(
+  raw: string
+): { ok: true; seller: Seller } | { ok: false; error: string } {
+  const EMPTY_STRING = "";
+  const SINGLE_SPACE = " ";
+
+  function ampersandToAnd(raw: string): string {
+    return raw.replaceAll("&", "And");
+  }
+
+  function isWeirdCharacter(character: string): boolean {
+    return VALID_CHARACTERS.has(character.toLowerCase()) === false;
+  }
+
+  function weirdCharacterToSpace(character: string): string {
+    return isWeirdCharacter(character) ? SINGLE_SPACE : character;
+  }
+
+  function toCamelCase(word: string): string {
+    return word
+      .split(EMPTY_STRING)
+      .map((character, index) =>
+        index === 0 ? character.toUpperCase() : character.toLowerCase()
+      )
+      .join(EMPTY_STRING);
+  }
+
+  function cleanChunk(chunk: string): string {
+    return ampersandToAnd(chunk)
+      .split(EMPTY_STRING)
+      .map(weirdCharacterToSpace)
+      .join(EMPTY_STRING)
+      .split(SINGLE_SPACE)
+      .map(toCamelCase)
+      .join(EMPTY_STRING);
+  }
+
+  const viaFound = raw.includes(" via ");
+  const chunks = viaFound ? raw.split(" via ") : [raw];
+
+  if (chunks.length === 0) throw unreachable("expected 1 or 2 chunks, but got 0");
+
+  const cleanChunks = chunks.map(cleanChunk);
+  switch (cleanChunks.length) {
+    case 1:
+      return { ok: true, seller: cleanChunks[0] };
+    case 2:
+      const [main, via] = cleanChunks;
+      return { ok: true, seller: `${main} (via @${via})` };
+    default:
+      throw unreachable(`expected 1 or 2 chunks, but got ${cleanChunks.length}`);
+  }
 }
