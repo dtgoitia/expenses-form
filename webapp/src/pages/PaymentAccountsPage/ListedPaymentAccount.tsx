@@ -1,12 +1,17 @@
 import { Button } from "../../components/Button";
-import { CurrencyCode, PaymentAccount, PaymentAccountId } from "../../domain/model";
+import {
+  CurrencyCode,
+  PaymentAccount,
+  PaymentAccountId,
+  PaymentAccountIsTheDefaultOne,
+} from "../../domain/model";
 import { unreachable } from "../../lib/devex";
 import { PaymentAccountEditor } from "./PaymentAccountEditor";
 import { useState } from "react";
 
 interface Props {
   account: PaymentAccount;
-  isDefault: boolean;
+  isDefault: PaymentAccountIsTheDefaultOne;
   currencies: CurrencyCode[];
   onUpdate: (account: PaymentAccount) => void;
   onDelete: (id: PaymentAccountId) => void;
@@ -68,7 +73,12 @@ export function ListedPaymentAccount({
 
   return (
     <div role="payment-account" className={css}>
-      <PaymentAccountEditor account={account} currencies={currencies} onUpdate={update} />
+      <PaymentAccountEditor
+        account={account}
+        isDefault={isDefault}
+        currencies={currencies}
+        onUpdate={update}
+      />
 
       <Button text="Delete" onClick={handleDeletionIntent} />
 

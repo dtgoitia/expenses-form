@@ -50,6 +50,7 @@ export type PaymentAccountName = string;
 export type LedgerAccountName = string;
 
 export type PaymentAccountIsVisible = boolean;
+export type PaymentAccountIsTheDefaultOne = boolean;
 export interface PaymentAccount {
   id: PaymentAccountId;
   name: PaymentAccountName; // the one displayed in the UI dropdown

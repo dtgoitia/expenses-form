@@ -7,6 +7,7 @@ import {
   CurrencyCode,
   LedgerAccountName,
   PaymentAccount,
+  PaymentAccountIsTheDefaultOne,
   PaymentAccountIsVisible,
   PaymentAccountName,
 } from "../../domain/model";
@@ -15,9 +16,15 @@ import { useState } from "react";
 interface Props {
   account: PaymentAccount;
   currencies: CurrencyCode[];
+  isDefault: PaymentAccountIsTheDefaultOne;
   onUpdate: (account: PaymentAccount) => void;
 }
-export function PaymentAccountEditor({ account, currencies, onUpdate: update }: Props) {
+export function PaymentAccountEditor({
+  account,
+  isDefault,
+  currencies,
+  onUpdate: update,
+}: Props) {
   const [name, setName] = useState<PaymentAccountName | undefined>(account.name);
   const [ledgerName, setLedgerName] = useState<LedgerAccountName | undefined>(
     account.ledgerName
@@ -44,6 +51,14 @@ export function PaymentAccountEditor({ account, currencies, onUpdate: update }: 
     }
 
     update({ ...account, name, ledgerName, currency, isVisible });
+  }
+
+  function handleToggleVisibility(isOn: boolean): void {
+    if (isDefault) {
+      alert("default account cannot be hidden");
+    } else {
+      setIsVisible(isOn);
+    }
   }
 
   const canSaveAccount = name !== undefined && ledgerName !== undefined;
@@ -85,7 +100,7 @@ export function PaymentAccountEditor({ account, currencies, onUpdate: update }: 
         isOn={isVisible}
         labelOn="account is visible"
         labelOff="account is hidden"
-        onToggle={(isOn) => setIsVisible(isOn)}
+        onToggle={handleToggleVisibility}
       />
 
       <div className="flex justify-end m-3">
