@@ -6,6 +6,10 @@ import {
   PaymentAccount,
   PaymentAccountId,
 } from "../../domain/model";
+import {
+  PaymentAccountDeleteResult,
+  PaymentAccountUpdateResult,
+} from "../../domain/paymentAccounts";
 import { AddPaymentAccount } from "./AddPaymentAccount";
 import { ListedPaymentAccount } from "./ListedPaymentAccount";
 import { useEffect, useState } from "react";
@@ -42,12 +46,14 @@ export default function PaymentAccountsPage({ app }: Props) {
     app.paymentAccountsManager.add({ draft: account });
   }
 
-  function handleUpdatePaymentAccount(account: PaymentAccount): void {
-    app.paymentAccountsManager.update({ account });
+  function handleUpdatePaymentAccount(
+    account: PaymentAccount
+  ): PaymentAccountUpdateResult {
+    return app.paymentAccountsManager.update({ account });
   }
 
-  function handleDeletePaymentAccount(id: PaymentAccountId): void {
-    app.paymentAccountsManager.delete({ id });
+  function handleDeletePaymentAccount(id: PaymentAccountId): PaymentAccountDeleteResult {
+    return app.paymentAccountsManager.delete({ id });
   }
 
   function handleMarkPaymentAccountAsDefault(id: PaymentAccountId): void {

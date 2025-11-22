@@ -12,12 +12,13 @@ import {
   PaymentAccountName,
 } from "../../domain/model";
 import { useState } from "react";
+import { PaymentAccountUpdateResult } from "../../domain/paymentAccounts";
 
 interface Props {
   account: PaymentAccount;
   currencies: CurrencyCode[];
   isDefault: PaymentAccountIsTheDefaultOne;
-  onUpdate: (account: PaymentAccount) => void;
+  onUpdate: (account: PaymentAccount) => PaymentAccountUpdateResult;
 }
 export function PaymentAccountEditor({
   account,
@@ -31,8 +32,6 @@ export function PaymentAccountEditor({
   );
   const [currency, setCurrency] = useState<CurrencyCode>(account.currency);
   const [isVisible, setIsVisible] = useState<PaymentAccountIsVisible>(account.isVisible);
-
-  console.log(`${name} ${isVisible} ${account.isVisible}`);
 
   const changesSaved =
     name === account.name &&
@@ -50,7 +49,10 @@ export function PaymentAccountEditor({
       return;
     }
 
-    update({ ...account, name, ledgerName, currency, isVisible });
+    const result = update({ ...account, name, ledgerName, currency, isVisible });
+    if (result.ok === false) {
+      alert(result.reason);
+    }
   }
 
   function handleToggleVisibility(isOn: boolean): void {

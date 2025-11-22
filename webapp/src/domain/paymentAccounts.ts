@@ -1,7 +1,17 @@
-import { SortAction } from "../sort";
-import { generatePrefixedId } from "./idGeneration";
-import { DraftPaymentAccount, PaymentAccount, PaymentAccountId } from "./model";
 import { Observable, Subject } from "rxjs";
+import { SortAction } from "../sort";
+import { ExpenseManager } from "./expenses";
+import { generatePrefixedId } from "./idGeneration";
+import {
+  DraftPaymentAccount,
+  ExpenseId,
+  PaymentAccount,
+  PaymentAccountId,
+} from "./model";
+
+interface Args {
+  expenseManager: ExpenseManager;
+}
 
 export class PaymentAccountsManager {
   public change$: Observable<PaymentAccountChanges>;
@@ -9,9 +19,15 @@ export class PaymentAccountsManager {
   private accounts: Map<PaymentAccountId, PaymentAccount>;
   private changeSubject: Subject<PaymentAccountChanges>;
   private defaultAccountId: PaymentAccountId | undefined;
+  private expensesPerAccount: Map<PaymentAccountId, ExpenseId[]>;
 
-  constructor() {
+  private expenseManager: ExpenseManager;
+
+  constructor({ expenseManager }: Args) {
+    this.expenseManager = expenseManager;
+
     this.accounts = new Map<PaymentAccountId, PaymentAccount>();
+    this.expensesPerAccount = new Map<PaymentAccountId, ExpenseId[]>();
     this.changeSubject = new Subject<PaymentAccountChanges>();
     this.change$ = this.changeSubject.asObservable();
     this.defaultAccountId = undefined;
@@ -19,6 +35,19 @@ export class PaymentAccountsManager {
     this.change$.subscribe((change) =>
       console.debug(`${PaymentAccountsManager.name}.change$:`, change)
     );
+
+    this.expenseManager.change$.subscribe((change) => {
+      switch (change.kind) {
+        case "ExpenseAdded":
+          return this.updateAccountToExpenseIndex();
+        case "ExpenseUpdated":
+          return this.updateAccountToExpenseIndex();
+        case "ExpenseDeleted":
+          return this.updateAccountToExpenseIndex();
+        default:
+          throw new Error(`PaymentAccountsManager: unsupported change: ${change}`);
+      }
+    });
   }
 
   public initialize({
@@ -50,6 +79,8 @@ export class PaymentAccountsManager {
         `PaymentAccountsManager.initialize::no account ID matches the defaultAccountId='${defaultAccountId}'`
       );
     }
+
+    this.updateAccountToExpenseIndex();
 
     this.defaultAccountId = defaultAccountId;
 
@@ -99,30 +130,48 @@ export class PaymentAccountsManager {
     this.changeSubject.next({ kind: "PaymentAccountAdded", id });
   }
 
-  public update({ account }: { account: PaymentAccount }): void {
+  public update({ account }: { account: PaymentAccount }): PaymentAccountUpdateResult {
     const { id } = account;
 
     if (this.accounts.has(id) === false) {
-      throw new Error(
-        `PaymentAccountsManager.update::Cannot update an account because it does not exist, id=${id}`
-      );
+      return {
+        ok: false,
+        reason: `cannot update account because it does not exist, id=${id}`,
+      };
+    }
+
+    if (account.isVisible === false && this.isAccountUsedByExpense(id)) {
+      return {
+        ok: false,
+        reason: `cannot save account as hidden because it is used by at least one expense`,
+      };
     }
 
     this.accounts.set(id, account);
 
     this.changeSubject.next({ kind: "PaymentAccountUpdated", id });
+    return { ok: true };
   }
 
-  public delete({ id }: { id: PaymentAccountId }): void {
+  public delete({ id }: { id: PaymentAccountId }): PaymentAccountDeleteResult {
     if (this.accounts.has(id) === false) {
-      throw new Error(
-        `PaymentAccountsManager.delete::Cannot delete an account because it does not exist, id=${id}`
-      );
+      return {
+        ok: false,
+        reason: `cannot delete account because it does not exist, id=${id}`,
+      };
+    }
+
+    if (this.isAccountUsedByExpense(id)) {
+      return {
+        ok: false,
+        reason: `cannot delete account because it is used by at least one expense`,
+      };
     }
 
     this.accounts.delete(id);
 
     this.changeSubject.next({ kind: "PaymentAccountDeleted", id });
+    return { ok: true };
   }
 
   private generatePaymentAccountId(): PaymentAccountId {
@@ -133,11 +182,33 @@ export class PaymentAccountsManager {
       }
     }
   }
+
+  private updateAccountToExpenseIndex(): void {
+    const expensesPerAccount = new Map<PaymentAccountId, ExpenseId[]>();
+    for (const appExpense of this.expenseManager.getAll()) {
+      const expense = appExpense.expense;
+      const id: PaymentAccountId = expense.paid_with;
+      const previous = expensesPerAccount.get(id);
+      if (previous === undefined) {
+        expensesPerAccount.set(id, [expense.id]);
+      } else {
+        expensesPerAccount.set(id, [...previous, expense.id]);
+      }
+    }
+    this.expensesPerAccount = expensesPerAccount;
+  }
+
+  private isAccountUsedByExpense(id: PaymentAccountId): boolean {
+    return this.expensesPerAccount.has(id);
+  }
 }
 
 function sortPaymentAccountsByName(a: PaymentAccount, b: PaymentAccount): SortAction {
   return a.name <= b.name ? SortAction.KeepOrder : SortAction.SwapOrder;
 }
+
+export type PaymentAccountUpdateResult = { ok: true } | { ok: false; reason: string };
+export type PaymentAccountDeleteResult = { ok: true } | { ok: false; reason: string };
 
 export type PaymentAccountChanges =
   | { kind: "PaymentAccountManagerInitialized" }

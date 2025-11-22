@@ -5,6 +5,10 @@ import {
   PaymentAccountId,
   PaymentAccountIsTheDefaultOne,
 } from "../../domain/model";
+import {
+  PaymentAccountDeleteResult,
+  PaymentAccountUpdateResult,
+} from "../../domain/paymentAccounts";
 import { unreachable } from "../../lib/devex";
 import { PaymentAccountEditor } from "./PaymentAccountEditor";
 import { useState } from "react";
@@ -13,8 +17,8 @@ interface Props {
   account: PaymentAccount;
   isDefault: PaymentAccountIsTheDefaultOne;
   currencies: CurrencyCode[];
-  onUpdate: (account: PaymentAccount) => void;
-  onDelete: (id: PaymentAccountId) => void;
+  onUpdate: (account: PaymentAccount) => PaymentAccountUpdateResult;
+  onDelete: (id: PaymentAccountId) => PaymentAccountDeleteResult;
   onMarkAsDefault: () => void;
 }
 export function ListedPaymentAccount({
@@ -68,7 +72,10 @@ export function ListedPaymentAccount({
 
   function handleDeletionIntent(): void {
     // TODO: show confirmation dialog
-    onDelete(account.id);
+    const result = onDelete(account.id);
+    if (result.ok === false) {
+      alert(result.reason);
+    }
   }
 
   return (

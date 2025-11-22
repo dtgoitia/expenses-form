@@ -29,7 +29,7 @@ const updateSW = registerSW({
 });
 
 const expenseManager = new ExpenseManager();
-const paymentAccountsManager = new PaymentAccountsManager();
+const paymentAccountsManager = new PaymentAccountsManager({ expenseManager });
 const peopleManager = new PeopleManager();
 const shortcutsManager = new ShortcutsManager();
 const browserStorage = new BrowserStorage({
