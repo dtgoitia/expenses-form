@@ -49,12 +49,15 @@ export type PaymentAccountId = string;
 export type PaymentAccountName = string;
 export type LedgerAccountName = string;
 
+export type PaymentAccountIsVisible = boolean;
 export interface PaymentAccount {
   id: PaymentAccountId;
   name: PaymentAccountName; // the one displayed in the UI dropdown
   ledgerName: LedgerAccountName;
   currency: CurrencyCode;
+  isVisible: PaymentAccountIsVisible;
 }
+
 export type DraftPaymentAccount = Omit<PaymentAccount, "id">;
 
 export type ShortcutId = number;

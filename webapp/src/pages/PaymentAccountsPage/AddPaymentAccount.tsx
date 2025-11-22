@@ -2,13 +2,17 @@ import { Button } from "../../components/Button";
 import { Label } from "../../components/Label";
 import { Select } from "../../components/Select";
 import { TextInput } from "../../components/TextInput";
+import { Toggle } from "../../components/Toggle";
 import {
   CurrencyCode,
   DraftPaymentAccount,
   LedgerAccountName,
+  PaymentAccountIsVisible,
   PaymentAccountName,
 } from "../../domain/model";
 import { useState } from "react";
+
+const ACCOUNT_DEFAULT_VISIBILITY: PaymentAccountIsVisible = true;
 
 interface Props {
   currencies: CurrencyCode[];
@@ -21,16 +25,23 @@ export function AddPaymentAccount({
   const [name, setName] = useState<PaymentAccountName | undefined>(undefined);
   const [ledgerName, setLedgerName] = useState<LedgerAccountName | undefined>(undefined);
   const [currency, setCurrency] = useState<CurrencyCode | undefined>(undefined);
+  const [isVisible, setIsVisible] = useState<boolean>(ACCOUNT_DEFAULT_VISIBILITY);
 
   function handleAddPaymentAccount(): void {
-    if (name === undefined || ledgerName === undefined || currency === undefined) {
+    if (
+      name === undefined ||
+      ledgerName === undefined ||
+      currency === undefined ||
+      isVisible === undefined
+    ) {
       return;
     }
 
-    addPaymentAccount({ name, ledgerName, currency });
+    addPaymentAccount({ name, ledgerName, currency, isVisible });
     setName(undefined);
     setLedgerName(undefined);
     setCurrency(undefined);
+    setIsVisible(ACCOUNT_DEFAULT_VISIBILITY);
   }
 
   const canCreateAccount = name !== undefined && ledgerName !== undefined;
@@ -66,6 +77,14 @@ export function AddPaymentAccount({
           className="mt-1"
         />
       </Label>
+
+      <Toggle
+        uniqueKey="new-account"
+        isOn={isVisible}
+        labelOn="account is visible"
+        labelOff="account is hidden"
+        onToggle={() => setIsVisible(!isVisible)}
+      />
 
       <div className="flex justify-end p-4">
         <Button

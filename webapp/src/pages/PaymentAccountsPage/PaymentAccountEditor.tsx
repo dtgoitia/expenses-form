@@ -2,10 +2,12 @@ import { Button } from "../../components/Button";
 import { Label } from "../../components/Label";
 import { Select } from "../../components/Select";
 import { TextInput } from "../../components/TextInput";
+import { Toggle } from "../../components/Toggle";
 import {
   CurrencyCode,
   LedgerAccountName,
   PaymentAccount,
+  PaymentAccountIsVisible,
   PaymentAccountName,
 } from "../../domain/model";
 import { useState } from "react";
@@ -21,11 +23,15 @@ export function PaymentAccountEditor({ account, currencies, onUpdate: update }: 
     account.ledgerName
   );
   const [currency, setCurrency] = useState<CurrencyCode>(account.currency);
+  const [isVisible, setIsVisible] = useState<PaymentAccountIsVisible>(account.isVisible);
+
+  console.log(`${name} ${isVisible} ${account.isVisible}`);
 
   const changesSaved =
     name === account.name &&
     ledgerName === account.ledgerName &&
-    currency === account.currency;
+    currency === account.currency &&
+    isVisible === account.isVisible;
 
   function handleAddPaymentAccount(): void {
     if (
@@ -37,7 +43,7 @@ export function PaymentAccountEditor({ account, currencies, onUpdate: update }: 
       return;
     }
 
-    update({ ...account, name, ledgerName, currency });
+    update({ ...account, name, ledgerName, currency, isVisible });
   }
 
   const canSaveAccount = name !== undefined && ledgerName !== undefined;
@@ -73,6 +79,14 @@ export function PaymentAccountEditor({ account, currencies, onUpdate: update }: 
           className="mt-1"
         />
       </Label>
+
+      <Toggle
+        uniqueKey={account.id}
+        isOn={isVisible}
+        labelOn="account is visible"
+        labelOff="account is hidden"
+        onToggle={(isOn) => setIsVisible(isOn)}
+      />
 
       <div className="flex justify-end m-3">
         <Button

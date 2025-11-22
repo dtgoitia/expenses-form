@@ -154,6 +154,7 @@ export class BrowserStorage {
         name: storedItem.name,
         ledgerName: storedItem.ledgerName,
         currency: storedItem.currency,
+        isVisible: storedItem.isVisible === undefined ? true : storedItem.isVisible,
       };
 
       accounts.push(account);
