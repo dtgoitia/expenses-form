@@ -1,13 +1,6 @@
 import { assertNever } from "../exhaustive-match";
 import { Storage } from "../localStorage";
-import {
-  AppExpense,
-  ExpenseAdded,
-  ExpenseDeleted,
-  ExpenseManager,
-  ExpenseStatus,
-  ExpenseUpdated,
-} from "./expenses";
+import { AppExpense, ExpenseManager, ExpenseStatus } from "./expenses";
 import {
   CurrencyCode,
   ExpenseId,
@@ -52,13 +45,13 @@ export class BrowserStorage {
 
     this.expenseManager.change$.subscribe((change) => {
       console.debug(`BrowserStorage.expenseManager.changes:`, change);
-      switch (true) {
-        case change instanceof ExpenseAdded:
-          return this.handleExpenseAdded(change);
-        case change instanceof ExpenseUpdated:
-          return this.handleExpenseUpdated(change);
-        case change instanceof ExpenseDeleted:
-          return this.handleExpenseDeleted(change);
+      switch (change.kind) {
+        case "ExpenseAdded":
+          return this.handleExpenseAdded(change.expenseId);
+        case "ExpenseUpdated":
+          return this.handleExpenseUpdated(change.expenseId);
+        case "ExpenseDeleted":
+          return this.handleExpenseDeleted(change.expenseId);
         default:
           throw new Error(`BrowserStorage: unsupported change: ${change}`);
       }
@@ -223,18 +216,18 @@ export class BrowserStorage {
     this.client.expenses.set(updated);
   }
 
-  private handleExpenseAdded(change: ExpenseAdded): void {
-    const appExpense = this.expenseManager.get(change.expenseId);
+  private handleExpenseAdded(expenseId: ExpenseId): void {
+    const appExpense = this.expenseManager.get(expenseId);
     this.persistAppExpense(appExpense);
   }
 
-  private handleExpenseUpdated(change: ExpenseUpdated): void {
-    const appExpense = this.expenseManager.get(change.expenseId);
+  private handleExpenseUpdated(expenseId: ExpenseId): void {
+    const appExpense = this.expenseManager.get(expenseId);
     this.persistAppExpense(appExpense);
   }
 
-  private handleExpenseDeleted(change: ExpenseDeleted): void {
-    this.deleteExpense(change.expenseId);
+  private handleExpenseDeleted(expenseId: ExpenseId): void {
+    this.deleteExpense(expenseId);
   }
 
   private persistAllPaymentAccounts(): void {

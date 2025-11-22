@@ -48,7 +48,7 @@ export class ExpenseManager {
     };
 
     this.expenses.set(id, appExpense);
-    this.changeSubject.next(new ExpenseAdded(id));
+    this.changeSubject.next({ kind: "ExpenseAdded", expenseId: id });
   }
 
   public get(id: ExpenseId): AppExpense {
@@ -93,13 +93,13 @@ export class ExpenseManager {
     };
 
     this.expenses.set(id, updated);
-    this.changeSubject.next(new ExpenseUpdated(id));
+    this.changeSubject.next({ kind: "ExpenseUpdated", expenseId: id });
   }
 
   public delete(id: ExpenseId): void {
     console.debug(`ExpenseManager.delete::id=${id}`);
     this.expenses.delete(id);
-    this.changeSubject.next(new ExpenseDeleted(id));
+    this.changeSubject.next({ kind: "ExpenseDeleted", expenseId: id });
   }
 
   public initialize({ appExpenses }: { appExpenses: AppExpense[] }): void {
@@ -125,19 +125,14 @@ export class ExpenseManager {
   }
 }
 
-export class ExpenseAdded {
-  constructor(public readonly expenseId: ExpenseId) {}
-}
-
-export class ExpenseUpdated {
-  constructor(public readonly expenseId: ExpenseId) {}
-}
-
 export class ExpenseDeleted {
   constructor(public readonly expenseId: ExpenseId) {}
 }
 
-type ExpenseChange = ExpenseAdded | ExpenseUpdated | ExpenseDeleted;
+type ExpenseChange =
+  | { kind: "ExpenseAdded"; expenseId: ExpenseId }
+  | { kind: "ExpenseUpdated"; expenseId: ExpenseId }
+  | { kind: "ExpenseDeleted"; expenseId: ExpenseId };
 
 function isReadyToPublish(draft: DraftExpense): boolean {
   if (draft.amount === undefined) {
