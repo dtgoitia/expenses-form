@@ -121,7 +121,7 @@ export class PaymentAccountsManager {
 
     this.accounts.delete(id);
 
-    this.changeSubject.next({ kind: "PaymentAccountUpdated", id });
+    this.changeSubject.next({ kind: "PaymentAccountDeleted", id });
   }
 
   private error(caller: Function, msg: string): never {
