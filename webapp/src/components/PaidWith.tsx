@@ -22,10 +22,10 @@ export function PaidWithDropdown({
 
   useEffect(() => {
     const subscription = app.paymentAccountsManager.change$.subscribe((_) => {
-      updateAccounts(app.paymentAccountsManager.getAll());
+      updateAccounts(app.paymentAccountsManager.getAllVisible());
     });
 
-    updateAccounts(app.paymentAccountsManager.getAll());
+    updateAccounts(app.paymentAccountsManager.getAllVisible());
 
     return () => {
       subscription.unsubscribe();
