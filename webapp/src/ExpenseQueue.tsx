@@ -169,6 +169,7 @@ function ExpenseList({ expenses, onEditExpense, onDelete, app }: Props) {
     <div>
       <div className="flex flex-row justify-end">
         <Toggle
+          uniqueKey={"expenses"}
           isOn={inDeletionMode}
           labelOn="enable deletion mode"
           labelOff="exit deletion mode"

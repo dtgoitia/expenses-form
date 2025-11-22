@@ -2,6 +2,12 @@ import { ChangeEvent } from "react";
 
 interface Props {
   /**
+   * Unique string for each instance of the component. Necessary if
+   * the component appears multiple times on the screen.
+   */
+  uniqueKey: string;
+
+  /**
    * Pass `true` to set the toggle to ON, or `false` to set the
    * toggle to OFF.
    */
@@ -16,17 +22,21 @@ interface Props {
   onToggle: (isOn: boolean) => void;
 }
 
-export function Toggle({ isOn, labelOn, labelOff, onToggle }: Props) {
+export function Toggle({ uniqueKey, isOn, labelOn, labelOff, onToggle }: Props) {
   function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     onToggle(event.target.checked);
   }
 
-  const htmlFor = labelOn
-    .toLowerCase()
-    .replaceAll("-", "")
-    .replaceAll(" ", "")
-    .replaceAll("!", "")
-    .replaceAll("?", "");
+  const htmlFor = [uniqueKey, labelOn]
+    .map((chunk) =>
+      chunk
+        .toLowerCase()
+        .replaceAll("-", "")
+        .replaceAll(" ", "")
+        .replaceAll("!", "")
+        .replaceAll("?", "")
+    )
+    .join("-");
 
   return (
     <label
