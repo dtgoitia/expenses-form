@@ -123,6 +123,12 @@ export class PaymentAccountsManager {
     return [...this.accounts.values()].sort(sortPaymentAccountsByName);
   }
 
+  public getAllVisible(): PaymentAccount[] {
+    return [...this.accounts.values()]
+      .filter((account) => account.isVisible)
+      .sort(sortPaymentAccountsByName);
+  }
+
   public add({ draft }: { draft: DraftPaymentAccount }): void {
     const id = this.generatePaymentAccountId();
     const account: PaymentAccount = { id, ...draft };
