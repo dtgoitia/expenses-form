@@ -40,7 +40,7 @@ export function PaymentAccountEditor({
     currency === account.currency &&
     isVisible === account.isVisible;
 
-  function handleAddPaymentAccount(): void {
+  function handleUpdatePaymentAccount(): void {
     if (
       name === undefined ||
       ledgerName === undefined ||
@@ -106,7 +106,7 @@ export function PaymentAccountEditor({
       <div className="flex justify-end m-3">
         <Button
           // icon="floppy-disk"
-          onClick={handleAddPaymentAccount}
+          onClick={handleUpdatePaymentAccount}
           disabled={!canSaveAccount || changesSaved}
           text={!canSaveAccount ? "'name' and 'ledger name' must not be empty" : "Save"}
         />
