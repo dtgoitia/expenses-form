@@ -28,25 +28,26 @@ export class PaymentAccountsManager {
     accounts: PaymentAccount[];
     defaultAccountId: PaymentAccountId | undefined;
   }): void {
-    console.debug(`${PaymentAccountsManager.name}.${this.initialize.name}::started`);
+    console.debug(`PaymentAccountsManager.initialize::started`);
     console.debug(
-      `${PaymentAccountsManager.name}.${this.initialize.name}::defaultAccountId`,
+      `PaymentAccountsManager.initialize::defaultAccountId`,
       defaultAccountId
     );
     for (const account of accounts) {
       const { id } = account;
 
       if (this.accounts.has(id)) {
-        this.error(this.initialize, `same PaymentAccountId found at least twice: ${id}`);
+        throw new Error(
+          `PaymentAccountsManager.initialize::same PaymentAccountId found at least twice: ${id}`
+        );
       }
 
       this.accounts.set(id, account);
     }
 
     if (defaultAccountId && this.accounts.has(defaultAccountId) === false) {
-      this.error(
-        this.initialize,
-        `no account ID matches the defaultAccountId='${defaultAccountId}'`
+      throw new Error(
+        `PaymentAccountsManager.initialize::no account ID matches the defaultAccountId='${defaultAccountId}'`
       );
     }
 
@@ -61,7 +62,9 @@ export class PaymentAccountsManager {
 
   public setDefault({ id }: { id: PaymentAccountId }): void {
     if (this.accounts.has(id) === false) {
-      this.error(this.setDefault, `'${id}' must match an existing Payment Account ID`);
+      throw new Error(
+        `PaymentAccountsManager.setDefault::'${id}' must match an existing Payment Account ID`
+      );
     }
 
     this.defaultAccountId = id;
@@ -100,9 +103,8 @@ export class PaymentAccountsManager {
     const { id } = account;
 
     if (this.accounts.has(id) === false) {
-      this.error(
-        this.update,
-        `Cannot update an account because it does not exist, id=${id}`
+      throw new Error(
+        `PaymentAccountsManager.update::Cannot update an account because it does not exist, id=${id}`
       );
     }
 
@@ -113,19 +115,14 @@ export class PaymentAccountsManager {
 
   public delete({ id }: { id: PaymentAccountId }): void {
     if (this.accounts.has(id) === false) {
-      this.error(
-        this.delete,
-        `Cannot delete an account because it does not exist, id=${id}`
+      throw new Error(
+        `PaymentAccountsManager.delete::Cannot delete an account because it does not exist, id=${id}`
       );
     }
 
     this.accounts.delete(id);
 
     this.changeSubject.next({ kind: "PaymentAccountDeleted", id });
-  }
-
-  private error(caller: Function, msg: string): never {
-    throw new Error(`${PaymentAccountsManager.name}.${caller.name}::${msg}`);
   }
 
   private generatePaymentAccountId(): PaymentAccountId {
