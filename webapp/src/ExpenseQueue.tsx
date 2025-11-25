@@ -132,7 +132,16 @@ function ListItem({
           <pre>datetime: {dateToLocale(customISOStringToDate(expense.datetime))}</pre>
           <pre>paid_with: {account && account.name}</pre>
           <pre>
+            amount:{" "}
+            {expense.amount === undefined
+              ? "--"
+              : `${expense.amount} ${expense.currency}`}
+          </pre>
+          <pre>
             original_amount: {expense.originalAmount} {expense.originalCurrency}
+          </pre>
+          <pre>
+            splits: {expense.splits.length === 0 ? "--" : JSON.stringify(expense.splits)}
           </pre>
           <div className="flex flex-row gap-3 pt-1">
             <Button
