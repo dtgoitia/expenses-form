@@ -4,7 +4,8 @@ import { Toggle } from "./components/Toggle";
 import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
 import { AppExpense, groupExpensesByLocalDate } from "./domain/expenses";
-import { DraftExpense, ExpenseId } from "./domain/model";
+import { CurrencyAmount, CurrencyCode, DraftExpense, ExpenseId } from "./domain/model";
+import { NUMBER_FORMATTER } from "./lib/number";
 import { errorsService } from "./services/errors";
 import { descriptionToSplitwiseFormat } from "./splitwise";
 import { useState } from "react";
@@ -61,17 +62,24 @@ function copyToClipboard(text: string): Promise<void> {
 }
 
 function formatAmount(expense: DraftExpense): string {
+  function _format(amount: CurrencyAmount, currency: CurrencyCode): string {
+    return `${NUMBER_FORMATTER.format(amount)} ${currency}`;
+  }
+
   const isPaidInAnotherCurrency = !!expense.originalAmount;
 
   if (isPaidInAnotherCurrency) {
-    return `${expense.originalAmount} ${expense.originalCurrency}`;
+    return _format(
+      expense.originalAmount as CurrencyAmount,
+      expense.originalCurrency as CurrencyCode
+    );
   }
 
   if (expense.amount === undefined) {
     return `?`;
   }
 
-  return `${expense.amount} ${expense.currency}`;
+  return _format(expense.amount, expense.currency);
 }
 
 interface ListItemProps {
@@ -135,13 +143,19 @@ function ListItem({
             amount:{" "}
             {expense.amount === undefined
               ? "--"
-              : `${expense.amount} ${expense.currency}`}
+              : `${NUMBER_FORMATTER.format(expense.amount)} ${expense.currency}`}
           </pre>
           <pre>
-            original_amount: {expense.originalAmount} {expense.originalCurrency}
+            original_amount:{" "}
+            {expense.originalAmount === undefined
+              ? "--"
+              : `${NUMBER_FORMATTER.format(expense.originalAmount)} ${
+                  expense.originalCurrency
+                }`}
           </pre>
           <pre>
-            splits: {expense.splits.length === 0 ? "--" : JSON.stringify(expense.splits)}
+            splits:{" "}
+            {expense.splits.length === 0 ? "--" : JSON.stringify(expense.splits, null, 2)}
           </pre>
           <div className="flex flex-row gap-3 pt-1">
             <Button
