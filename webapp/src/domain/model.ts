@@ -8,9 +8,9 @@ export type CurrencyAmount = number;
 export interface Expense {
   id: ExpenseId;
   amount: CurrencyAmount;
-  currency: string;
+  currency: CurrencyCode;
   originalAmount: CurrencyAmount | undefined;
-  originalCurrency: string | undefined;
+  originalCurrency: CurrencyCode | undefined;
   description: string;
   datetime: DatetimeISOString;
   paid_with: PaymentAccountId;
