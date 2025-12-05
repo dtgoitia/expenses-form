@@ -38,6 +38,20 @@ describe("divide expense equally", () => {
     const owedAmounts = result.map((split) => split.owed).sort();
     expect(owedAmounts).toEqual([0.33, 0.33, 0.34]);
   });
+
+  it("with only one person with a 'paid' value", () => {
+    const splits: Split[] = [
+      { person: "A", paid: 3, owed: undefined },
+      { person: "B", paid: undefined, owed: undefined },
+      { person: "C", paid: undefined, owed: undefined },
+    ];
+    const result = divideEqually(splits);
+    expect(result).toEqual([
+      { person: "A", paid: 3, owed: 1 },
+      { person: "B", paid: 0, owed: 1 },
+      { person: "C", paid: 0, owed: 1 },
+    ]);
+  });
 });
 
 describe("validate splits", () => {

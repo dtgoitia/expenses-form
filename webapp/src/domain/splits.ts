@@ -34,7 +34,11 @@ export function divideEqually(splits: Split[]): Split[] {
     }
   }
 
-  const result = splits.map((split, i) => ({ ...split, owed: values[i] / base }));
+  const result = splits.map((split, i) => ({
+    ...split,
+    paid: split.paid === undefined ? 0 : split.paid,
+    owed: values[i] / base,
+  }));
   return result;
 }
 
