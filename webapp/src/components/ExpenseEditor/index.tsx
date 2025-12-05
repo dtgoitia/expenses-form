@@ -129,7 +129,13 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   }
 
   function handleSplitwiseChange(checked: boolean): void {
-    update({ ...expense, shared: checked });
+    const updated = {
+      ...expense,
+      shared: checked,
+      splits: checked ? expense.splits : [],
+    };
+    update(updated);
+    setSplits([...updated.splits]);
   }
 
   function handlePaidInOtherCurrencyCheckboxChange(checked: boolean): void {
