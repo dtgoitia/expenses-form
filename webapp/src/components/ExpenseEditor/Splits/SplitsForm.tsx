@@ -4,7 +4,6 @@ import { Label } from "../../Label";
 import { ListedSplit } from "./ListedSplit";
 import { CurrencyAmount, PersonName, Split } from "../../../domain/model";
 import { DefaultActions } from "./DefaultActions";
-import { validateSplits } from "../../../domain/splits";
 
 interface Props {
   splits: Split[];
