@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FRACTION_DELIMITER,
   NEGATIVE_SYMBOL,
@@ -15,9 +15,11 @@ interface Props {
 }
 
 export function NumericInput({ value, placeholder, onChange: change, className }: Props) {
-  const [internalValue, setInternalValue] = useState<string | undefined>(
-    value === undefined ? undefined : NUMBER_FORMATTER.format(value)
-  );
+  function _format(value: number | undefined): string | undefined {
+    return value === undefined ? undefined : NUMBER_FORMATTER.format(value);
+  }
+
+  const [internalValue, setInternalValue] = useState<string | undefined>(_format(value));
 
   let css =
     "w-full py-3 px-4" +
@@ -33,6 +35,12 @@ export function NumericInput({ value, placeholder, onChange: change, className }
   if (className) {
     css += ` ${className}`;
   }
+
+  // required because the 'value' value can change both via props and via
+  // user inputs
+  useEffect(() => {
+    setInternalValue(_format(value));
+  }, [value]);
 
   function handleChange(raw: string | undefined): void {
     if (raw === "" || raw === undefined || raw === null) {
