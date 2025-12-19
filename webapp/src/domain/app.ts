@@ -2,7 +2,7 @@ import { assertNever } from "../exhaustive-match";
 import { BrowserStorage } from "./browserstorage";
 import { CurrencyManager } from "./currencies";
 import { ExpenseManager } from "./expenses";
-import { PaymentAccountId } from "./model";
+import { CurrencyCode, PaymentAccountId } from "./model";
 import {
   PaymentAccountChanges as PaymentAccountChange,
   PaymentAccountsManager,
@@ -10,7 +10,7 @@ import {
 import { PeopleManager } from "./people";
 import { ShortcutsManager } from "./shortcuts";
 
-interface Props {
+interface Args {
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
   browserStorage: BrowserStorage;
@@ -36,7 +36,7 @@ export class App {
     currencyManager,
     peopleManager,
     shortcutsManager,
-  }: Props) {
+  }: Args) {
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
     this.browserStorage = browserStorage;
@@ -85,6 +85,39 @@ export class App {
     console.debug(`App.initialize::completed`);
   }
 
+  public deleteCurrencySafe(currency: CurrencyCode): DeleteCurrencyResult {
+    let isUsedByAccount =
+      this.paymentAccountsManager
+        .getAll()
+        .filter((account) => account.currency === currency).length > 0;
+    if (isUsedByAccount) {
+      return {
+        ok: false,
+        reason: `currency ${currency} was not deleted because it used by one or more account`,
+      };
+    }
+
+    let isUsedByExpense =
+      this.expenseManager
+        .getAll()
+        .filter((expense) =>
+          [expense.expense.currency, expense.expense.originalCurrency].includes(currency)
+        ).length > 0;
+    if (isUsedByExpense) {
+      return {
+        ok: false,
+        reason: `currency ${currency} was not deleted because it used as an 'original currency' by one or more expenses`,
+      };
+    }
+
+    const unsafeResult = this.currencyManager.deleteUnsafe(currency);
+    if (unsafeResult.ok === false) {
+      return { ok: false, reason: unsafeResult.reason };
+    }
+
+    return unsafeResult;
+  }
+
   private handlePaymentAccountChange(change: PaymentAccountChange): void {
     switch (change.kind) {
       case "PaymentAccountManagerInitialized":
@@ -106,3 +139,5 @@ export class App {
     this.browserStorage.setDefaultAccountId({ id });
   }
 }
+
+type DeleteCurrencyResult = { ok: true } | { ok: false; reason: string };
