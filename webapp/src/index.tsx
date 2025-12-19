@@ -32,14 +32,15 @@ const expenseManager = new ExpenseManager();
 const paymentAccountsManager = new PaymentAccountsManager({ expenseManager });
 const peopleManager = new PeopleManager();
 const shortcutsManager = new ShortcutsManager();
+const currencyManager = new CurrencyManager();
 const browserStorage = new BrowserStorage({
   expenseManager,
   paymentAccountsManager,
   client: new Storage(),
   peopleManager,
   shortcutsManager,
+  currencyManager,
 });
-const currencyManager = new CurrencyManager();
 
 const app = new App({
   browserStorage,

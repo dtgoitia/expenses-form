@@ -1,5 +1,6 @@
 import { assertNever } from "../exhaustive-match";
 import { Storage } from "../localStorage";
+import { CurrencyManager } from "./currencies";
 import { AppExpense, ExpenseManager, ExpenseStatus } from "./expenses";
 import {
   CurrencyCode,
@@ -21,6 +22,7 @@ interface BrowserStorageParams {
   paymentAccountsManager: PaymentAccountsManager;
   peopleManager: PeopleManager;
   shortcutsManager: ShortcutsManager;
+  currencyManager: CurrencyManager;
 }
 
 export class BrowserStorage {
@@ -29,6 +31,7 @@ export class BrowserStorage {
   private paymentAccountsManager: PaymentAccountsManager;
   private peopleManager: PeopleManager;
   private shortcutsManager: ShortcutsManager;
+  private currencyManager: CurrencyManager;
 
   constructor({
     client,
@@ -36,12 +39,14 @@ export class BrowserStorage {
     paymentAccountsManager,
     peopleManager,
     shortcutsManager,
+    currencyManager,
   }: BrowserStorageParams) {
     this.client = client;
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
     this.peopleManager = peopleManager;
     this.shortcutsManager = shortcutsManager;
+    this.currencyManager = currencyManager;
 
     this.expenseManager.change$.subscribe((change) => {
       console.debug(`BrowserStorage.expenseManager.changes:`, change);
@@ -98,6 +103,20 @@ export class BrowserStorage {
           return this.persistAllShortcuts();
         case "ShortcutDeleted":
           return this.persistAllShortcuts();
+      }
+    });
+
+    this.currencyManager.change$.subscribe((change) => {
+      console.debug(`BrowserStorage.currencyManager.changes$:`, change);
+      switch (change.kind) {
+        case "CurrencyManagerInitialized":
+          return;
+        case "CurrencyAdded":
+          return this.persistAllCurrencies();
+        case "CurrencyDeleted":
+          return this.persistAllCurrencies();
+        default:
+          assertNever(change, `unsupported CurrencyChange: ${change}`);
       }
     });
   }
@@ -243,5 +262,10 @@ export class BrowserStorage {
   private persistAllShortcuts(): void {
     const shortcuts = this.shortcutsManager.getAll();
     this.client.shortcuts.set(shortcuts);
+  }
+
+  private persistAllCurrencies(): void {
+    const currencies = [...this.currencyManager.getAll()].sort().join(",");
+    this.client.currencies.set(currencies);
   }
 }
