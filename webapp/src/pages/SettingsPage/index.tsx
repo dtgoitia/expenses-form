@@ -6,6 +6,7 @@ import storage from "../../localStorage";
 import { useEffect, useState } from "react";
 import { PeopleForm } from "./PeopleForm";
 import { ShortcutsForm } from "./ShortcutsForm";
+import { CurrenciesForm } from "./CurrenciesForm";
 
 function listToInputField(items: string[]): string {
   return items.join(",");
@@ -29,7 +30,6 @@ export function SettingsPage({ app }: Props) {
   const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
   const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
-  const [currencies, setCurrencies] = useState<string | undefined>();
 
   useEffect(() => {
     if (storage.splitwiseApiToken.exists()) {
@@ -41,9 +41,6 @@ export function SettingsPage({ app }: Props) {
     if (storage.firestoreConfig.exists()) {
       const config = storage.firestoreConfig.read();
       setFirestoreConfig(JSON.stringify(config));
-    }
-    if (storage.currencies.exists()) {
-      setCurrencies(storage.currencies.read());
     }
   }, []);
 
@@ -83,17 +80,6 @@ export function SettingsPage({ app }: Props) {
     storage.firestoreConfig.set(config);
   }
 
-  function handleCurrenciesChange(value: string | undefined): void {
-    if (value === undefined || value === "") {
-      setCurrencies(undefined);
-      storage.currencies.delete();
-      return;
-    }
-
-    setCurrencies(value);
-    storage.currencies.set(value);
-  }
-
   return (
     <CenteredPage>
       <div className="px-3 flex flex-col gap-4">
@@ -128,15 +114,7 @@ export function SettingsPage({ app }: Props) {
           />
         </Label>
 
-        <Label htmlFor="currencies" text="Currencies">
-          <TextInput
-            id="currencies"
-            value={currencies}
-            placeholder={`GBP,EUR,USD`}
-            onChange={handleCurrenciesChange}
-            className="mt-1"
-          />
-        </Label>
+        <CurrenciesForm app={app} />
 
         <PeopleForm app={app} />
 
