@@ -63,7 +63,7 @@ export function CurrenciesForm({ app }: Props) {
   return (
     <div className="flex flex-col gap-3 ">
       <h2>Currencies</h2>
-      <div className="flex flex-row gap-3">
+      <div className="flex flex-row flex-wrap gap-3">
         {currencies.length === 0 ? (
           <p>no currencies, please add some below</p>
         ) : (
