@@ -166,9 +166,7 @@ const VALID_CHARACTERS = new Set<string>(
   "abcçdefghijklmnñopqrstuvwxyz0123456789".split("")
 );
 
-export function formatSeller(
-  raw: string
-): { ok: true; seller: Seller } | { ok: false; error: string } {
+export function formatSeller(raw: string): Seller {
   const EMPTY_STRING = "";
   const SINGLE_SPACE = " ";
 
@@ -211,10 +209,10 @@ export function formatSeller(
   const cleanChunks = chunks.map(cleanChunk);
   switch (cleanChunks.length) {
     case 1:
-      return { ok: true, seller: cleanChunks[0] };
+      return cleanChunks[0];
     case 2:
       const [main, via] = cleanChunks;
-      return { ok: true, seller: `${main} (via @${via})` };
+      return `${main} (via @${via})`;
     default:
       throw unreachable(`expected 1 or 2 chunks, but got ${cleanChunks.length}`);
   }

@@ -11,17 +11,11 @@ export function SellerSuggestion({ descriptionSeller, onAcceptance: update }: Pr
   if (descriptionSeller === undefined) {
     return null;
   }
-  const formatResult = formatSeller(descriptionSeller);
+  const suggestion = formatSeller(descriptionSeller);
 
-  if (formatResult.ok === false) {
-    return <div>ERROR when computing seller suggestion: {formatResult.error}</div>;
-  }
-
-  if (formatResult.seller === descriptionSeller) {
+  if (suggestion === descriptionSeller) {
     return null;
   }
-
-  const suggestion = formatResult.seller;
 
   return (
     <div className="m-3 flex flex-col flex-wrap gap-y-3">
