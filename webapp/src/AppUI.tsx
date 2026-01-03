@@ -5,7 +5,7 @@ import NavBar from "./components/NaviBar";
 import { BASE_URL } from "./constants";
 import { App } from "./domain/app";
 import { ExpenseEditorPage } from "./pages/ExpenseEditorPage";
-import ExpensesForm from "./pages/ExpensesForm";
+import { ExpensesPage } from "./pages/ExpensesPage";
 import PageNotFound from "./pages/PageNotFound";
 import PaymentAccountsPage from "./pages/PaymentAccountsPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -57,7 +57,7 @@ function AppUI({ app }: Props) {
             <NavBar />
             <ScrollableSectionBellowNavBar>
               <Routes>
-                <Route path={Paths.root} element={<ExpensesForm app={app} />} />
+                <Route path={Paths.root} element={<ExpensesPage app={app} />} />
                 <Route
                   path={Paths.expenseEditor}
                   element={<ExpenseEditorPage app={app} />}

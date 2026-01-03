@@ -12,11 +12,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { first } from "rxjs";
 
-interface ExpensesFormProps {
+interface Props {
   app: App;
 }
 
-function ExpensesForm({ app }: ExpensesFormProps) {
+export function ExpensesPage({ app }: Props) {
   const navigate = useNavigate();
 
   const [appExpenses, setAppExpenses] = useState<AppExpense[]>([]);
@@ -118,5 +118,3 @@ function ExpensesForm({ app }: ExpensesFormProps) {
     </CenteredPage>
   );
 }
-
-export default ExpensesForm;
