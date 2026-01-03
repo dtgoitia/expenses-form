@@ -8,7 +8,6 @@ import {
   PersonName,
   Shortcut,
   ShortcutId,
-  Split,
 } from "../../domain/model";
 import { Button } from "../Button";
 import { Checkbox } from "../Checkbox";
@@ -19,8 +18,9 @@ import { Select } from "../Select";
 import DateTimePicker from "./DateTimePicker";
 import { SyntheticEvent, useEffect, useState } from "react";
 import styled from "styled-components";
-import { SplitsForm } from "./Splits/SplitsForm";
 import Shortcuts from "../../PredefinedButtons";
+import { Link } from "react-router-dom";
+import Paths, { EXPENSE_ID } from "../../routes";
 
 const DateSlot = styled.div`
   display: flex;
@@ -37,16 +37,15 @@ interface ExpenseEditorProps {
   update: (expense: DraftExpense) => void;
 }
 
-function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
+export function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   // If true, the user has paid with a different currency to the default
   // currency of the account used to pay
-  const [paidInOtherCurrency, setPaidInOtherCurrency] = useState<boolean>(
+  const [paidInDifferentCurrency, setPaidInDifferentCurrency] = useState<boolean>(
     expense.originalAmount !== undefined
   );
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
   const [account, setAccount] = useState<PaymentAccount | undefined>();
   const [people, setPeople] = useState<PersonName[]>([]);
-  const [splits, setSplits] = useState<Split[]>(expense.splits);
 
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
 
@@ -135,20 +134,14 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       splits: checked ? expense.splits : [],
     };
     update(updated);
-    setSplits([...updated.splits]);
   }
 
-  function handlePaidInOtherCurrencyCheckboxChange(checked: boolean): void {
-    const paidInOtherCurrency = checked;
-    if (paidInOtherCurrency) {
+  function handlePaidInDifferentCurrencyCheckboxChange(checked: boolean): void {
+    const paidInDifferentCurrency = checked;
+    if (paidInDifferentCurrency) {
       update({ ...expense, originalAmount: undefined, originalCurrency: undefined });
     }
-    setPaidInOtherCurrency(checked);
-  }
-
-  function handleSplitsChange(splits: Split[]): void {
-    setSplits(splits);
-    update({ ...expense, splits });
+    setPaidInDifferentCurrency(checked);
   }
 
   if (account === undefined) {
@@ -162,6 +155,11 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
   const paymentCurrencies: CurrencyCode[] = [...currencies]
     .filter((currency) => currency !== account.currency)
     .sort();
+
+  const { showLink: showLinkToSplitEditor, help } = guardUserAccessToSplitEditor({
+    expense,
+    paidInDifferentCurrency,
+  });
 
   return (
     <div>
@@ -186,13 +184,13 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       <div className="pb-3 flex flex-row flex-no-wrap justify-end">
         <Checkbox
           label="paid with different currency"
-          checked={paidInOtherCurrency}
-          onChange={handlePaidInOtherCurrencyCheckboxChange}
+          checked={paidInDifferentCurrency}
+          onChange={handlePaidInDifferentCurrencyCheckboxChange}
         />
       </div>
 
       <div className="grid grid-col-2 gap-2">
-        {paidInOtherCurrency ? (
+        {paidInDifferentCurrency ? (
           <>
             <div className="col-span-1">
               <NumericInput
@@ -279,22 +277,68 @@ function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
         />
       </div>
 
-      {expense.shared && (
-        <div
-          style={{
-            height: `${8 * Math.max(people.length, expense.splits.length)}rem`,
-          }}
-        >
-          <SplitsForm
-            splits={splits}
-            amount={expense.originalAmount || expense.amount || 0}
-            selectablePeople={people}
-            onChange={handleSplitsChange}
-          />
+      <div className="flex flex-col justify-center mb-5">
+        <div className="flex flex-row justify-center">
+          <Link to={Paths.expenseSplitsEditor.replace(EXPENSE_ID, expense.id)}>
+            <Button
+              text="split payment"
+              disabled={!showLinkToSplitEditor}
+              onClick={() => {}}
+            />
+          </Link>
         </div>
-      )}
+        {help && (
+          <div
+            role="help-to-access-split-editor"
+            className="flex flex-row justify-center p-2"
+          >
+            tip: {help}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-export default ExpenseEditor;
+function shouldUserBeAbleToSetSplits(expense: DraftExpense): boolean {
+  const amountInAccountCurrencyIsSet = expense.amount !== undefined;
+  const amountInMerchantCurrencyIsSet =
+    expense.originalAmount !== undefined && expense.originalCurrency !== undefined;
+  const atLeastOneAmountIsSet =
+    amountInAccountCurrencyIsSet || amountInMerchantCurrencyIsSet;
+  const should = expense.shared && atLeastOneAmountIsSet;
+  return should;
+}
+
+function guardUserAccessToSplitEditor({
+  expense,
+  paidInDifferentCurrency,
+}: {
+  expense: DraftExpense;
+  paidInDifferentCurrency: boolean;
+}): { showLink: boolean; help: string | undefined } {
+  if (expense.shared === false) {
+    return { showLink: false, help: undefined };
+  }
+
+  const showLink = shouldUserBeAbleToSetSplits(expense);
+
+  if (paidInDifferentCurrency === false) {
+    if (showLink) {
+      return { showLink: true, help: undefined };
+    } else {
+      return { showLink: false, help: "input amount" };
+    }
+  }
+
+  if (showLink) {
+    return { showLink, help: undefined };
+  }
+
+  const help =
+    expense.originalCurrency === undefined
+      ? "either input amount for account currency or choose merchant currency"
+      : "input one of the amounts";
+
+  return { showLink: false, help };
+}

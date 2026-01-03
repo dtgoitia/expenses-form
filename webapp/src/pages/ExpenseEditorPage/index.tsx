@@ -1,9 +1,9 @@
-import CenteredPage from "../components/CenteredPage";
-import ExpenseEditor from "../components/ExpenseEditor";
-import { App } from "../domain/app";
-import { AppExpense } from "../domain/expenses";
-import { DraftExpense } from "../domain/model";
-import Paths from "../routes";
+import CenteredPage from "../../components/CenteredPage";
+import { ExpenseEditor } from "../../components/ExpenseEditor";
+import { App } from "../../domain/app";
+import { AppExpense } from "../../domain/expenses";
+import { DraftExpense } from "../../domain/model";
+import Paths from "../../routes";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 

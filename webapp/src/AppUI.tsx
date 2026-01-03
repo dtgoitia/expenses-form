@@ -6,6 +6,7 @@ import { BASE_URL } from "./constants";
 import { App } from "./domain/app";
 import { ExpenseEditorPage } from "./pages/ExpenseEditorPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
+import { ExpenseSplitsEditorPage } from "./pages/ExpenseSplitsEditorPage";
 import PageNotFound from "./pages/PageNotFound";
 import PaymentAccountsPage from "./pages/PaymentAccountsPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -61,6 +62,10 @@ function AppUI({ app }: Props) {
                 <Route
                   path={Paths.expenseEditor}
                   element={<ExpenseEditorPage app={app} />}
+                />
+                <Route
+                  path={Paths.expenseSplitsEditor}
+                  element={<ExpenseSplitsEditorPage app={app} />}
                 />
                 <Route
                   path={Paths.paymentAccounts}

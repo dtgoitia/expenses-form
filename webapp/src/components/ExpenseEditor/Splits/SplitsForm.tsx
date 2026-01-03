@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Choice, MultipleChoice } from "../../MultipleChoice";
 import { Label } from "../../Label";
 import { ListedSplit } from "./ListedSplit";
-import { CurrencyAmount, PersonName, Split } from "../../../domain/model";
+import { CurrencyAmount, CurrencyCode, PersonName, Split } from "../../../domain/model";
 import { DefaultActions } from "./DefaultActions";
+import { Button } from "../../Button";
 
 interface Props {
   splits: Split[];
@@ -20,12 +21,22 @@ export function SplitsForm({
   const [splits, setSplits] = useState<Split[]>(originalSplits);
 
   const [participants, setParticipants] = useState<PersonName[]>(
-    splits.map((s) => s.person)
+    inferParticipants(originalSplits)
   );
+
+  useEffect(() => {
+    setSplits(originalSplits);
+    setParticipants(inferParticipants(originalSplits));
+  }, [originalSplits]);
 
   function updateSplits(updated: Split[]): void {
     setSplits(updated);
     update(updated);
+  }
+
+  function handleDefaultActionSelection(updated: Split[]): void {
+    setParticipants(inferParticipants(updated));
+    updateSplits(updated);
   }
 
   function handleSplitUpdate(splitIndex: number) {
@@ -59,7 +70,7 @@ export function SplitsForm({
       reviewed.add(person);
     }
 
-    // traverse reminding choices
+    // traverse remaining choices
     for (const choice of choicesSet.values()) {
       if (updated.length === 0) {
         updated.push({ person: choice, paid: amount, owed: undefined });
@@ -87,12 +98,12 @@ export function SplitsForm({
           </div>
         </Label>
       </div>
-      {splits.length === 0 && (
-        <div className="p-2 flex flex-row justify-center">
-          <p>there are no splits</p>
-        </div>
-      )}
-      {splits.length > 0 && <DefaultActions splits={splits} onChange={updateSplits} />}
+
+      <DefaultActions
+        amount={amount}
+        splits={splits}
+        onChange={handleDefaultActionSelection}
+      />
 
       {splits.length > 0 && (
         <ol>
@@ -107,4 +118,8 @@ export function SplitsForm({
       )}
     </div>
   );
+}
+
+function inferParticipants(splits: Split[]): PersonName[] {
+  return splits.map((s) => s.person);
 }
