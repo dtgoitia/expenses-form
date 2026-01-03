@@ -170,10 +170,6 @@ export function formatSeller(raw: string): Seller {
   const EMPTY_STRING = "";
   const SINGLE_SPACE = " ";
 
-  function ampersandToAnd(raw: string): string {
-    return raw.replaceAll("&", "And");
-  }
-
   function isWeirdCharacter(character: string): boolean {
     return VALID_CHARACTERS.has(character.toLowerCase()) === false;
   }
@@ -192,7 +188,12 @@ export function formatSeller(raw: string): Seller {
   }
 
   function cleanChunk(chunk: string): string {
-    return ampersandToAnd(chunk)
+    return chunk
+      .normalize("NFD") // split letters and diacritics
+      .replace(/[\u0300-\u036f]/g, "") // remove diacritic marks
+      .replaceAll("Đ", "d")
+      .replaceAll("đ", "d")
+      .replaceAll("&", "And")
       .split(EMPTY_STRING)
       .map(weirdCharacterToSpace)
       .join(EMPTY_STRING)
