@@ -111,7 +111,7 @@ function validateCurrency(raw: any): { ok: true } | { ok: false; reason: string 
     };
   }
 
-  const validCurrencyPattern = /^[ABCDEFGHIJKLMNOPQRSTUVWXZ]{3}$/;
+  const validCurrencyPattern = /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ]{3}$/;
   const matches = validCurrencyPattern.exec(raw);
   if (matches === null) {
     return {
