@@ -4,7 +4,7 @@ import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
 import { dateToISOLocale, now } from "../datetimeUtils";
 import { App } from "../domain/app";
-import { AppExpense, AddExpenseArgs } from "../domain/expenses";
+import { AppExpense, AddExpenseArgs, shouldPublish } from "../domain/expenses";
 import { Expense, ExpenseId, PaymentAccount } from "../domain/model";
 import { unreachable } from "../lib/devex";
 import Paths from "../routes";
@@ -76,7 +76,7 @@ export function ExpensesPage({ app }: Props) {
   const canAddExpense = defaultAccount !== undefined;
 
   const publishableExpenses = appExpenses
-    .filter((appExpense) => appExpense.readyToPublish)
+    .filter(shouldPublish)
     .map((appExpense) => appExpense.expense) as Expense[];
 
   return (
