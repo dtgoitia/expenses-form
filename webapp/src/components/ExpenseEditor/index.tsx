@@ -4,6 +4,7 @@ import {
   CurrencyCode,
   DatetimeISOString,
   DraftExpense,
+  ExpenseId,
   PaymentAccount,
   PersonName,
   Shortcut,
@@ -21,6 +22,7 @@ import styled from "styled-components";
 import Shortcuts from "../../PredefinedButtons";
 import { Link } from "react-router-dom";
 import Paths, { EXPENSE_ID } from "../../routes";
+import { IsPublicationAllowed } from "../../domain/expenses";
 
 const DateSlot = styled.div`
   display: flex;
@@ -34,10 +36,20 @@ const ReloadDate = styled.div`
 interface ExpenseEditorProps {
   app: App;
   expense: DraftExpense;
+  publicationAllowed: IsPublicationAllowed;
   update: (expense: DraftExpense) => void;
+  blockPublication: (id: ExpenseId) => void;
+  allowPublication: (id: ExpenseId) => void;
 }
 
-export function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
+export function ExpenseEditor({
+  app,
+  expense,
+  publicationAllowed,
+  update,
+  blockPublication,
+  allowPublication,
+}: ExpenseEditorProps) {
   // If true, the user has paid with a different currency to the default
   // currency of the account used to pay
   const [paidInDifferentCurrency, setPaidInDifferentCurrency] = useState<boolean>(
@@ -142,6 +154,15 @@ export function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
       update({ ...expense, originalAmount: undefined, originalCurrency: undefined });
     }
     setPaidInDifferentCurrency(checked);
+  }
+
+  function handlePublicationBlockageChange(checked: boolean): void {
+    const blocked = checked;
+    if (blocked) {
+      blockPublication(expense.id);
+    } else {
+      allowPublication(expense.id);
+    }
   }
 
   if (account === undefined) {
@@ -295,6 +316,19 @@ export function ExpenseEditor({ app, expense, update }: ExpenseEditorProps) {
             tip: {help}
           </div>
         )}
+      </div>
+
+      <div
+        className={
+          "p-3 flex flex-row flex-no-wrap justify-center" +
+          (publicationAllowed ? "" : " bg-red-200 dark:bg-red-900")
+        }
+      >
+        <Checkbox
+          label="publication blocked"
+          checked={publicationAllowed === false}
+          onChange={handlePublicationBlockageChange}
+        />
       </div>
     </div>
   );

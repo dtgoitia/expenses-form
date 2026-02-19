@@ -2,7 +2,7 @@ import CenteredPage from "../../components/CenteredPage";
 import { ExpenseEditor } from "../../components/ExpenseEditor";
 import { App } from "../../domain/app";
 import { AppExpense } from "../../domain/expenses";
-import { DraftExpense } from "../../domain/model";
+import { DraftExpense, ExpenseId } from "../../domain/model";
 import Paths from "../../routes";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -38,6 +38,16 @@ export function ExpenseEditorPage({ app }: Props) {
     app.expenseManager.update(expense);
   }
 
+  function handleBlockPublication(id: ExpenseId): void {
+    console.debug(`ExpenseEditorPage::handleBlockPublication::expense ID`, id);
+    app.expenseManager.blockPublication(id);
+  }
+
+  function handleAllowPublication(id: ExpenseId): void {
+    console.debug(`ExpenseEditorPage::handleAllowPublication::expense ID`, id);
+    app.expenseManager.allowPublication(id);
+  }
+
   if (expense === undefined) {
     return (
       <CenteredPage>
@@ -48,7 +58,14 @@ export function ExpenseEditorPage({ app }: Props) {
 
   return (
     <CenteredPage>
-      <ExpenseEditor expense={expense.expense} app={app} update={handleUpdate} />
+      <ExpenseEditor
+        expense={expense.expense}
+        publicationAllowed={expense.publicationAllowed}
+        app={app}
+        update={handleUpdate}
+        blockPublication={handleBlockPublication}
+        allowPublication={handleAllowPublication}
+      />
     </CenteredPage>
   );
 }
