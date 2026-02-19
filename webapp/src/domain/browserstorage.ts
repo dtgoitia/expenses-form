@@ -57,6 +57,10 @@ export class BrowserStorage {
           return this.handleExpenseUpdated(change.expenseId);
         case "ExpenseDeleted":
           return this.handleExpenseDeleted(change.expenseId);
+        case "ExpensePublicationAllowed":
+          return this.handleExpenseUpdated(change.expenseId);
+        case "ExpensePublicationBlocked":
+          return this.handleExpenseUpdated(change.expenseId);
         default:
           throw new Error(`BrowserStorage: unsupported change: ${change}`);
       }
@@ -142,6 +146,7 @@ export class BrowserStorage {
         },
         status: ExpenseStatus[storedItem.status as keyof typeof ExpenseStatus],
         readyToPublish: storedItem.readyToPublish,
+        publicationAllowed: storedItem.publicationAllowed,
       };
 
       allExpenses.push(appExpense);

@@ -5,6 +5,7 @@ import { generatePrefixedId } from "./idGeneration";
 import { DateISOString, DraftExpense, ExpenseId, Seller } from "./model";
 
 export type AddExpenseArgs = Omit<DraftExpense, "id">;
+export type IsPublicationAllowed = boolean;
 
 /**
  * As opposed to `Expense` - which is a domain-only concept, agnostic to the expense
@@ -15,6 +16,7 @@ export interface AppExpense {
   expense: DraftExpense;
   status: ExpenseStatus;
   readyToPublish: boolean;
+  publicationAllowed: IsPublicationAllowed;
 }
 
 export enum ExpenseStatus {
@@ -45,6 +47,7 @@ export class ExpenseManager {
       expense,
       status: ExpenseStatus.local,
       readyToPublish: false,
+      publicationAllowed: true,
     };
 
     this.expenses.set(id, appExpense);
@@ -102,6 +105,42 @@ export class ExpenseManager {
     this.changeSubject.next({ kind: "ExpenseDeleted", expenseId: id });
   }
 
+  public blockPublication(
+    id: ExpenseId
+  ): { success: true } | { success: false; reason: string } {
+    const previous = this.expenses.get(id);
+    if (previous === undefined) {
+      return {
+        success: false,
+        reason: `Expected an Expense with ID ${id}, but none found.`,
+      };
+    }
+
+    const updated: AppExpense = { ...previous, publicationAllowed: false };
+
+    this.expenses.set(id, updated);
+    this.changeSubject.next({ kind: "ExpensePublicationBlocked", expenseId: id });
+    return { success: true };
+  }
+
+  public allowPublication(
+    id: ExpenseId
+  ): { success: true } | { success: false; reason: string } {
+    const previous = this.expenses.get(id);
+    if (previous === undefined) {
+      return {
+        success: false,
+        reason: `Expected an Expense with ID ${id}, but none found.`,
+      };
+    }
+
+    const updated: AppExpense = { ...previous, publicationAllowed: true };
+
+    this.expenses.set(id, updated);
+    this.changeSubject.next({ kind: "ExpensePublicationAllowed", expenseId: id });
+    return { success: true };
+  }
+
   public initialize({ appExpenses }: { appExpenses: AppExpense[] }): void {
     console.debug(`ExpenseManager.initialize::Starting initialization...`);
 
@@ -132,7 +171,9 @@ export class ExpenseDeleted {
 type ExpenseChange =
   | { kind: "ExpenseAdded"; expenseId: ExpenseId }
   | { kind: "ExpenseUpdated"; expenseId: ExpenseId }
-  | { kind: "ExpenseDeleted"; expenseId: ExpenseId };
+  | { kind: "ExpenseDeleted"; expenseId: ExpenseId }
+  | { kind: "ExpensePublicationBlocked"; expenseId: ExpenseId }
+  | { kind: "ExpensePublicationAllowed"; expenseId: ExpenseId };
 
 function isReadyToPublish(draft: DraftExpense): boolean {
   if (draft.amount === undefined) {
@@ -217,4 +258,8 @@ export function formatSeller(raw: string): Seller {
     default:
       throw unreachable(`expected 1 or 2 chunks, but got ${cleanChunks.length}`);
   }
+}
+
+export function shouldPublish(expense: AppExpense): boolean {
+  return expense.publicationAllowed && expense.readyToPublish;
 }

@@ -44,6 +44,10 @@ export class PaymentAccountsManager {
           return this.updateAccountToExpenseIndex();
         case "ExpenseDeleted":
           return this.updateAccountToExpenseIndex();
+        case "ExpensePublicationAllowed":
+          return;
+        case "ExpensePublicationBlocked":
+          return;
         default:
           throw new Error(`PaymentAccountsManager: unsupported change: ${change}`);
       }
