@@ -55,11 +55,11 @@ export function ExpenseSplitsEditor({ app, expense, onUpdate: update }: Props) {
   }
 
   function handleAmountSelection(amount: CurrencyAmount): void {
-    console.debug(`>> ExpenseSplits.Editor.handleAmountSelection::amount: ${amount}`);
+    console.debug(`ExpenseSplits.Editor.handleAmountSelection::amount: ${amount}`);
     setAmount(amount);
     const updatedSplits = resetSplits(splits);
     console.log(
-      `>> ExpenseSplits.Editor.handleAmountSelection::updatedSplits:`,
+      `ExpenseSplits.Editor.handleAmountSelection::updatedSplits:`,
       JSON.stringify(updatedSplits)
     );
     setSplits(updatedSplits);

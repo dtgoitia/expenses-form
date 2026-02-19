@@ -96,7 +96,7 @@ export function NumericInput({ value, placeholder, onChange: change, className }
         }
       } else if (countDecimalDelimiterOccurrences(raw) > 1) {
         console.debug(
-          `>> NumericInput.handleChange::the user typed a second decimal delimiter, which is not supported`
+          `NumericInput.handleChange::the user typed a second decimal delimiter, which is not supported`
         );
         return;
       } else {
