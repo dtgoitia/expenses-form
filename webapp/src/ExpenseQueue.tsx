@@ -3,7 +3,7 @@ import { Collapse } from "./components/Collapse";
 import { Toggle } from "./components/Toggle";
 import { customISOStringToDate, dateToLocale } from "./datetimeUtils";
 import { App } from "./domain/app";
-import { AppExpense, groupExpensesByLocalDate } from "./domain/expenses";
+import { AppExpense, groupExpensesByLocalDate, shouldPublish } from "./domain/expenses";
 import { CurrencyAmount, CurrencyCode, DraftExpense, ExpenseId } from "./domain/model";
 import { NUMBER_FORMATTER } from "./lib/number";
 import { errorsService } from "./services/errors";
@@ -117,7 +117,7 @@ function ListItem({
   let splitwiseDescription = descriptionToSplitwiseFormat(expense.description);
 
   let css = "flex flex-row flex-nowrap gap-x-2" + " p-2 dark:p-2";
-  if (!appExpense.readyToPublish) {
+  if (shouldPublish(appExpense) === false) {
     css += " bg-red-200 dark:bg-red-900";
   }
 
