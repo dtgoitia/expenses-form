@@ -1,0 +1,12 @@
+services:
+
+  claude:
+    build:
+      context: ..
+      dockerfile: .agent-env/Dockerfile.claude
+    image: expenses-webapp--agent-env
+    container_name: expenses-webapp--agent-env
+    volumes:
+      - ../.:/projects/expenses-form/:Z
+      - /dev/null:/projects/expenses-form/.envrc:ro
+      - ${HOME}/.config/claude:/root/.claude:Z
