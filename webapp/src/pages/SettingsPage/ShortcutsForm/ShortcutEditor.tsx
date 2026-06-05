@@ -10,6 +10,7 @@ import {
   Shortcut,
   ShortcutButtonName,
   ShortcutMainDescription,
+  TagName,
 } from "../../../domain/model";
 import { Button } from "../../../components/Button";
 import { App } from "../../../domain/app";
@@ -27,6 +28,7 @@ export function ShortcutEditor({ app, shortcut, onUpdate: updateShortcut }: Prop
   const originalDescription = descriptionToString(shortcut);
   const [description, setDescription] = useState<string>(originalDescription);
   const [peopleInSettings, setPeopleInSettings] = useState<PersonName[]>([]);
+  const [tagsInSettings, setTagsInSettings] = useState<TagName[]>([]);
 
   const buttonNameIsSet =
     buttonName !== undefined && buttonName !== null && buttonName !== "";
@@ -39,10 +41,15 @@ export function ShortcutEditor({ app, shortcut, onUpdate: updateShortcut }: Prop
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
       setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
     });
+    const tagsSubscription = app.tagManager.change$.subscribe((_) => {
+      setTagsInSettings(app.tagManager.getVisible().map((tag) => tag.name));
+    });
     setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
+    setTagsInSettings(app.tagManager.getVisible().map((tag) => tag.name));
 
     return () => {
       peopleSubscription.unsubscribe();
+      tagsSubscription.unsubscribe();
     };
   }, [app]);
 
@@ -71,6 +78,7 @@ export function ShortcutEditor({ app, shortcut, onUpdate: updateShortcut }: Prop
       <DescriptionForm
         description={description}
         peopleInSettings={peopleInSettings}
+        tagsInSettings={tagsInSettings}
         onChange={setDescription}
       />
       <div className="flex justify-end p-2">

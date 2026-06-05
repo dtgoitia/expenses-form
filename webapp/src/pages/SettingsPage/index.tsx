@@ -7,20 +7,7 @@ import { useEffect, useState } from "react";
 import { PeopleForm } from "./PeopleForm";
 import { ShortcutsForm } from "./ShortcutsForm";
 import { CurrenciesForm } from "./CurrenciesForm";
-
-function listToInputField(items: string[]): string {
-  return items.join(",");
-}
-
-function inputFieldToList(inputValue: string): string[] {
-  const quotedItems = inputValue
-    .split(",")
-    .filter((tag) => tag !== "") // because  value="foo,," --> ["foo","",""]
-    .map((tag) => `"${tag}"`)
-    .join(",");
-  const items = JSON.parse(`[${quotedItems}]`);
-  return items;
-}
+import { TagsForm } from "./TagsForm";
 
 interface Props {
   app: App;
@@ -28,15 +15,11 @@ interface Props {
 
 export function SettingsPage({ app }: Props) {
   const [splitwiseToken, setSplitwiseToken] = useState<string | undefined>(undefined);
-  const [tripTags, setTripTags] = useState<string | undefined>(undefined);
   const [firestoreConfig, setFirestoreConfig] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (storage.splitwiseApiToken.exists()) {
       setSplitwiseToken(storage.splitwiseApiToken.read());
-    }
-    if (storage.tripTags.exists()) {
-      setTripTags(listToInputField(storage.tripTags.read() as string[]));
     }
     if (storage.firestoreConfig.exists()) {
       const config = storage.firestoreConfig.read();
@@ -53,19 +36,6 @@ export function SettingsPage({ app }: Props) {
 
     setSplitwiseToken(value);
     storage.splitwiseApiToken.set(value);
-  }
-
-  function handleTripTagsChange(value: string | undefined): void {
-    if (value === undefined || value === "") {
-      setTripTags(undefined);
-      storage.tripTags.delete();
-      return;
-    }
-
-    setTripTags(value);
-
-    const tags = inputFieldToList(value);
-    storage.tripTags.set(tags);
   }
 
   function handleFirestoreConfigChange(value: string | undefined): void {
@@ -93,15 +63,7 @@ export function SettingsPage({ app }: Props) {
           />
         </Label>
 
-        <Label htmlFor="trip-tags" text="Trip tags">
-          <TextInput
-            id="trip-tags"
-            value={tripTags}
-            placeholder="trip tags"
-            onChange={handleTripTagsChange}
-            className="mt-1"
-          />
-        </Label>
+        <TagsForm app={app} />
 
         <Label htmlFor="firestore-config" text="Firestore config">
           <TextInput

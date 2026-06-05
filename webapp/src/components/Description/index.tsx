@@ -1,6 +1,4 @@
-import { TAGS } from "../../constants";
 import { PersonName, Seller, TagName } from "../../domain/model";
-import storage from "../../localStorage";
 import { Choice, MultipleChoice } from "../MultipleChoice";
 import { TextInput } from "../TextInput";
 import { SellerSuggestion } from "./SellerSuggestion";
@@ -10,6 +8,7 @@ import { useState } from "react";
 interface DescriptionProps {
   description: string;
   peopleInSettings: PersonName[];
+  tagsInSettings: TagName[];
   onChange: (description: string) => void;
 }
 
@@ -87,9 +86,6 @@ export function stringToDescription({ raw }: { raw: string }): Description {
   return { main, people, seller, tags };
 }
 
-const tagsInSettings = storage.tripTags.read() || [];
-const availableTags: TagName[] = mergeStringLists([TAGS, tagsInSettings]);
-
 function mergeStringLists(listOfStringLists: string[][]): string[] {
   /**
    * Return a list of unique strings. The order is preserved - items of the first list
@@ -110,6 +106,7 @@ function mergeStringLists(listOfStringLists: string[][]): string[] {
 export function DescriptionForm({
   description: raw,
   peopleInSettings,
+  tagsInSettings,
   onChange: update,
 }: DescriptionProps) {
   const description = stringToDescription({ raw });
@@ -189,7 +186,7 @@ export function DescriptionForm({
       )}
 
       <TagSelector
-        tags={availableTags}
+        tags={tagsInSettings}
         selected={new Set(description.tags)}
         onChange={handleTagChange}
       />

@@ -9,12 +9,14 @@ import {
 } from "./paymentAccounts";
 import { PeopleManager } from "./people";
 import { ShortcutsManager } from "./shortcuts";
+import { TagManager } from "./tags";
 
 interface Args {
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
   browserStorage: BrowserStorage;
   currencyManager: CurrencyManager;
+  tagManager: TagManager;
   peopleManager: PeopleManager;
   shortcutsManager: ShortcutsManager;
 }
@@ -23,6 +25,7 @@ export class App {
   public expenseManager: ExpenseManager;
   public paymentAccountsManager: PaymentAccountsManager;
   public currencyManager: CurrencyManager;
+  public tagManager: TagManager;
   public peopleManager: PeopleManager;
   public shortcutsManager: ShortcutsManager;
   public initialized: boolean = false;
@@ -34,6 +37,7 @@ export class App {
     paymentAccountsManager,
     browserStorage,
     currencyManager,
+    tagManager,
     peopleManager,
     shortcutsManager,
   }: Args) {
@@ -41,6 +45,7 @@ export class App {
     this.paymentAccountsManager = paymentAccountsManager;
     this.browserStorage = browserStorage;
     this.currencyManager = currencyManager;
+    this.tagManager = tagManager;
     this.peopleManager = peopleManager;
     this.shortcutsManager = shortcutsManager;
 
@@ -73,6 +78,8 @@ export class App {
         accounts,
         defaultAccountId: this.browserStorage.readDefaultAccountId(),
       });
+
+      this.tagManager.initialize({ tags: this.browserStorage.readTags() });
 
       this.peopleManager.initialize({ people: this.browserStorage.readPeople() });
 

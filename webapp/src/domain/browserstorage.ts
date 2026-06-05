@@ -13,10 +13,14 @@ import {
   PersonVisibility,
   Shortcut,
   SplitwiseId,
+  Tag,
+  TagName,
+  TagVisibility,
 } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 import { PeopleManager } from "./people";
 import { ShortcutsManager } from "./shortcuts";
+import { TagManager } from "./tags";
 
 type GenericObject = { [key: string]: any };
 
@@ -24,6 +28,7 @@ interface BrowserStorageParams {
   client: Storage;
   expenseManager: ExpenseManager;
   paymentAccountsManager: PaymentAccountsManager;
+  tagManager: TagManager;
   peopleManager: PeopleManager;
   shortcutsManager: ShortcutsManager;
   currencyManager: CurrencyManager;
@@ -33,6 +38,7 @@ export class BrowserStorage {
   private client: Storage;
   private expenseManager: ExpenseManager;
   private paymentAccountsManager: PaymentAccountsManager;
+  private tagManager: TagManager;
   private peopleManager: PeopleManager;
   private shortcutsManager: ShortcutsManager;
   private currencyManager: CurrencyManager;
@@ -41,6 +47,7 @@ export class BrowserStorage {
     client,
     expenseManager,
     paymentAccountsManager,
+    tagManager,
     peopleManager,
     shortcutsManager,
     currencyManager,
@@ -48,6 +55,7 @@ export class BrowserStorage {
     this.client = client;
     this.expenseManager = expenseManager;
     this.paymentAccountsManager = paymentAccountsManager;
+    this.tagManager = tagManager;
     this.peopleManager = peopleManager;
     this.shortcutsManager = shortcutsManager;
     this.currencyManager = currencyManager;
@@ -81,6 +89,22 @@ export class BrowserStorage {
           return this.persistAllPaymentAccounts();
         case "PaymentAccountDeleted":
           return this.persistAllPaymentAccounts();
+      }
+    });
+
+    this.tagManager.change$.subscribe((change) => {
+      console.debug(`BrowserStorage.tagManager.change$:`, change);
+      switch (change.kind) {
+        case "TagManagerInitialized":
+          return;
+        case "TagAdded":
+          return this.persistAllTags();
+        case "TagUpdated":
+          return this.persistAllTags();
+        case "TagDeleted":
+          return this.persistAllTags();
+        default:
+          assertNever(change, `unsupported TagChange: ${change}`);
       }
     });
 
@@ -190,6 +214,21 @@ export class BrowserStorage {
     return id;
   }
 
+  public readTags(): Tag[] {
+    console.debug(`BrowserStorage.readTags()`);
+    const raw: any[] = this.client.tags.read() || [];
+    const tags: Tag[] = [];
+    for (const storedItem of raw) {
+      const tag: Tag = {
+        name: storedItem.name as TagName,
+        isVisible: storedItem.isVisible as TagVisibility,
+      };
+      tags.push(tag);
+    }
+
+    return tags;
+  }
+
   public readPeople(): Person[] {
     console.debug(`BrowserStorage.readPeople()`);
     const raw: any[] = this.client.people.read() || [];
@@ -264,6 +303,11 @@ export class BrowserStorage {
   private persistAllPaymentAccounts(): void {
     const accounts = this.paymentAccountsManager.getAll();
     this.client.paymentAccounts.set(accounts);
+  }
+
+  private persistAllTags(): void {
+    const tags = this.tagManager.getAll();
+    this.client.tags.set(tags);
   }
 
   private persistAllPeople(): void {

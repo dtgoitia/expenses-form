@@ -5,6 +5,7 @@ import {
   Shortcut,
   ShortcutButtonName,
   ShortcutId,
+  TagName,
 } from "../../../domain/model";
 import { Button } from "../../../components/Button";
 import { Label } from "../../../components/Label";
@@ -22,6 +23,7 @@ export function ShortcutsForm({ app }: Props) {
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
 
   const [peopleInSettings, setPeopleInSettings] = useState<PersonName[]>([]);
+  const [tagsInSettings, setTagsInSettings] = useState<TagName[]>([]);
 
   const [buttonName, setButtonName] = useState<ShortcutButtonName | undefined>();
   const [description, setDescription] = useState<string>(NO_DESCRIPTION);
@@ -30,15 +32,20 @@ export function ShortcutsForm({ app }: Props) {
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
       setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
     });
+    const tagsSubscription = app.tagManager.change$.subscribe((_) => {
+      setTagsInSettings(app.tagManager.getVisible().map((tag) => tag.name));
+    });
     const shortcutsSubscription = app.shortcutsManager.change$.subscribe((_) => {
       setShortcuts(app.shortcutsManager.getAll());
     });
 
     setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
+    setTagsInSettings(app.tagManager.getVisible().map((tag) => tag.name));
     setShortcuts(app.shortcutsManager.getAll());
 
     return () => {
       peopleSubscription.unsubscribe();
+      tagsSubscription.unsubscribe();
       shortcutsSubscription.unsubscribe();
     };
   }, [app]);
@@ -118,6 +125,7 @@ export function ShortcutsForm({ app }: Props) {
             <DescriptionForm
               description={description}
               peopleInSettings={peopleInSettings}
+              tagsInSettings={tagsInSettings}
               onChange={setDescription}
             />
           </Label>

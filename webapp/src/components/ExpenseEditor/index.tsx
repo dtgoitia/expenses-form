@@ -9,6 +9,7 @@ import {
   PersonName,
   Shortcut,
   ShortcutId,
+  TagName,
 } from "../../domain/model";
 import { Button } from "../Button";
 import { Checkbox } from "../Checkbox";
@@ -57,6 +58,7 @@ export function ExpenseEditor({
   );
   const [currencies, setCurrencies] = useState<Set<CurrencyCode>>(new Set());
   const [account, setAccount] = useState<PaymentAccount | undefined>();
+  const [tags, setTags] = useState<TagName[]>([]);
   const [people, setPeople] = useState<PersonName[]>([]);
 
   const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
@@ -68,6 +70,9 @@ export function ExpenseEditor({
     const currenciesSubscription = app.currencyManager.change$.subscribe((_) => {
       setCurrencies(app.currencyManager.getAll());
     });
+    const tagsSubscription = app.tagManager.change$.subscribe((_) => {
+      setTags(app.tagManager.getVisible().map((tag) => tag.name));
+    });
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
       setPeople(app.peopleManager.getVisible().map((person) => person.name));
     });
@@ -77,12 +82,14 @@ export function ExpenseEditor({
 
     setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
     setCurrencies(app.currencyManager.getAll());
+    setTags(app.tagManager.getVisible().map((tag) => tag.name));
     setPeople(app.peopleManager.getVisible().map((person) => person.name));
     setShortcuts(app.shortcutsManager.getAll());
 
     return () => {
       accountsSubscription.unsubscribe();
       currenciesSubscription.unsubscribe();
+      tagsSubscription.unsubscribe();
       peopleSubscription.unsubscribe();
       shortcutsSubscription.unsubscribe();
     };
@@ -286,6 +293,7 @@ export function ExpenseEditor({
 
       <DescriptionForm
         description={expense.description}
+        tagsInSettings={tags}
         peopleInSettings={people}
         onChange={handleDescriptionChange}
       />

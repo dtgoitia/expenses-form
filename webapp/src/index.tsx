@@ -14,6 +14,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { registerSW } from "virtual:pwa-register";
 import { ShortcutsManager } from "./domain/shortcuts";
+import { TagManager } from "./domain/tags";
 
 const isLocalhost = window.location.hostname === "localhost";
 
@@ -30,6 +31,7 @@ const updateSW = registerSW({
 
 const expenseManager = new ExpenseManager();
 const paymentAccountsManager = new PaymentAccountsManager({ expenseManager });
+const tagManager = new TagManager();
 const peopleManager = new PeopleManager();
 const shortcutsManager = new ShortcutsManager();
 const currencyManager = new CurrencyManager();
@@ -37,6 +39,7 @@ const browserStorage = new BrowserStorage({
   expenseManager,
   paymentAccountsManager,
   client: new Storage(),
+  tagManager,
   peopleManager,
   shortcutsManager,
   currencyManager,
@@ -47,6 +50,7 @@ const app = new App({
   expenseManager,
   paymentAccountsManager,
   currencyManager,
+  tagManager,
   peopleManager,
   shortcutsManager,
 });

@@ -75,6 +75,12 @@ export interface Person {
 }
 
 export type TagName = string; // TODO: make every piece of code point here
+export type TagVisibility = boolean;
+export const DEFAULT_IS_TAG_VISIBLE: PersonVisibility = true;
+export interface Tag {
+  name: TagName;
+  isVisible: TagVisibility;
+}
 
 export type ShortcutButtonName = string;
 export type ShortcutMainDescription = string;

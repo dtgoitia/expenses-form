@@ -80,7 +80,7 @@ class StoredItem<T> {
 
 export class Storage {
   splitwiseApiToken: StoredItem<string | undefined>;
-  tripTags: StoredItem<string[] | undefined>;
+  tags: StoredItem<object[] | undefined>;
   people: StoredItem<object[] | undefined>;
   expenses: StoredItem<object | undefined>;
   paymentAccounts: StoredItem<object[] | undefined>;
@@ -91,7 +91,7 @@ export class Storage {
 
   constructor() {
     this.splitwiseApiToken = new StoredItem("exp_splitwise_api_token", ValueType.string);
-    this.tripTags = new StoredItem("exp__trip_tags", ValueType.object);
+    this.tags = new StoredItem("exp__tags", ValueType.object);
     this.people = new StoredItem("exp__people", ValueType.object);
     this.expenses = new StoredItem("exp__expenses", ValueType.object);
     this.paymentAccounts = new StoredItem("exp__payment_accounts", ValueType.object);
