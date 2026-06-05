@@ -28,13 +28,13 @@ export function ShortcutsForm({ app }: Props) {
 
   useEffect(() => {
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
-      setPeopleInSettings(app.peopleManager.getAll().map((person) => person.name));
+      setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
     });
     const shortcutsSubscription = app.shortcutsManager.change$.subscribe((_) => {
       setShortcuts(app.shortcutsManager.getAll());
     });
 
-    setPeopleInSettings(app.peopleManager.getAll().map((person) => person.name));
+    setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
     setShortcuts(app.shortcutsManager.getAll());
 
     return () => {

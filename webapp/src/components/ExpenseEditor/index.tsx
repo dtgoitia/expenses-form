@@ -69,7 +69,7 @@ export function ExpenseEditor({
       setCurrencies(app.currencyManager.getAll());
     });
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
-      setPeople(app.peopleManager.getAll().map((person) => person.name));
+      setPeople(app.peopleManager.getVisible().map((person) => person.name));
     });
     const shortcutsSubscription = app.shortcutsManager.change$.subscribe((_) => {
       setShortcuts(app.shortcutsManager.getAll());
@@ -77,7 +77,7 @@ export function ExpenseEditor({
 
     setAccount(app.paymentAccountsManager.get({ id: expense.paid_with }));
     setCurrencies(app.currencyManager.getAll());
-    setPeople(app.peopleManager.getAll().map((person) => person.name));
+    setPeople(app.peopleManager.getVisible().map((person) => person.name));
     setShortcuts(app.shortcutsManager.getAll());
 
     return () => {

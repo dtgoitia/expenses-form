@@ -66,9 +66,11 @@ export type ShortcutId = number;
 export type Seller = string;
 
 export type PersonName = string;
-
+export type PersonVisibility = boolean;
+export const DEFAULT_IS_PERSON_VISIBLE: PersonVisibility = true;
 export interface Person {
   name: PersonName;
+  isVisible: PersonVisibility;
   splitwiseId?: SplitwiseId;
 }
 

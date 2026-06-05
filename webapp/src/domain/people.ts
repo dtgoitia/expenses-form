@@ -1,6 +1,6 @@
 import { Observable, Subject } from "rxjs";
 import { SortAction } from "../sort";
-import { Person, PersonName } from "./model";
+import { DEFAULT_IS_PERSON_VISIBLE, Person, PersonName } from "./model";
 
 export class PeopleManager {
   public change$: Observable<PeopleChanges>;
@@ -33,13 +33,17 @@ export class PeopleManager {
     return [...this.people.values()].sort(sortPerson);
   }
 
+  public getVisible(): Person[] {
+    return this.getAll().filter((person) => person.isVisible);
+  }
+
   public add(name: PersonName): void {
     const exists = this.people.has(name);
     if (exists) {
       console.warn(`PeopleManager.add: '${name}' not added because already existed`);
       return;
     }
-    const person: Person = { name };
+    const person: Person = { name, isVisible: DEFAULT_IS_PERSON_VISIBLE };
     this.people.set(name, person);
     this.changesSubject.next({ kind: "PersonAdded", name });
   }
@@ -55,7 +59,10 @@ export class PeopleManager {
       return { success: false, reason: `person '${name}' not found` };
     }
 
-    if (previous.splitwiseId === person.splitwiseId) {
+    const isUpToDate =
+      previous.isVisible === person.isVisible &&
+      previous.splitwiseId === person.splitwiseId;
+    if (isUpToDate) {
       return { success: false, reason: `person '${name}' is already up to date` };
     }
 

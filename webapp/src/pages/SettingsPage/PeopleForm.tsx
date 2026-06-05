@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { App } from "../../domain/app";
-import { Person, PersonName, SplitwiseId } from "../../domain/model";
+import { Person, PersonName, PersonVisibility, SplitwiseId } from "../../domain/model";
 import { Button } from "../../components/Button";
 import { Label } from "../../components/Label";
 import { TextInput } from "../../components/TextInput";
 import { Collapse } from "../../components/Collapse";
+import { Toggle } from "../../components/Toggle";
 
 interface Props {
   app: App;
@@ -45,6 +46,7 @@ export function PeopleForm({ app }: Props) {
   function handlePersonUpdate(person: Person): void {
     app.peopleManager.update({ person });
   }
+
   function handlePersonDeletion(name: PersonName): void {
     app.peopleManager.delete(name);
   }
@@ -97,19 +99,22 @@ function ListedPerson({ person, onUpdate, onDelete }: ListedPersonProps) {
   const [splitwiseId, setSplitwiseId] = useState<SplitwiseId | undefined>(
     person.splitwiseId
   );
+  const [isVisible, setIsVisible] = useState<PersonVisibility>(person.isVisible);
 
-  const dirty = splitwiseId !== person.splitwiseId;
+  const dirtyIsVisible = isVisible !== person.isVisible;
+  const dirtySplitwiseId = splitwiseId !== person.splitwiseId;
+  const dirty = dirtySplitwiseId || dirtyIsVisible;
 
   function toggleOpen(): void {
     setIsOpen(!isOpen);
   }
 
-  function saveSplitwiseId(): void {
+  function persistChanges(): void {
     if (dirty === false) {
       return;
     }
 
-    onUpdate({ ...person, splitwiseId });
+    onUpdate({ ...person, isVisible, splitwiseId });
   }
 
   return (
@@ -124,19 +129,39 @@ function ListedPerson({ person, onUpdate, onDelete }: ListedPersonProps) {
         }
       >
         <Button icon="pencil" onClick={toggleOpen} />
-        <div role="person-name" className="w-full">
+        <div
+          role="person-name"
+          className="w-full"
+          style={{ opacity: person.isVisible ? "1" : "0.5" }}
+        >
           {person.name}
         </div>
         <Button icon="bin" onClick={() => onDelete(person.name)} />
       </div>
       <Collapse isOpen={isOpen}>
+        <div className="flex flex-row items-center gap-2 pl-6 pt-3 pr-2 pb-4">
+          <Toggle
+            uniqueKey={`${person.name}-person-is-visible`}
+            isOn={isVisible}
+            labelOn="is visible"
+            labelOff="is hidden"
+            onToggle={setIsVisible}
+          />
+        </div>
         <div className="flex flex-row items-center gap-2 pl-6 pt-1 pr-2 pb-4">
-          <Button icon="rotate" disabled={dirty === false} onClick={saveSplitwiseId} />
           <TextInput
             id="splitwise-id"
             value={splitwiseId}
             placeholder="Splitwise ID"
             onChange={setSplitwiseId}
+          />
+        </div>
+        <div className="flex flex-row items-center gap-2 pl-6 pt-1 pr-2 pb-4">
+          <Button
+            text={dirty ? "save changes" : "no changes to apply"}
+            icon="rotate"
+            disabled={dirty === false}
+            onClick={persistChanges}
           />
         </div>
       </Collapse>

@@ -4,11 +4,15 @@ import { CurrencyManager } from "./currencies";
 import { AppExpense, ExpenseManager, ExpenseStatus } from "./expenses";
 import {
   CurrencyCode,
+  DEFAULT_IS_PERSON_VISIBLE,
   ExpenseId,
   PaymentAccount,
   PaymentAccountId,
   Person,
+  PersonName,
+  PersonVisibility,
   Shortcut,
+  SplitwiseId,
 } from "./model";
 import { PaymentAccountsManager } from "./paymentAccounts";
 import { PeopleManager } from "./people";
@@ -194,6 +198,9 @@ export class BrowserStorage {
       const person: Person = {
         name: storedItem.name as PersonName,
         splitwiseId: storedItem.splitwiseId as SplitwiseId | undefined,
+        isVisible: [true, false].includes(storedItem.isVisible)
+          ? (storedItem.isVisible as PersonVisibility)
+          : DEFAULT_IS_PERSON_VISIBLE,
       };
       people.push(person);
     }

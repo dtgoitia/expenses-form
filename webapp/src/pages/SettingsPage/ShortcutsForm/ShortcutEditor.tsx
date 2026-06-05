@@ -37,9 +37,9 @@ export function ShortcutEditor({ app, shortcut, onUpdate: updateShortcut }: Prop
 
   useEffect(() => {
     const peopleSubscription = app.peopleManager.change$.subscribe((_) => {
-      setPeopleInSettings(app.peopleManager.getAll().map((person) => person.name));
+      setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
     });
-    setPeopleInSettings(app.peopleManager.getAll().map((person) => person.name));
+    setPeopleInSettings(app.peopleManager.getVisible().map((person) => person.name));
 
     return () => {
       peopleSubscription.unsubscribe();

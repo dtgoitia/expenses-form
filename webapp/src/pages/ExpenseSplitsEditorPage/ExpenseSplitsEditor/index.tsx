@@ -19,7 +19,7 @@ interface Props {
 
 export function ExpenseSplitsEditor({ app, expense, onUpdate: update }: Props) {
   function getPotentialParticipants(app: App): PersonName[] {
-    return app.peopleManager.getAll().map((person) => person.name);
+    return app.peopleManager.getVisible().map((person) => person.name);
   }
 
   const [people, setPeople] = useState<PersonName[]>(getPotentialParticipants(app));
