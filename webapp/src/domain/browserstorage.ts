@@ -192,8 +192,8 @@ export class BrowserStorage {
     const people: Person[] = [];
     for (const storedItem of raw) {
       const person: Person = {
-        name: storedItem.name,
-        splitwiseId: storedItem.splitwiseId,
+        name: storedItem.name as PersonName,
+        splitwiseId: storedItem.splitwiseId as SplitwiseId | undefined,
       };
       people.push(person);
     }
