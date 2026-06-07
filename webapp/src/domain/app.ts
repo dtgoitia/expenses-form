@@ -22,6 +22,7 @@ interface Args {
 }
 
 export class App {
+  public browserStorage: BrowserStorage;
   public expenseManager: ExpenseManager;
   public paymentAccountsManager: PaymentAccountsManager;
   public currencyManager: CurrencyManager;
@@ -29,8 +30,6 @@ export class App {
   public peopleManager: PeopleManager;
   public shortcutsManager: ShortcutsManager;
   public initialized: boolean = false;
-
-  private browserStorage: BrowserStorage;
 
   constructor({
     expenseManager,

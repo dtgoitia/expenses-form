@@ -1,4 +1,5 @@
 import ExpenseQueue from "../ExpenseQueue";
+import { BackupImport } from "../components/BackupImport";
 import { Button } from "../components/Button";
 import CenteredPage from "../components/CenteredPage";
 import DownloadJson from "../components/DownloadJson";
@@ -99,6 +100,10 @@ export function ExpensesPage({ app }: Props) {
             <Link to={Paths.paymentAccounts}>
               <Button text="Go to Accounts" />
             </Link>
+            <div>
+              or &nbsp;<b>restore</b>&nbsp; from a backup:
+            </div>
+            <BackupImport app={app} />
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { assertNever } from "../exhaustive-match";
-import { Storage } from "../localStorage";
+import { Export, Storage } from "../localStorage";
 import { CurrencyManager } from "./currencies";
 import { AppExpense, ExpenseManager, ExpenseStatus } from "./expenses";
 import {
@@ -151,6 +151,14 @@ export class BrowserStorage {
           assertNever(change, `unsupported CurrencyChange: ${change}`);
       }
     });
+  }
+
+  public export(): Export {
+    return this.client.export();
+  }
+
+  public import(payload: Export): void {
+    return this.client.import(payload);
   }
 
   public readExpenses(): AppExpense[] {

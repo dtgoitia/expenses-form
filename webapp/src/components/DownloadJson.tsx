@@ -3,14 +3,14 @@ import { App } from "../domain/app";
 import { FirestoreClient } from "../domain/firebase";
 import { Expense } from "../domain/model";
 import { unreachable } from "../lib/devex";
-import storage from "../localStorage";
+import storage, { Export } from "../localStorage";
 import { errorsService } from "../services/errors";
 import { Button } from "./Button";
 import { useState } from "react";
 import styled from "styled-components";
 
-function buildJson(expenses: Expense[]): Blob {
-  const jsonString = JSON.stringify(expenses, null, 2);
+function buildJson<T>(payload: T): Blob {
+  const jsonString = JSON.stringify(payload, null, 2);
 
   const json = new Blob([jsonString], { type: "application/json" });
   return json;
@@ -71,17 +71,23 @@ function DownloadJson({ expenses, app }: DownloadJsonProps) {
   const [pushing, setPushing] = useState(false);
 
   const timestamp = getTimestamp();
-  const fileName = `expenses-form-${timestamp}.json`;
+  const expensesFileName = `expenses-form-${timestamp}.json`;
+  const exportFileName = `expenses-form-${timestamp}.export.json`;
   const shareApiAvailable = shareApiNotAvailable() === false;
 
-  function download(): void {
-    const blob = buildJson(expenses);
-    downloadJson(blob, fileName);
+  function downloadExpenses(): void {
+    const blob = buildJson<Expense[]>(expenses);
+    downloadJson(blob, expensesFileName);
+  }
+
+  function exportAppData(): void {
+    const blob = buildJson<Export>(app.browserStorage.export());
+    downloadJson(blob, exportFileName);
   }
 
   function share(): void {
     const blob = buildJson(expenses);
-    const file = new File([blob], fileName, { type: "text/csv" });
+    const file = new File([blob], expensesFileName, { type: "text/csv" });
     if (shareApiNotAvailable()) {
       alert("Your device is not compatible with the Web Share API, sorry :)");
       return;
@@ -166,18 +172,23 @@ function DownloadJson({ expenses, app }: DownloadJsonProps) {
 
   return (
     <Container>
-      <Button text="Download CSV" onClick={() => download()} />
-      <Button
-        text="Share CSV"
-        onClick={() => share()}
-        disabled={shareApiAvailable === false}
-      />
-      <Button
-        text="Push to Firestore"
-        onClick={() => pushToFirestore()}
-        disabled={pushing}
-        icon={pushing ? "rotate" : undefined}
-      />
+      <div>
+        <Button text="Download CSV" onClick={() => downloadExpenses()} />
+        <Button
+          text="Share CSV"
+          onClick={() => share()}
+          disabled={shareApiAvailable === false}
+        />
+        <Button
+          text="Push to Firestore"
+          onClick={() => pushToFirestore()}
+          disabled={pushing}
+          icon={pushing ? "rotate" : undefined}
+        />
+      </div>
+      <div>
+        <Button text="Export backup" onClick={() => exportAppData()} />
+      </div>
     </Container>
   );
 }

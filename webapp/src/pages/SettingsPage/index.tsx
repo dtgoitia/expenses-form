@@ -8,6 +8,7 @@ import { PeopleForm } from "./PeopleForm";
 import { ShortcutsForm } from "./ShortcutsForm";
 import { CurrenciesForm } from "./CurrenciesForm";
 import { TagsForm } from "./TagsForm";
+import { BackupImport } from "../../components/BackupImport";
 
 interface Props {
   app: App;
@@ -81,6 +82,11 @@ export function SettingsPage({ app }: Props) {
         <PeopleForm app={app} />
 
         <ShortcutsForm app={app} />
+
+        <div className="pb-6">
+          <b>restore</b>&nbsp; from a backup:
+          <BackupImport app={app} />
+        </div>
       </div>
     </CenteredPage>
   );

@@ -5,8 +5,8 @@ enum ValueType {
 }
 
 class StoredItem<T> {
-  private key: string;
-  private type: string;
+  public key: string;
+  public type: string;
   constructor(key: string, type: ValueType) {
     this.key = key;
     this.type = type;
@@ -103,6 +103,62 @@ export class Storage {
     this.currencies = new StoredItem("exp__currencies", ValueType.string);
     this.shortcuts = new StoredItem("exp__shortcuts", ValueType.object);
   }
+
+  public export(): Export {
+    return {
+      splitwiseApiToken: this.splitwiseApiToken.read(),
+      tags: this.tags.read(),
+      people: this.people.read(),
+      expenses: this.expenses.read(),
+      paymentAccounts: this.paymentAccounts.read(),
+      defaultPaymentAccountId: this.defaultPaymentAccountId.read(),
+      firestoreConfig: this.firestoreConfig.read(),
+      currencies: this.currencies.read(),
+      shortcuts: this.shortcuts.read(),
+    };
+  }
+
+  public import(payload: Export): void {
+    if (payload.splitwiseApiToken) {
+      storage.splitwiseApiToken.set(payload.splitwiseApiToken);
+    }
+    if (payload.tags) {
+      storage.tags.set(payload.tags);
+    }
+    if (payload.people) {
+      storage.people.set(payload.people);
+    }
+    if (payload.expenses) {
+      storage.expenses.set(payload.expenses);
+    }
+    if (payload.paymentAccounts) {
+      storage.paymentAccounts.set(payload.paymentAccounts);
+    }
+    if (payload.defaultPaymentAccountId) {
+      storage.defaultPaymentAccountId.set(payload.defaultPaymentAccountId);
+    }
+    if (payload.firestoreConfig) {
+      storage.firestoreConfig.set(payload.firestoreConfig);
+    }
+    if (payload.currencies) {
+      storage.currencies.set(payload.currencies);
+    }
+    if (payload.shortcuts) {
+      storage.shortcuts.set(payload.shortcuts);
+    }
+  }
+}
+
+export interface Export {
+  splitwiseApiToken: string | undefined;
+  tags: object[] | undefined;
+  people: object[] | undefined;
+  expenses: object | undefined;
+  paymentAccounts: object[] | undefined;
+  defaultPaymentAccountId: string | undefined;
+  firestoreConfig: object | undefined;
+  currencies: string | undefined;
+  shortcuts: object[] | undefined;
 }
 
 const storage = new Storage();
